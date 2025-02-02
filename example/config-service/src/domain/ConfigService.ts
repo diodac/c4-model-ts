@@ -2,7 +2,7 @@ import { ConfigRepository } from '../infrastructure/ConfigRepository';
 
 /**
  * @c4Component "Core service for configuration management" "TypeScript" "Domain,Core"
- *   group "Domain"
+ * @c4Group "Domain"
  */
 export class ConfigService {
     /**

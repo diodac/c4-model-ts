@@ -2,7 +2,7 @@ import { MetricsService } from '../domain/MetricsService';
 
 /**
  * @c4Component "REST API for metrics collection" "TypeScript" "API,Controller"
- *   group "API"
+ * @c4Group "API"
  */
 export class MetricsController {
     /**

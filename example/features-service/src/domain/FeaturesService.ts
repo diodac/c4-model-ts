@@ -2,7 +2,7 @@ import { FeatureRepository } from '../infrastructure/FeatureRepository';
 
 /**
  * @c4Component "Core service for feature flag management" "TypeScript" "Domain,Core"
- *   group "Domain"
+ * @c4Group "Domain"
  */
 export class FeaturesService {
     /**

@@ -2,7 +2,7 @@ import { ConfigService } from '../domain/ConfigService';
 
 /**
  * @c4Component "REST API for configuration management" "TypeScript" "API,Controller"
- *   group "API"
+ * @c4Group "API"
  */
 export class ConfigController {
     /**

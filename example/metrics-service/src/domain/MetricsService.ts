@@ -1,9 +1,8 @@
 import { MetricsRepository } from '../infrastructure/MetricsRepository';
 
 /**
- * @c4Component "" "TypeScript" "Domain,Core"
- *   description "Core service for metrics processing and analysis"
- *   group "Domain"
+ * @c4Component "Core service for metrics processing and analysis" "TypeScript" "Domain,Core"
+ * @c4Group "Domain"
  */
 export class MetricsService {
     /**

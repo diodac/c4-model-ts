@@ -3,7 +3,7 @@ import { FeaturesService } from '../domain/FeaturesService';
 /**
  * @c4Component "" "TypeScript" "API,Controller"
  *   description "REST API for managing feature flags"
- *   group "API"
+ * @c4Group "API"
  */
 export class FeaturesController {
     /**
