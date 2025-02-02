@@ -1,0 +1,97 @@
+# C4 Model Generator Code Rules
+
+# IMPORTANT: This file should be updated whenever new significant code generation guidelines are introduced.
+# It serves as a central reference for all code generation rules and conventions.
+# When making changes to the codebase that introduce new patterns or requirements,
+# make sure to document them here to maintain consistency across the project.
+
+## Language
+- Use English for all code, comments, and documentation
+- Keep technical terms consistent with C4 Model terminology
+
+## Code Organization
+- Keep tag names centralized in C4DocTags constant
+- Keep model-related interfaces and types in model.ts
+- Keep parsing logic in parser.ts
+- Keep generation logic in generator.ts
+- Keep DSL generation separate from model generation
+
+## Code Style
+- Use TypeScript strict mode
+- Use explicit types for function parameters and return values
+- Use interfaces for data structures
+- Use 'as const' for string literal objects
+- Use meaningful variable names that reflect their purpose
+- Keep indentation consistent in generated DSL code
+- Handle optional fields explicitly
+
+## Data Structure
+- Keep groups and components as separate concerns
+- Use default group "_" for ungrouped components
+- Support hierarchical group structures
+- Maintain clear separation between model and its DSL representation
+
+## Error Handling
+- Use custom StructurizrValidationError for validation errors
+- Validate all inputs before processing
+- Provide clear error messages with context
+- Validate group existence before component assignment
+
+## Documentation
+- Document public APIs with TSDoc comments
+- Use custom TSDoc tags (@c4Component, @c4Relation, @c4Group) for C4 metadata
+- Define custom tags in tsdoc.json
+- Keep documentation format consistent with Structurizr DSL
+- Support multi-line tag content according to Structurizr DSL format
+- Parse additional parameters from subsequent lines after main tag content
+- Support nested blocks (properties, perspectives) in tag content
+
+## JSDoc Tag Content
+- Validate that tag content is not empty
+- Ensure all values are properly quoted with double quotes
+- Support multi-line content with proper indentation
+- Parse nested blocks (properties, perspectives) with proper scope
+- Support DSL-specific keywords (description, tags, url, etc.)
+- Handle block opening/closing with curly braces
+- Support multiple values per line with proper quoting
+
+## Component Names
+- Validate that component names are not empty
+- Allow only letters, numbers, spaces and hyphens in names
+- Ensure names are unique within a container
+- Keep names consistent with C4 Model conventions
+
+## Performance
+- Process files and classes in a single pass when possible
+- Avoid redundant iterations and operations
+- Use Map for component storage to optimize lookups
+- Minimize string concatenations in DSL generation
+
+## Testing
+- Write unit tests for core functionality
+- Test error cases and edge conditions
+- Use example.ts for documentation and testing
+- Test DSL output format correctness
+
+## Configuration
+- Use c4model.json for project configuration
+- Support hierarchical group definitions
+- Allow flexible source file patterns
+- Make container technology optional
+
+## Validation
+- Validate group names against configuration
+- Ensure unique component names within a container
+- Validate relationship source and target existence
+- Check for duplicate relationships
+- Validate component names against allowed characters
+- Validate JSDoc tag content format and structure
+- Ensure all required values are properly quoted
+- Validate nested block structure and content
+
+## Output Format
+- Follow Structurizr DSL syntax rules
+- Maintain consistent indentation in generated code
+- Group related elements together
+- Keep relationships section separate
+- Handle optional fields gracefully 

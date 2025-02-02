@@ -1,0 +1,51 @@
+{
+  "name": "@rhino/c4-generator",
+  "version": "0.1.0",
+  "description": "C4 model generator from TypeScript code using TSDoc annotations",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "c4-generator": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "clean": "rimraf dist",
+    "prepare": "npm run clean && npm run build",
+    "generate": "ts-node src/cli.ts"
+  },
+  "keywords": [
+    "c4",
+    "architecture",
+    "documentation",
+    "typescript",
+    "tsdoc",
+    "structurizr"
+  ],
+  "author": "Rhino Team",
+  "license": "MIT",
+  "dependencies": {
+    "@microsoft/tsdoc": "^0.15.1",
+    "@microsoft/tsdoc-config": "^0.17.1",
+    "ts-morph": "^25.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "@types/jest": "^29.5.14",
+    "@typescript-eslint/eslint-plugin": "^8.22.0",
+    "@typescript-eslint/parser": "^8.22.0",
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0",
+    "rimraf": "^5.0.5",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "tsdoc.json"
+  ]
+} 
