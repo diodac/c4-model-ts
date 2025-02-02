@@ -1,0 +1,11 @@
+{
+    "include": {
+        "containers": {
+            "type": "c4container.json",
+            "source": [
+                "../*/c4container.json",
+                "!../workspace"
+            ]
+        }
+    }
+}

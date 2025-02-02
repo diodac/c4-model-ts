@@ -77,6 +77,19 @@ export class StructurizrValidationError extends Error {
     }
 }
 
+export interface C4ContainerConfig {
+    name: string;
+    description: string;
+    technology?: string;
+    tags?: string[];
+    properties?: Record<string, string>;
+    groups?: Record<string, any>;
+    source?: string[];
+    external?: Record<string, {
+        type: string;
+    }>;
+}
+
 export class StructurizrModel {
     private container: C4ContainerMetadata;
     private components: Map<string, C4ComponentMetadata> = new Map();

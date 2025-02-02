@@ -246,7 +246,6 @@ export class C4DocParser {
         const tokens: string[] = [];
         let currentToken = '';
         let inQuotes = false;
-        console.log(input);
         
         for (let i = 0; i < input.length; i++) {
             const char = input[i];

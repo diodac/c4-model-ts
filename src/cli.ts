@@ -52,8 +52,6 @@ function main() {
     try {
         // Read and parse config
         const config = JSON.parse(fs.readFileSync(containerConfigPath, 'utf-8'));
-        
-        // Get tsconfig path relative to config location
         const configDir = path.dirname(containerConfigPath);
         const tsConfigPath = path.join(configDir, 'tsconfig.json');
         
@@ -63,15 +61,13 @@ function main() {
         }
 
         // Initialize generator
-        const generator = new C4Generator(containerConfigPath, tsConfigPath);
+        const generator = new C4Generator(config, configDir);
         
         // Generate model or DSL
         if (generateDsl) {
-            const dsl = generator.generateDSL(config.source || ['**/*.ts']);
-            console.log(dsl);
+            console.log(generator.generateDSL());
         } else {
-            const model = generator.generate(config.source || ['**/*.ts']);
-            console.log(JSON.stringify(model, null, 2));
+            console.log(JSON.stringify(generator.generate(), null, 2));
         }
     } catch (error: unknown) {
         if (error instanceof Error) {

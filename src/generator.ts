@@ -5,12 +5,12 @@ import {
     C4ModelData, 
     C4ContainerMetadata,
     C4ComponentMetadata,
-    C4PerspectiveMetadata,
     C4RelationMetadata,
-    StructurizrValidationError
+    C4ContainerConfig,
+    C4ExternalConfig,
+    C4ElementType
 } from "./model";
 import { C4RelationValidator } from "./validator";
-import * as fs from 'fs';
 import * as path from 'path';
 
 export class C4Generator {
@@ -18,91 +18,107 @@ export class C4Generator {
     private parser: C4DocParser;
     private model: StructurizrModel;
     private validator: C4RelationValidator;
-    private configDir: string;
 
-    constructor(configPath: string, tsConfigPath: string) {
+    constructor(
+        private containerConfig: C4ContainerConfig,
+        private baseDir: string
+    ) {
+        const tsConfigPath = path.join(baseDir, 'tsconfig.json');
+        
         this.project = new Project({
             tsConfigFilePath: tsConfigPath,
         });
+        
         this.parser = new C4DocParser();
         this.validator = new C4RelationValidator(this.project);
         
-        // Load data from c4container.json
-        const configData = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-        const containerData: C4ContainerMetadata = {
-            name: configData.name,
-            description: configData.description,
-            technology: configData.technology,
-            external: configData.external
-        };
-        const groupsConfig = configData.groups || {};
+        // Konwersja external config do wymaganego formatu
+        const externalConfig: C4ExternalConfig = {};
+        if (containerConfig.external) {
+            Object.entries(containerConfig.external).forEach(([key, value]) => {
+                externalConfig[key] = {
+                    type: value.type as C4ElementType
+                };
+            });
+        }
         
-        this.configDir = path.dirname(configPath);
-        this.model = new StructurizrModel(containerData, groupsConfig);
+        const containerData: C4ContainerMetadata = {
+            name: containerConfig.name,
+            description: containerConfig.description,
+            technology: containerConfig.technology,
+            external: externalConfig
+        };
+        
+        this.model = new StructurizrModel(containerData, containerConfig.groups || {});
     }
 
-    generate(patterns: string[]): C4ModelData {
-        process.chdir(this.configDir);
+    generate(): C4ModelData {
+        // Zmiana katalogu roboczego na katalog bazowy
+        const originalCwd = process.cwd();
+        process.chdir(this.baseDir);
         
-        const sourceFiles = this.project.getSourceFiles(patterns);
-        const components: { metadata: C4ComponentMetadata, groupName?: string, declaration: ClassDeclaration }[] = [];
-        const relations: { relation: C4RelationMetadata, declaration: ClassDeclaration | MethodDeclaration }[] = [];
+        try {
+            const sourceFiles = this.project.getSourceFiles(this.containerConfig.source || ['**/*.ts']);
+            const components: { metadata: C4ComponentMetadata, groupName?: string, declaration: ClassDeclaration }[] = [];
+            const relations: { relation: C4RelationMetadata, declaration: ClassDeclaration | MethodDeclaration }[] = [];
 
-        // First pass: collect all components and relations
-        for (const sourceFile of sourceFiles) {
-            const classes = sourceFile.getClasses();
-            
-            for (const classDeclaration of classes) {
-                // Process component metadata
-                const componentData = this.parser.parseComponent(classDeclaration);
-                console.log('classDeclaration!!!', classDeclaration.getName(), componentData);
-                if (componentData) {
-                    components.push({ ...componentData, declaration: classDeclaration });
-                }
+            // First pass: collect all components and relations
+            for (const sourceFile of sourceFiles) {
+                const classes = sourceFile.getClasses();
+                
+                for (const classDeclaration of classes) {
+                    // Process component metadata
+                    const componentData = this.parser.parseComponent(classDeclaration);
+                    if (componentData) {
+                        components.push({ ...componentData, declaration: classDeclaration });
+                    }
 
-                // Collect class-level relationships
-                const classRelations = this.parser.parseRelations(classDeclaration);
-                for (const relation of classRelations) {
-                    relations.push({ relation, declaration: classDeclaration });
-                }
+                    // Collect class-level relationships
+                    const classRelations = this.parser.parseRelations(classDeclaration);
+                    for (const relation of classRelations) {
+                        relations.push({ relation, declaration: classDeclaration });
+                    }
 
-                // Collect method-level relationships
-                const methods = classDeclaration.getMethods();
-                for (const method of methods) {
-                    const methodRelations = this.parser.parseRelations(method);
-                    for (const relation of methodRelations) {
-                        relations.push({ relation, declaration: method });
+                    // Collect method-level relationships
+                    const methods = classDeclaration.getMethods();
+                    for (const method of methods) {
+                        const methodRelations = this.parser.parseRelations(method);
+                        for (const relation of methodRelations) {
+                            relations.push({ relation, declaration: method });
+                        }
                     }
                 }
             }
-        }
-        console.log('components!!!', components);
 
-        // Second pass: add components to model and register them with validator
-        for (const component of components) {
-            this.model.addComponent(component.metadata, component.groupName);
-            this.validator.registerComponent(component.metadata.name, component.declaration);
-        }
+            // Second pass: add components to model and register them with validator
+            for (const component of components) {
+                this.model.addComponent(component.metadata, component.groupName);
+                this.validator.registerComponent(component.metadata.name, component.declaration);
+            }
 
-        // Third pass: add relations to model and register them with validator
-        for (const relation of relations) {
-            this.model.addRelation(relation.relation);
-            this.validator.registerRelation(relation.relation);
-        }
+            // Third pass: add relations to model and register them with validator
+            for (const relation of relations) {
+                this.model.addRelation(relation.relation);
+                this.validator.registerRelation(relation.relation);
+            }
 
-        // Validate relations
-        const missingRelations = this.validator.validate();
-        if (missingRelations.length > 0) {
-            throw new StructurizrValidationError(
-                'Missing component relations detected:\n' + missingRelations.join('\n')
-            );
-        }
+            // Validate relations
+            const missingRelations = this.validator.validate();
+            if (missingRelations.length > 0) {
+                throw new Error(
+                    'Missing component relations detected:\n' + missingRelations.join('\n')
+                );
+            }
 
-        return this.model.getData();
+            return this.model.getData();
+        } finally {
+            // Przywróć oryginalny katalog roboczy
+            process.chdir(originalCwd);
+        }
     }
 
-    generateDSL(patterns: string[]): string {
-        const model = this.generate(patterns);
+    generateDSL(): string {
+        const model = this.generate();
         const dsl: string[] = [];
 
         // Container definition
@@ -209,7 +225,7 @@ export class C4Generator {
 
         if (component.perspectives && Object.keys(component.perspectives).length > 0) {
             lines.push(`${indentation}    perspectives {`);
-            Object.entries(component.perspectives).forEach(([key, perspective]: [string, C4PerspectiveMetadata]) => {
+            Object.entries(component.perspectives).forEach(([key, perspective]) => {
                 const value = perspective.value ? ` "${perspective.value}"` : '';
                 lines.push(`${indentation}        ${key} "${perspective.description}"${value}`);
             });
@@ -226,5 +242,4 @@ export class C4Generator {
         lines.push(`${indentation}}`);
         return lines.join('\n');
     }
-}
-
+} 
