@@ -1,82 +1,115 @@
 #!/usr/bin/env node
 
-import { C4Generator } from './generator';
+import { Command } from 'commander';
+import { C4Generator } from './container/generator';
+import { C4WorkspaceParser } from './workspace/parser';
+import { C4WorkspaceGenerator } from './workspace/generator';
 import * as fs from 'fs';
 import * as path from 'path';
 
-function findConfigFile(startPath: string): string | null {
+function findConfigFile(startPath: string, fileName: string): string | undefined {
     let currentPath = startPath;
     
     while (true) {
-        const configPath = path.join(currentPath, 'c4container.json');
+        const configPath = path.join(currentPath, fileName);
         if (fs.existsSync(configPath)) {
             return configPath;
         }
 
         const parentPath = path.dirname(currentPath);
         if (parentPath === currentPath) {
-            return null;
+            return undefined;
         }
         currentPath = parentPath;
     }
 }
 
-function main() {
-    const args = process.argv.slice(2);
-    let containerConfigPath: string | null = null;
-    let generateDsl = false;
+async function handleContainer(configPath: string | undefined, options: { dsl?: boolean }) {
+    // Find or validate config file
+    if (!configPath) {
+        configPath = findConfigFile(process.cwd(), 'c4container.json');
+        if (!configPath) {
+            throw new Error('Could not find c4container.json in current directory or any parent directory');
+        }
+    }
 
-    // Parse arguments
-    for (let i = 0; i < args.length; i++) {
-        if (args[i] === '--dsl') {
-            generateDsl = true;
-        } else if (!containerConfigPath) {
-            const providedPath = path.resolve(args[i]);
-            if (!fs.existsSync(providedPath)) {
-                console.error(`Error: Config file not found at ${providedPath}`);
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    const configDir = path.dirname(configPath);
+    
+    const generator = new C4Generator(config, configDir);
+    
+    if (options.dsl) {
+        console.log(generator.generateDSL());
+    } else {
+        console.log(JSON.stringify(generator.generate(), null, 2));
+    }
+}
+
+async function handleWorkspace(configPath: string | undefined) {
+    // Find or validate config file
+    if (!configPath) {
+        configPath = findConfigFile(process.cwd(), 'c4workspace.json');
+        if (!configPath) {
+            throw new Error('Could not find c4workspace.json in current directory or any parent directory');
+        }
+    }
+
+    const workspaceDir = path.dirname(configPath);
+    const parser = new C4WorkspaceParser(workspaceDir);
+    const templatePath = parser.getTemplatePath(configPath);
+    
+    if (!fs.existsSync(templatePath)) {
+        throw new Error(`Template file not found at ${templatePath}`);
+    }
+
+    const generator = new C4WorkspaceGenerator(templatePath);
+    const data = await parser.parse(configPath);
+    const dsl = generator.generate(data);
+    console.log(dsl);
+}
+
+async function main() {
+    const program = new Command();
+
+    program
+        .name('c4-model-ts')
+        .description('C4 Model documentation generator')
+        .version('1.0.0');
+
+    program.command('container')
+        .description('Generate container documentation')
+        .argument('[config-path]', 'path to c4container.json')
+        .option('--dsl', 'generate DSL output instead of JSON')
+        .action(async (configPath, options) => {
+            try {
+                await handleContainer(configPath, options);
+            } catch (error: unknown) {
+                if (error instanceof Error) {
+                    console.error('Error:', error.message);
+                } else {
+                    console.error('An unknown error occurred');
+                }
                 process.exit(1);
             }
-            containerConfigPath = providedPath;
-        }
-    }
+        });
 
-    // Try to find config file if not provided
-    if (!containerConfigPath) {
-        containerConfigPath = findConfigFile(process.cwd());
-        if (!containerConfigPath) {
-            console.error('Error: Could not find c4container.json in current directory or any parent directory');
-            process.exit(1);
-        }
-    }
+    program.command('workspace')
+        .description('Generate workspace documentation')
+        .argument('[config-path]', 'path to c4workspace.json')
+        .action(async (configPath) => {
+            try {
+                await handleWorkspace(configPath);
+            } catch (error: unknown) {
+                if (error instanceof Error) {
+                    console.error('Error:', error.message);
+                } else {
+                    console.error('An unknown error occurred');
+                }
+                process.exit(1);
+            }
+        });
 
-    try {
-        // Read and parse config
-        const config = JSON.parse(fs.readFileSync(containerConfigPath, 'utf-8'));
-        const configDir = path.dirname(containerConfigPath);
-        const tsConfigPath = path.join(configDir, 'tsconfig.json');
-        
-        if (!fs.existsSync(tsConfigPath)) {
-            console.error(`Error: tsconfig.json not found at ${tsConfigPath}`);
-            process.exit(1);
-        }
-
-        // Initialize generator
-        const generator = new C4Generator(config, configDir);
-        
-        // Generate model or DSL
-        if (generateDsl) {
-            console.log(generator.generateDSL());
-        } else {
-            console.log(JSON.stringify(generator.generate(), null, 2));
-        }
-    } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error('Error:', error.message);
-        } else {
-            console.error('An unknown error occurred');
-        }
-        process.exit(1);
-    }
+    await program.parseAsync();
 }
 
 main(); 

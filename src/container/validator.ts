@@ -1,5 +1,5 @@
 import { Project, ClassDeclaration, MethodDeclaration, Node, ReferencedSymbol, SourceFile } from "ts-morph";
-import { C4ComponentMetadata, C4RelationMetadata, StructurizrValidationError } from "./model";
+import { C4ComponentMetadata, C4RelationMetadata, StructurizrValidationError } from "../model";
 
 export class C4RelationValidator {
     private project: Project;

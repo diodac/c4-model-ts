@@ -1,23 +1,8 @@
+import { C4ExternalConfig, C4PerspectiveMetadata, C4RelationMetadata, StructurizrValidationError, Tags } from "../model";
+
 /**
- * Wspólne stałe i typy dla C4 Model
+ * Container metadata
  */
-
-export const C4DocTags = {
-    COMPONENT: '@c4Component',
-    RELATION: '@c4Relation',
-    GROUP: '@c4Group'
-} as const;
-
-export type C4ElementType = 'component' | 'container' | 'softwareSystem' | 'person';
-
-export interface C4ExternalElement {
-    type: C4ElementType;
-}
-
-export interface C4ExternalConfig {
-    [elementId: string]: C4ExternalElement;
-}
-
 export interface C4ContainerMetadata {
     name: string;
     description: string;
@@ -25,62 +10,9 @@ export interface C4ContainerMetadata {
     external?: C4ExternalConfig;
 }
 
-export interface C4PerspectiveMetadata {
-    description: string;
-    value?: string;
-}
-
-export interface C4GroupsConfig {
-    [groupName: string]: C4GroupsConfig
-}
-
-export interface C4ComponentMetadata {
-    name: string;
-    description?: string;
-    technology?: string;
-    tags?: string[];
-    url?: string;
-    properties?: Record<string, string>;
-    perspectives?: Record<string, C4PerspectiveMetadata>;
-    docs?: string;
-    adrs?: string;
-}
-
-export interface C4GroupComponents {
-    [groupName: string]: string[];  // array of component names
-}
-
-export interface C4RelationMetadata {
-    source: string;
-    target: string;
-    description?: string;
-    technology?: string;
-    tags?: string[];
-    url?: string;
-    properties?: Record<string, string>;
-}
-
-export interface C4ModelData {
-    container: C4ContainerMetadata;
-    components: C4ComponentMetadata[];
-    relations: C4RelationMetadata[];
-    groups: C4GroupsConfig;
-    groupComponents: C4GroupComponents;
-}
-
-export const Tags = {
-    ELEMENT: 'Element',
-    COMPONENT: 'Component',
-    RELATIONSHIP: 'Relationship'
-} as const;
-
-export class StructurizrValidationError extends Error {
-    constructor(message: string) {
-        super(message);
-        this.name = 'StructurizrValidationError';
-    }
-}
-
+/**
+ * Container configuration from c4container.json file
+ */
 export interface C4ContainerConfig {
     name: string;
     description: string;
@@ -94,6 +26,49 @@ export interface C4ContainerConfig {
     }>;
 }
 
+/**
+ * Component metadata
+ */
+export interface C4ComponentMetadata {
+    name: string;
+    description?: string;
+    technology?: string;
+    tags?: string[];
+    url?: string;
+    properties?: Record<string, string>;
+    perspectives?: Record<string, C4PerspectiveMetadata>;
+    docs?: string;
+    adrs?: string;
+}
+
+/**
+ * Groups configuration
+ */
+export interface C4GroupsConfig {
+    [groupName: string]: C4GroupsConfig
+}
+
+/**
+ * Component group assignments
+ */
+export interface C4GroupComponents {
+    [groupName: string]: string[];  // array of component names
+}
+
+/**
+ * Container model data
+ */
+export interface C4ModelData {
+    container: C4ContainerMetadata;
+    components: C4ComponentMetadata[];
+    relations: C4RelationMetadata[];
+    groups: C4GroupsConfig;
+    groupComponents: C4GroupComponents;
+}
+
+/**
+ * Structurizr model for container
+ */
 export class StructurizrModel {
     private container: C4ContainerMetadata;
     private components: Map<string, C4ComponentMetadata> = new Map();

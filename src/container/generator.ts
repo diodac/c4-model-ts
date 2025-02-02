@@ -9,7 +9,7 @@ import {
     C4ContainerConfig,
     C4ExternalConfig,
     C4ElementType
-} from "./model";
+} from "../model";
 import { C4RelationValidator } from "./validator";
 import * as path from 'path';
 

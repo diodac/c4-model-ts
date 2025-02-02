@@ -3,10 +3,10 @@ workspace {
 		featureSystem = softwareSystem "Feature Management System" {
 			description "System for managing feature flags and configurations"
 			
-			{{ include.containers|containers }}
+			{{containers containers}}
 			
 			# relationships between services
-			{{ include.containers|relationships }}
+			{{relationships containers}}
 		}
 	}
 }
