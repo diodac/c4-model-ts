@@ -1,0 +1,19 @@
+{
+    "name": "config-service",
+    "description": "Service for managing system configuration",
+    "technology": "Node.js, TypeScript, Express",
+    "tags": ["backend", "configuration"],
+    "properties": {
+        "team": "platform",
+        "criticality": "high"
+    },
+    "groups": {
+        "API": {},
+        "Domain": {},
+        "Infrastructure": {}
+    },
+    "source": [
+        "src/**/*.ts",
+        "!**/*.spec.ts"
+    ]
+} 

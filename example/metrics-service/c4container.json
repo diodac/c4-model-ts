@@ -1,0 +1,19 @@
+{
+    "name": "metrics-service",
+    "description": "Service for collecting and analyzing system metrics",
+    "technology": "Node.js, TypeScript, Express",
+    "tags": ["backend", "monitoring"],
+    "properties": {
+        "team": "platform",
+        "criticality": "high"
+    },
+    "groups": {
+        "API": {},
+        "Domain": {},
+        "Infrastructure": {}
+    },
+    "source": [
+        "src/**/*.ts",
+        "!**/*.spec.ts"
+    ]
+} 

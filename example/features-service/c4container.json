@@ -1,0 +1,19 @@
+{
+    "name": "features-service",
+    "description": "Service for managing feature flags",
+    "technology": "Node.js, TypeScript, Express",
+    "tags": ["backend", "features"],
+    "properties": {
+        "team": "platform",
+        "criticality": "high"
+    },
+    "groups": {
+        "API": {},
+        "Domain": {},
+        "Infrastructure": {}
+    },
+    "source": [
+        "src/**/*.ts",
+        "!**/*.spec.ts"
+    ]
+} 
