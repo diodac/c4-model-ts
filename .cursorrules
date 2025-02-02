@@ -94,4 +94,12 @@
 - Maintain consistent indentation in generated code
 - Group related elements together
 - Keep relationships section separate
-- Handle optional fields gracefully 
+- Handle optional fields gracefully
+
+## DSL Identifiers
+- Use hierarchical identifiers for components within containers
+- Prefix component identifiers with their container name when referenced in relationships
+- Do not add prefixes to container identifiers as they may already include necessary system/scope prefixes
+- Do not modify or normalize identifiers provided by users
+- Preserve original casing and naming conventions
+- Validate identifier references in relationships 

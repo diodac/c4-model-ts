@@ -12,7 +12,7 @@ export class C4WorkspaceGenerator {
             return Array.from(containers.values()).map((container: C4ModelData) => {
                 // Generate DSL for each container
                 const lines = [];
-                lines.push(`            container "${container.container.name}" {`);
+                lines.push(`            ${container.container.name} = container "${container.container.name}" {`);
                 lines.push(`                description "${container.container.description}"`);
                 if (container.container.technology) {
                     lines.push(`                technology "${container.container.technology}"`);
@@ -25,7 +25,15 @@ export class C4WorkspaceGenerator {
         Handlebars.registerHelper('relationships', function(containers: Map<string, C4ModelData>) {
             const relationships = Array.from(containers.values()).flatMap((container: C4ModelData) => 
                 container.relations.map(relation => {
-                    let line = `            ${relation.source} -> ${relation.target}`;
+                    // If source is a component from current container, prefix it with container name
+                    const source = container.components.some(c => c.name === relation.source) ? 
+                        `${container.container.name}.${relation.source}` : relation.source;
+                    
+                    // If target is a component from current container, prefix it with container name
+                    const target = container.components.some(c => c.name === relation.target) ? 
+                        `${container.container.name}.${relation.target}` : relation.target;
+
+                    let line = `            ${source} -> ${target}`;
                     if (relation.description) {
                         line += ` "${relation.description}"`;
                     }
