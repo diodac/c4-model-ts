@@ -4,10 +4,21 @@ export const C4DocTags = {
     GROUP: '@c4Group'
 } as const;
 
+export type C4ElementType = 'component' | 'container' | 'softwareSystem' | 'person';
+
+export interface C4ExternalElement {
+    type: C4ElementType;
+}
+
+export interface C4ExternalConfig {
+    [elementId: string]: C4ExternalElement;
+}
+
 export interface C4ContainerMetadata {
     name: string;
     description: string;
     technology?: string;
+    external?: C4ExternalConfig;
 }
 
 export interface C4PerspectiveMetadata {
@@ -147,16 +158,18 @@ export class StructurizrModel {
     }
 
     addRelation(relation: C4RelationMetadata) {
-        // Check if components exist
-        console.log('relation!!!', relation);
+        // Check if source component exists
         if (!this.components.has(relation.source)) {
             throw new StructurizrValidationError(
                 `Source component "${relation.source}" does not exist`
             );
         }
-        if (!this.components.has(relation.target)) {
+
+        // Check if target component exists internally or is defined as external
+        const isTargetExternal = this.container.external?.[relation.target];
+        if (!this.components.has(relation.target) && !isTargetExternal) {
             throw new StructurizrValidationError(
-                `Target component "${relation.target}" does not exist`
+                `Target "${relation.target}" does not exist as internal component or external element`
             );
         }
 

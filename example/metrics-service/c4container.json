@@ -15,5 +15,13 @@
     "source": [
         "src/**/*.ts",
         "!**/*.spec.ts"
-    ]
+    ],
+    "external": {
+        "features-service": {
+            "type": "container"
+        },
+        "config-service": {
+            "type": "container"
+        }
+    }
 } 

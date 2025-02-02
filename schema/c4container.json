@@ -56,6 +56,22 @@
         "description": "Glob pattern for including/excluding files"
       },
       "minItems": 1
+    },
+    "external": {
+      "type": "object",
+      "description": "External components that can be referenced in relationships",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["component", "container", "softwareSystem", "person"],
+            "description": "Type of the external component in C4 model"
+          }
+        },
+        "additionalProperties": false
+      }
     }
   },
   "additionalProperties": false

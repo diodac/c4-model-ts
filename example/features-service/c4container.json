@@ -15,5 +15,13 @@
     "source": [
         "src/**/*.ts",
         "!**/*.spec.ts"
-    ]
+    ],
+    "external": {
+        "config-service": {
+            "type": "container"
+        },
+        "metrics-service": {
+            "type": "container"
+        }
+    }
 } 

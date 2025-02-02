@@ -32,7 +32,8 @@ export class C4Generator {
         const containerData: C4ContainerMetadata = {
             name: configData.name,
             description: configData.description,
-            technology: configData.technology
+            technology: configData.technology,
+            external: configData.external
         };
         const groupsConfig = configData.groups || {};
         

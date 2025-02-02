@@ -24,17 +24,24 @@ function findConfigFile(startPath: string): string | null {
 function main() {
     const args = process.argv.slice(2);
     let containerConfigPath: string | null = null;
+    let generateDsl = false;
 
-    // Check if config path is provided
-    if (args.length > 0) {
-        const providedPath = path.resolve(args[0]);
-        if (!fs.existsSync(providedPath)) {
-            console.error(`Error: Config file not found at ${providedPath}`);
-            process.exit(1);
+    // Parse arguments
+    for (let i = 0; i < args.length; i++) {
+        if (args[i] === '--dsl') {
+            generateDsl = true;
+        } else if (!containerConfigPath) {
+            const providedPath = path.resolve(args[i]);
+            if (!fs.existsSync(providedPath)) {
+                console.error(`Error: Config file not found at ${providedPath}`);
+                process.exit(1);
+            }
+            containerConfigPath = providedPath;
         }
-        containerConfigPath = providedPath;
-    } else {
-        // Try to find config file in current directory or parent directories
+    }
+
+    // Try to find config file if not provided
+    if (!containerConfigPath) {
         containerConfigPath = findConfigFile(process.cwd());
         if (!containerConfigPath) {
             console.error('Error: Could not find c4container.json in current directory or any parent directory');
@@ -58,11 +65,14 @@ function main() {
         // Initialize generator
         const generator = new C4Generator(containerConfigPath, tsConfigPath);
         
-        // Generate model
-        const model = generator.generate(config.source || ['**/*.ts']);
-
-        // Output result
-        console.log(JSON.stringify(model, null, 2));
+        // Generate model or DSL
+        if (generateDsl) {
+            const dsl = generator.generateDSL(config.source || ['**/*.ts']);
+            console.log(dsl);
+        } else {
+            const model = generator.generate(config.source || ['**/*.ts']);
+            console.log(JSON.stringify(model, null, 2));
+        }
     } catch (error: unknown) {
         if (error instanceof Error) {
             console.error('Error:', error.message);

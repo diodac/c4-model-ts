@@ -2,7 +2,7 @@
     "name": "config-service",
     "description": "Service for managing system configuration",
     "technology": "Node.js, TypeScript, Express",
-    "tags": ["backend", "configuration"],
+    "tags": ["backend", "config"],
     "properties": {
         "team": "platform",
         "criticality": "high"
@@ -15,5 +15,10 @@
     "source": [
         "src/**/*.ts",
         "!**/*.spec.ts"
-    ]
+    ],
+    "external": {
+        "metrics-service": {
+            "type": "container"
+        }
+    }
 } 

@@ -1,7 +1,7 @@
 import { FeatureRepository } from '../infrastructure/FeatureRepository';
 
 /**
- * @c4Component "Core service for feature flags management" "TypeScript" "Domain,Core"
+ * @c4Component "Core service for feature flag management" "TypeScript" "Domain,Core"
  *   group "Domain"
  */
 export class FeaturesService {
@@ -11,14 +11,14 @@ export class FeaturesService {
     constructor(private repository: FeatureRepository) {}
 
     /**
-     * @c4Relation "ConfigService" "Gets configuration" "HTTP" "External"
+     * @c4Relation "config-service" "Gets configuration" "HTTP"
      */
-    async getFeatureConfig(featureId: string): Promise<any> {
+    async getConfig(): Promise<any> {
         // Implementation
     }
 
     /**
-     * @c4Relation "MetricsService" "Sends usage metrics" "Kafka" "External"
+     * @c4Relation "metrics-service" "Sends usage metrics" "Kafka"
      */
     async trackFeatureUsage(featureId: string): Promise<void> {
         // Implementation

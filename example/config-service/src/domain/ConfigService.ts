@@ -1,8 +1,7 @@
 import { ConfigRepository } from '../infrastructure/ConfigRepository';
 
 /**
- * @c4Component "" "TypeScript" "Domain,Core"
- *   description "Core service for configuration management"
+ * @c4Component "Core service for configuration management" "TypeScript" "Domain,Core"
  *   group "Domain"
  */
 export class ConfigService {
@@ -12,7 +11,7 @@ export class ConfigService {
     constructor(private repository: ConfigRepository) {}
 
     /**
-     * @c4Relation "MetricsService" "Sends config access metrics" "Kafka" "External"
+     * @c4Relation "metrics-service" "Sends config access metrics" "Kafka"
      */
     async trackConfigAccess(configId: string): Promise<void> {
         // Implementation

@@ -12,7 +12,7 @@ export class MetricsService {
     constructor(private repository: MetricsRepository) {}
 
     /**
-     * @c4Relation "ConfigService" "Gets metrics configuration" "HTTP" "External"
+     * @c4Relation "config-service" "Gets metrics configuration" "HTTP"
      */
     async getMetricsConfig(): Promise<any> {
         // Implementation
