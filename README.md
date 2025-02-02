@@ -21,6 +21,7 @@ The module uses:
 - Custom block tags that extend the TSDoc standard:
   - `@c4Component` - Marks a class as a C4 component
   - `@c4Relation` - Defines relationships between components
+  - `@c4Group` - Defines logical grouping of components
 
 ## Installation
 
@@ -73,17 +74,56 @@ Create a `c4model.json` file in your project root:
 
 ```json
 {
-    "container": {
-        "name": "your-service-name",
-        "description": "Service description",
-        "technology": "technology stack"
-    },
+    "name": "your-service-name",
+    "description": "Service description",
+    "technology": "technology stack",
     "source": [
         "**/*.ts",
         "!node_modules/**",
         "!dist/**",
         "!test/**"
     ]
+}
+```
+
+The configuration file follows a JSON schema that supports:
+- Required fields:
+  - `name` - Container/service name
+  - `description` - Container purpose description
+  - `source` - Array of glob patterns for source files
+- Optional fields:
+  - `technology` - Primary technology stack
+  - `tags` - Array of container tags
+  - `properties` - Custom name/value properties
+  - `groups` - Hierarchical structure of component groups
+
+Full schema definition is available in `schema/c4container.json`.
+
+Example of a complete configuration:
+```json
+{
+  "name": "features-service",
+  "description": "Feature flags management service",
+  "technology": "Node.js + Express",
+  "tags": ["backend", "features"],
+  "properties": {
+    "criticality": "high",
+    "maintainer": "team-core"
+  },
+  "groups": {
+    "API": {
+      "Controllers": {},
+      "Middleware": {}
+    },
+    "Domain": {
+      "Services": {},
+      "Models": {}
+    }
+  },
+  "source": [
+    "src/**/*.ts",
+    "!**/*.spec.ts"
+  ]
 }
 ```
 
@@ -141,6 +181,7 @@ const model = generator.generate([
 
 ### @c4Component
 Defines a C4 component with its metadata:
+- Can only be used on class declarations
 - First line: `"name" "technology" "tags"`
 - Additional parameters:
   - `description` - Detailed component description
@@ -151,13 +192,22 @@ Defines a C4 component with its metadata:
   - `!docs` - Path to documentation
   - `!adrs` - Path to architecture decision records
 
+### @c4Group
+Defines a logical group of components:
+- Can only be used in conjunction with @c4Component on the same class
+- Format: `"name"`
+
 ### @c4Relation
 Defines a relationship between components:
 - Format: `"target" "description" "technology" "tags"`
+- Additional parameters:
+  - `url` - Documentation URL for the relationship
+  - `properties` - Custom relationship properties
+  - `perspectives` - Relationship perspectives
 - Can be used on:
-  - Class declarations (component-level relationships)
-  - Constructor parameters (dependency relationships)
-  - Methods (behavioral relationships)
+  - Class declarations (for component-level relationships)
+  - Class methods (for behavioral relationships)
+  - Constructor parameters (for dependency relationships)
 
 ## Output
 
