@@ -64,7 +64,7 @@ async function handleWorkspace(configPath: string | undefined) {
 
     const generator = new C4WorkspaceGenerator(templatePath);
     const data = await parser.parse(configPath);
-    const dsl = generator.generate(data);
+    const dsl = await generator.generate(data);
     console.log(dsl);
 }
 

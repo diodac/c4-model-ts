@@ -30,11 +30,11 @@ Example:
 ```
 
 ## Template Engine
-- Using Handlebars
-- Template syntax: `{{ include.ALIAS|FILTER }}`
+- Using LiquidJS
+- Template syntax: `{{ include.ALIAS | FILTER }}`
   - `include` - fixed prefix for configuration data
   - `ALIAS` - key from include section in c4workspace.json
-  - `FILTER` - data transformation function (e.g. containers, relationships)
+  - `FILTER` - data transformation function (e.g. containers, relationships, indent)
 
 ## Generator Design
 
@@ -81,15 +81,19 @@ class C4Generator {
   4. Cross-container validations
 
 ## Template Processing
-- Custom helpers for data transformation
+- Custom filters for data transformation
 - Example registrations:
 ```typescript
-Handlebars.registerHelper('containers', function(data) {
+engine.registerFilter('containers', (containers: Map<string, C4ModelData>) => {
     // container generation logic
 });
 
-Handlebars.registerHelper('relationships', function(data) {
+engine.registerFilter('relationships', (containers: Map<string, C4ModelData>) => {
     // relationship generation logic
+});
+
+engine.registerFilter('indent', (value: string, spaces: number) => {
+    // indentation logic
 });
 ```
 

@@ -1,28 +1,46 @@
 import { C4WorkspaceData } from "./model";
 import { C4ModelData } from "../model";
-import * as Handlebars from "handlebars";
+import { Liquid } from 'liquidjs';
 import * as fs from 'fs';
 
 export class C4WorkspaceGenerator {
-    constructor(
-        private templatePath: string
-    ) {
-        // Register Handlebars helpers
-        Handlebars.registerHelper('containers', function(containers: Map<string, C4ModelData>) {
+    private engine: Liquid;
+
+    constructor(private templatePath: string) {
+        this.engine = new Liquid({
+            trimTagRight: false,
+            trimTagLeft: false,
+            trimOutputRight: false,
+            trimOutputLeft: false
+        });
+
+        // Register indent filter
+        this.engine.registerFilter('indent', (value: string, spaces: number) => {
+            const indent = ' '.repeat(spaces);
+            const lines = value.split('\n');
+            if (lines.length <= 1) return value;
+            
+            return [
+                lines[0],
+                ...lines.slice(1).map(line => `${indent}${line}`)
+            ].join('\n');
+        });
+
+        // Register filters for containers and relationships
+        this.engine.registerFilter('containers', (containers: Map<string, C4ModelData>) => {
             return Array.from(containers.values()).map((container: C4ModelData) => {
-                // Generate DSL for each container
                 const lines = [];
-                lines.push(`            ${container.container.name} = container "${container.container.name}" {`);
-                lines.push(`                description "${container.container.description}"`);
+                lines.push(`${container.container.name} = container "${container.container.name}" {`);
+                lines.push(`    description "${container.container.description}"`);
                 if (container.container.technology) {
-                    lines.push(`                technology "${container.container.technology}"`);
+                    lines.push(`    technology "${container.container.technology}"`);
                 }
-                lines.push('            }');
+                lines.push('}');
                 return lines.join('\n');
             }).join('\n\n');
         });
 
-        Handlebars.registerHelper('relationships', function(containers: Map<string, C4ModelData>) {
+        this.engine.registerFilter('relationships', (containers: Map<string, C4ModelData>) => {
             const relationships = Array.from(containers.values()).flatMap((container: C4ModelData) => 
                 container.relations.map(relation => {
                     // If source is a component from current container, prefix it with container name
@@ -33,7 +51,7 @@ export class C4WorkspaceGenerator {
                     const target = container.components.some(c => c.name === relation.target) ? 
                         `${container.container.name}.${relation.target}` : relation.target;
 
-                    let line = `            ${source} -> ${target}`;
+                    let line = `${source} -> ${target}`;
                     if (relation.description) {
                         line += ` "${relation.description}"`;
                     }
@@ -50,14 +68,8 @@ export class C4WorkspaceGenerator {
         });
     }
 
-    generate(data: C4WorkspaceData): string {
-        // Load template
+    async generate(data: C4WorkspaceData): Promise<string> {
         const templateContent = fs.readFileSync(this.templatePath, 'utf-8');
-        
-        // Compile template with noEscape option
-        const template = Handlebars.compile(templateContent, { noEscape: true });
-        
-        // Generate DSL
-        return template(data);
+        return await this.engine.parseAndRender(templateContent, data);
     }
 } 
