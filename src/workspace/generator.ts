@@ -30,11 +30,31 @@ export class C4WorkspaceGenerator {
         this.engine.registerFilter('containers', (containers: Map<string, C4ModelData>) => {
             return Array.from(containers.values()).map((container: C4ModelData) => {
                 const lines = [];
+                // Container definition
                 lines.push(`${container.container.name} = container "${container.container.name}" {`);
                 lines.push(`    description "${container.container.description}"`);
                 if (container.container.technology) {
                     lines.push(`    technology "${container.container.technology}"`);
                 }
+
+                // Components within container
+                if (container.components.length > 0) {
+                    lines.push('');
+                    container.components.forEach(component => {
+                        lines.push(`    ${component.name} = component "${component.name}" {`);
+                        if (component.description) {
+                            lines.push(`        description "${component.description}"`);
+                        }
+                        if (component.technology) {
+                            lines.push(`        technology "${component.technology}"`);
+                        }
+                        if (component.tags?.length) {
+                            lines.push(`        tags "${component.tags.join(',')}"`);
+                        }
+                        lines.push('    }');
+                    });
+                }
+
                 lines.push('}');
                 return lines.join('\n');
             }).join('\n\n');

@@ -9,7 +9,7 @@ interface C4WorkspaceConfig {
 }
 
 interface C4IncludeConfig {
-    type: string;  // currently only "c4containers", extensible in future
+    type: string;  // currently only "c4container.json", extensible in future
     source: string | string[];  // glob patterns
 }
 ```
