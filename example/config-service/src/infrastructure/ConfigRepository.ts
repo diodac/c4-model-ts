@@ -1,6 +1,9 @@
 /**
- * @c4Component "Config Repository" "TypeScript, MongoDB" "Infrastructure,Database"
- *   description "Stores configuration data"
+ * Repository for storing configuration data
+ * @c4Component
+ * - description: Stores configuration data
+ * - technology: TypeScript, MongoDB
+ * - tags: Infrastructure, Database
  * @c4Group "Infrastructure"
  */
 export class ConfigRepository {

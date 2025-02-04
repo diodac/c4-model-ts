@@ -1,5 +1,8 @@
 /**
- * @c4Component "Stores time-series metrics data" "TypeScript, TimescaleDB" "Infrastructure,Database"
+ * Repository for storing time-series metrics data
+ * @c4Component
+ * - technology: TypeScript, TimescaleDB
+ * - tags: Infrastructure, Database
  * @c4Group "Infrastructure"
  */
 export class MetricsRepository {

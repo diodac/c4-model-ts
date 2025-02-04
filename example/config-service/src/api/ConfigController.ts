@@ -1,12 +1,17 @@
 import { ConfigService } from '../domain/ConfigService';
 
 /**
- * @c4Component "REST API for configuration management" "TypeScript" "API,Controller"
+ * REST API for configuration management
+ * @c4Component
+ * - description: REST API for configuration management
+ * - technology: TypeScript
+ * - tags: API, Controller
  * @c4Group "API"
  */
 export class ConfigController {
     /**
-     * @c4Relation "ConfigService" "Uses for config management" "Internal"
+     * @c4Relation ConfigService | Uses for config management
+     * - technology: Internal
      */
     constructor(private configService: ConfigService) {}
 } 

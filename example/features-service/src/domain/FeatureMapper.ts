@@ -1,5 +1,8 @@
 /**
- * @c4Component "Feature flags data transformation helper" "TypeScript" "Mapper"
+ * Helper for transforming feature flags data between different formats
+ * @c4Component
+ * - technology: TypeScript
+ * - tags: Mapper
  */
 export class FeatureMapper {
     static toDto(feature: any): any {

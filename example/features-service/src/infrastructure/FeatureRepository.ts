@@ -1,5 +1,8 @@
 /**
- * @c4Component "Stores feature flags data" "TypeScript, PostgreSQL" "Infrastructure,Database"
+ * Repository for storing feature flags data
+ * @c4Component
+ * - technology: TypeScript, PostgreSQL
+ * - tags: Infrastructure, Database
  * @c4Group "Infrastructure"
  */
 export class FeatureRepository {

@@ -31,8 +31,10 @@
   "dependencies": {
     "@microsoft/tsdoc": "^0.15.1",
     "@microsoft/tsdoc-config": "^0.17.1",
+    "ajv": "^8.17.1",
     "commander": "^13.1.0",
     "liquidjs": "^10.20.2",
+    "ts-json-schema-generator": "^2.3.0",
     "ts-morph": "^25.0.0"
   },
   "devDependencies": {
