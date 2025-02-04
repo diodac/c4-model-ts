@@ -3,8 +3,10 @@
  * @c4Component
  * - technology: TypeScript, TimescaleDB
  * - tags: Infrastructure, Database
- * @c4Group "Infrastructure"
+ * @c4Group Infrastructure
  */
 export class MetricsRepository {
+    constructor() {}
+
     // Implementation
 } 

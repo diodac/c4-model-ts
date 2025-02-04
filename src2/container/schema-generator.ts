@@ -1,20 +1,21 @@
-import { createGenerator } from 'ts-json-schema-generator';
-import type { Config } from 'ts-json-schema-generator';
+import { createGenerator, Config } from 'ts-json-schema-generator';
+import { writeFileSync } from 'fs';
+import { resolve } from 'path';
 
-export class SchemaGenerator {
-    generateSchema(sourcePath: string, typeName: string): object {
-        const config: Config = {
-            path: sourcePath,
-            type: typeName,             // nazwa typu do wygenerowania schematu
-            expose: 'export',           // generuj tylko dla eksportowanych typów
-            topRef: true,              // dodaj $ref do głównego typu
-            jsDoc: 'extended',         // użyj rozszerzonych tagów JSDoc
-            sortProps: true,           // sortuj właściwości alfabetycznie
-            strictTuples: true,        // ścisła walidacja tupli
-            additionalProperties: false // nie pozwalaj na dodatkowe właściwości
-        };
+/** Generate JSON schema from TypeScript interfaces */
+export function generateSchema(tsConfigPath: string, typeName: string, outPath: string) {
+    const config: Config = {
+        path: tsConfigPath,
+        type: typeName,
+        expose: 'export' as const,  // generate only for exported types
+        topRef: true,              // add $ref to main type
+        jsDoc: 'extended',         // use extended JSDoc tags
+        sortProps: true,           // sort properties alphabetically
+        strictTuples: true,        // strict tuple validation
+        additionalProperties: false // don't allow additional properties
+    };
 
-        const generator = createGenerator(config);
-        return generator.createSchema(typeName);
-    }
+    const generator = createGenerator(config);
+    const schema = generator.createSchema(config.type);
+    writeFileSync(resolve(outPath), JSON.stringify(schema, null, 2));
 } 

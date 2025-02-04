@@ -32,7 +32,7 @@ export class C4Generator {
         this.parser = new C4DocParser();
         this.validator = new C4RelationValidator(this.project);
         
-        // Konwersja external config do wymaganego formatu
+        // Convert external config to required format
         const externalConfig: C4ExternalConfig = {};
         if (containerConfig.external) {
             Object.entries(containerConfig.external).forEach(([key, value]) => {
@@ -53,7 +53,7 @@ export class C4Generator {
     }
 
     generate(): C4ModelData {
-        // Zmiana katalogu roboczego na katalog bazowy
+        // Change working directory to base directory
         const originalCwd = process.cwd();
         process.chdir(this.baseDir);
         
@@ -112,7 +112,7 @@ export class C4Generator {
 
             return this.model.getData();
         } finally {
-            // Przywróć oryginalny katalog roboczy
+            // Restore original working directory
             process.chdir(originalCwd);
         }
     }

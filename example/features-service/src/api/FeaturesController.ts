@@ -1,12 +1,12 @@
 import { FeaturesService } from '../domain/FeaturesService';
 
 /**
- * REST API for managing feature flags
+ * REST API for feature flags management
  * @c4Component
  * - description: REST API for managing feature flags
  * - technology: TypeScript
  * - tags: API, Controller
- * @c4Group "API"
+ * @c4Group API
  */
 export class FeaturesController {
     /**

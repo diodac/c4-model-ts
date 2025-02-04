@@ -68,13 +68,18 @@ export class ComponentParser {
         const className = classDecl.getName() || '';
         const componentName = parsed.args[0] || className;
         
+        // Parse group tag and remove quotes from group name
+        const groupName = groupTag 
+            ? this.tagParser.parse(groupTag, this.groupSchema).args[0].replace(/^"|"$/g, '')
+            : undefined;
+        
         // Convert to component metadata
         const metadata: ComponentMetadata = {
             name: componentName,
             description: parsed.params.description as string || commentText || '',
             technology: parsed.params.technology as string,
             tags: Array.isArray(parsed.params.tags) ? parsed.params.tags : [],
-            group: groupTag ? this.tagParser.parse(groupTag, this.groupSchema).args[0] : undefined
+            group: groupName
         };
 
         return {

@@ -89,7 +89,7 @@ export class C4WorkspaceParser {
         const results: string[] = [];
         
         for (const pattern of patternList) {
-            // Rozwiąż wzorzec względem katalogu workspace
+            // Resolve pattern relative to workspace directory
             const matches = await globAsync(pattern, {
                 cwd: this.workspaceDir,
                 absolute: true,

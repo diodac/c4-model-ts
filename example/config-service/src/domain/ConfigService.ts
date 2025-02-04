@@ -5,7 +5,7 @@ import { ConfigRepository } from '../infrastructure/ConfigRepository';
  * @c4Component
  * - technology: TypeScript
  * - tags: Domain, Core
- * @c4Group "Domain"
+ * @c4Group Domain
  */
 export class ConfigService {
     /**

@@ -6,7 +6,7 @@ import { MetricsRepository } from '../infrastructure/MetricsRepository';
  * - description: Core service for metrics processing and analysis
  * - technology: TypeScript
  * - tags: Domain, Core
- * @c4Group "Domain"
+ * @c4Group Domain
  */
 export class MetricsService {
     /**

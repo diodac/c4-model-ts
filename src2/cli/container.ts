@@ -32,6 +32,9 @@ program
         const relationFinder = new RelationFinder();
         const relationValidator = new RelationValidator();
 
+        // Set config for external components validation
+        relationValidator.setConfig(config);
+
         // Add source files
         const sourcePatterns = config.source.map(pattern => resolve(configDir, pattern));
         componentFinder.addSourceFiles(sourcePatterns);
@@ -52,32 +55,45 @@ program
         // Show components if requested or no specific option
         if (options.components || (!options.undeclared && !options.invalid)) {
             console.log(`\nFound ${components.length} components:`);
+
+            // Group components by their group
+            const groupedComponents = new Map<string, typeof components>();
             for (const component of components) {
-                console.log(`\n[${component.metadata.name}]`);
-                console.log(`Description: ${component.metadata.description}`);
-                if (component.metadata.technology) {
-                    console.log(`Technology: ${component.metadata.technology}`);
+                const group = component.metadata.group || '(no group)';
+                if (!groupedComponents.has(group)) {
+                    groupedComponents.set(group, []);
                 }
-                if (component.metadata.tags?.length) {
-                    console.log(`Tags: ${component.metadata.tags.join(', ')}`);
-                }
-                if (component.metadata.group) {
-                    console.log(`Group: ${component.metadata.group}`);
-                }
-                if (component.relations.length > 0) {
-                    console.log('\nRelations:');
-                    for (const relation of component.relations) {
-                        console.log(`  → ${relation.metadata.target}`);
-                        console.log(`    Description: ${relation.metadata.description}`);
-                        if (relation.metadata.technology) {
-                            console.log(`    Technology: ${relation.metadata.technology}`);
-                        }
-                        if (relation.metadata.tags?.length) {
-                            console.log(`    Tags: ${relation.metadata.tags.join(', ')}`);
+                groupedComponents.get(group)!.push(component);
+            }
+
+            // Display components by group
+            for (const [group, groupComponents] of groupedComponents) {
+                console.log(`\n=== ${group.replace(/^"|"$/g, '')} ===`);
+                
+                for (const component of groupComponents) {
+                    console.log(`\n[${component.metadata.name}]`);
+                    console.log(`Description: ${component.metadata.description}`);
+                    if (component.metadata.technology) {
+                        console.log(`Technology: ${component.metadata.technology}`);
+                    }
+                    if (component.metadata.tags?.length) {
+                        console.log(`Tags: ${component.metadata.tags.join(', ')}`);
+                    }
+                    if (component.relations.length > 0) {
+                        console.log('\nRelations:');
+                        for (const relation of component.relations) {
+                            console.log(`  → ${relation.metadata.target}`);
+                            console.log(`    Description: ${relation.metadata.description}`);
+                            if (relation.metadata.technology) {
+                                console.log(`    Technology: ${relation.metadata.technology}`);
+                            }
+                            if (relation.metadata.tags?.length) {
+                                console.log(`    Tags: ${relation.metadata.tags.join(', ')}`);
+                            }
                         }
                     }
+                    console.log(`\nLocation: ${component.location.filePath}:${component.location.line}`);
                 }
-                console.log(`\nLocation: ${component.location.filePath}:${component.location.line}`);
             }
         }
 

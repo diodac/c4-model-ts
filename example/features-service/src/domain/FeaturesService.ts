@@ -1,12 +1,12 @@
 import { FeatureRepository } from '../infrastructure/FeatureRepository';
 
 /**
- * Core service for feature flag management
+ * Core service for feature flags management
  * @c4Component
  * - description: Core service for feature flag management
  * - technology: TypeScript
  * - tags: Domain, Core
- * @c4Group "Domain"
+ * @c4Group Domain
  */
 export class FeaturesService {
     /**

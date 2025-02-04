@@ -1,67 +1,42 @@
-/** Typ elementu w modelu C4 */
+/** C4 model element type */
 export type C4ElementType = 'component' | 'container' | 'softwareSystem' | 'person';
 
 /** 
- * Hierarchiczna struktura grup
+ * Hierarchical group structure
  * @additionalProperties true
  */
 export interface GroupHierarchy {
     [groupName: string]: GroupHierarchy;
 }
 
-/** Definicja elementu zewnętrznego */
+/** External element definition */
 export interface ExternalElement {
-    /** 
-     * Typ elementu w modelu C4 
-     * @enum {string}
-     */
+    /** Element type */
     type: C4ElementType;
+    /** Element description */
+    description?: string;
+    /** Technology used */
+    technology?: string;
+    /** Element tags */
+    tags?: string[];
 }
 
-/** 
- * Konfiguracja kontenera C4 
- * @additionalProperties false
- */
+/** Container configuration */
 export interface ContainerConfig {
-    /** 
-     * Nazwa kontenera/serwisu 
-     * @minLength 1
-     */
+    /** Container name */
     name: string;
-
-    /** 
-     * Opis celu kontenera 
-     * @minLength 1
-     */
+    /** Container description */
     description: string;
-
-    /** 
-     * Opcjonalny główny stos technologiczny 
-     * @minLength 1
-     */
-    technology?: string;
-
-    /** 
-     * Opcjonalna lista tagów 
-     * @uniqueItems true
-     */
+    /** Technology stack */
+    technology: string;
+    /** Container tags */
     tags?: string[];
-
-    /** Opcjonalne własne właściwości */
+    /** Custom properties */
     properties?: Record<string, string>;
-
-    /** Hierarchiczna struktura grup */
+    /** Group hierarchy */
     groups?: GroupHierarchy;
-
-    /** 
-     * Wzorce globalne plików źródłowych 
-     * @minItems 1
-     */
+    /** Source file patterns */
     source: string[];
-
-    /** 
-     * Elementy zewnętrzne 
-     * @additionalProperties false
-     */
+    /** External components */
     external?: Record<string, ExternalElement>;
 } 

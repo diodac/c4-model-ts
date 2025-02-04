@@ -1,6 +1,7 @@
 import { ClassDeclaration, MethodDeclaration, Node, Type, Project, SourceFile, Symbol, CallExpression, SyntaxKind } from 'ts-morph';
 import { ComponentInfo } from './component';
 import { RelationInfo } from './relation';
+import { ContainerConfig } from './config';
 
 /**
  * Result of relation validation
@@ -24,11 +25,19 @@ export interface ValidationResult {
  */
 export class RelationValidator {
     private project: Project;
+    private config?: ContainerConfig;
 
     constructor(tsConfigPath?: string) {
         this.project = new Project({
             tsConfigFilePath: tsConfigPath
         });
+    }
+
+    /**
+     * Set container configuration for validating external components
+     */
+    setConfig(config: ContainerConfig) {
+        this.config = config;
     }
 
     /**
@@ -55,10 +64,31 @@ export class RelationValidator {
         const targetComponent = componentsByName.get(relation.metadata.target);
         const sourceComponent = componentsByName.get(relation.sourceComponent);
 
-        if (!sourceComponent || !targetComponent) {
+        // Check if target is an external component
+        const isExternalTarget = this.config?.external?.[relation.metadata.target];
+
+        if (!sourceComponent) {
             return {
                 relation,
-                targetExists: !!targetComponent,
+                targetExists: !!targetComponent || !!isExternalTarget,
+                isUsed: false
+            };
+        }
+
+        // If target is external, we consider it exists but don't validate usage
+        if (isExternalTarget) {
+            return {
+                relation,
+                targetExists: true,
+                isUsed: true // We trust the relation is used if declared
+            };
+        }
+
+        // If target is internal but not found, it's invalid
+        if (!targetComponent) {
+            return {
+                relation,
+                targetExists: false,
                 isUsed: false
             };
         }
@@ -66,15 +96,6 @@ export class RelationValidator {
         // Get source class declaration
         const sourceFile = this.project.getSourceFile(sourceComponent.location.filePath);
         if (!sourceFile) {
-            return {
-                relation,
-                targetExists: true,
-                isUsed: false
-            };
-        }
-
-        const sourceClass = sourceFile.getClass(sourceComponent.location.className);
-        if (!sourceClass) {
             return {
                 relation,
                 targetExists: true,
@@ -112,7 +133,7 @@ export class RelationValidator {
         }
 
         // Check constructor parameters
-        const constructorUsage = this.checkConstructorParameters(sourceClass, targetSymbol);
+        const constructorUsage = this.checkConstructorParameters(sourceFile, targetSymbol);
         if (constructorUsage) {
             return {
                 relation,
@@ -123,7 +144,7 @@ export class RelationValidator {
         }
 
         // Check properties
-        const propertyUsage = this.checkProperties(sourceClass, targetSymbol);
+        const propertyUsage = this.checkProperties(sourceFile, targetSymbol);
         if (propertyUsage) {
             return {
                 relation,
@@ -134,7 +155,7 @@ export class RelationValidator {
         }
 
         // Check methods
-        const methodUsage = this.checkMethods(sourceClass, targetSymbol);
+        const methodUsage = this.checkMethods(sourceFile, targetSymbol);
         if (methodUsage) {
             return {
                 relation,
@@ -155,9 +176,12 @@ export class RelationValidator {
      * Check if target component is used in constructor parameters
      */
     private checkConstructorParameters(
-        sourceClass: ClassDeclaration, 
+        sourceFile: SourceFile, 
         targetSymbol: Symbol
     ): { filePath: string; line: number; } | undefined {
+        const sourceClass = sourceFile.getClass(sourceFile.getFilePath().split('/').pop() || '');
+        if (!sourceClass) return undefined;
+
         const constructor = sourceClass.getConstructors()[0];
         if (!constructor) return undefined;
 
@@ -171,7 +195,7 @@ export class RelationValidator {
             // Compare symbols to check if they point to the same declaration
             if (typeSymbol === targetSymbol) {
                 return {
-                    filePath: sourceClass.getSourceFile().getFilePath(),
+                    filePath: sourceFile.getFilePath(),
                     line: param.getStartLineNumber()
                 };
             }
@@ -184,9 +208,12 @@ export class RelationValidator {
      * Check if target component is used in class properties
      */
     private checkProperties(
-        sourceClass: ClassDeclaration,
+        sourceFile: SourceFile,
         targetSymbol: Symbol
     ): { filePath: string; line: number; } | undefined {
+        const sourceClass = sourceFile.getClass(sourceFile.getFilePath().split('/').pop() || '');
+        if (!sourceClass) return undefined;
+
         for (const property of sourceClass.getProperties()) {
             // Get property type
             const type = property.getType();
@@ -196,7 +223,7 @@ export class RelationValidator {
             // Compare with target symbol
             if (typeSymbol === targetSymbol) {
                 return {
-                    filePath: sourceClass.getSourceFile().getFilePath(),
+                    filePath: sourceFile.getFilePath(),
                     line: property.getStartLineNumber()
                 };
             }
@@ -207,7 +234,7 @@ export class RelationValidator {
                 const argSymbol = typeArg.getSymbol();
                 if (argSymbol && argSymbol === targetSymbol) {
                     return {
-                        filePath: sourceClass.getSourceFile().getFilePath(),
+                        filePath: sourceFile.getFilePath(),
                         line: property.getStartLineNumber()
                     };
                 }
@@ -221,9 +248,12 @@ export class RelationValidator {
      * Check if target component is used in methods
      */
     private checkMethods(
-        sourceClass: ClassDeclaration,
+        sourceFile: SourceFile,
         targetSymbol: Symbol
     ): { filePath: string; line: number; } | undefined {
+        const sourceClass = sourceFile.getClass(sourceFile.getFilePath().split('/').pop() || '');
+        if (!sourceClass) return undefined;
+
         for (const method of sourceClass.getMethods()) {
             // Check method parameters
             for (const param of method.getParameters()) {
@@ -231,7 +261,7 @@ export class RelationValidator {
                 const typeSymbol = type.getSymbol();
                 if (typeSymbol && typeSymbol === targetSymbol) {
                     return {
-                        filePath: sourceClass.getSourceFile().getFilePath(),
+                        filePath: sourceFile.getFilePath(),
                         line: param.getStartLineNumber()
                     };
                 }
@@ -242,7 +272,7 @@ export class RelationValidator {
                     const argSymbol = typeArg.getSymbol();
                     if (argSymbol && argSymbol === targetSymbol) {
                         return {
-                            filePath: sourceClass.getSourceFile().getFilePath(),
+                            filePath: sourceFile.getFilePath(),
                             line: param.getStartLineNumber()
                         };
                     }
@@ -254,7 +284,7 @@ export class RelationValidator {
             const returnSymbol = returnType.getSymbol();
             if (returnSymbol && returnSymbol === targetSymbol) {
                 return {
-                    filePath: sourceClass.getSourceFile().getFilePath(),
+                    filePath: sourceFile.getFilePath(),
                     line: method.getStartLineNumber()
                 };
             }
@@ -265,7 +295,7 @@ export class RelationValidator {
                 const argSymbol = typeArg.getSymbol();
                 if (argSymbol && argSymbol === targetSymbol) {
                     return {
-                        filePath: sourceClass.getSourceFile().getFilePath(),
+                        filePath: sourceFile.getFilePath(),
                         line: method.getStartLineNumber()
                     };
                 }
@@ -282,7 +312,7 @@ export class RelationValidator {
 
                     if (expressionSymbol && expressionSymbol === targetSymbol) {
                         return {
-                            filePath: sourceClass.getSourceFile().getFilePath(),
+                            filePath: sourceFile.getFilePath(),
                             line: call.getStartLineNumber()
                         };
                     }
