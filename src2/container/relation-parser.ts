@@ -1,5 +1,5 @@
-import { ClassDeclaration, MethodDeclaration, JSDoc } from 'ts-morph';
-import { RelationInfo, RelationMetadata } from './relation';
+import { ClassDeclaration, MethodDeclaration, ConstructorDeclaration, JSDoc } from 'ts-morph';
+import { RelationInfo, RelationMetadata } from './model/relation';
 import { TagParser, TagSchema } from './tag-parser';
 
 /**
@@ -40,6 +40,12 @@ export class RelationParser {
         // Check class level relations
         this.findRelationsInNode(classDecl, componentName, relations);
 
+        // Check constructor relations
+        const constructor = classDecl.getConstructors()[0];
+        if (constructor) {
+            this.findRelationsInNode(constructor, componentName, relations, 'constructor');
+        }
+
         // Check method level relations
         for (const method of classDecl.getMethods()) {
             this.findRelationsInNode(method, componentName, relations, method.getName());
@@ -49,7 +55,7 @@ export class RelationParser {
     }
 
     private findRelationsInNode(
-        node: ClassDeclaration | MethodDeclaration, 
+        node: ClassDeclaration | MethodDeclaration | ConstructorDeclaration, 
         componentName: string, 
         relations: RelationInfo[],
         methodName?: string
@@ -91,8 +97,8 @@ export class RelationParser {
         }
     }
 
-    private getParentClassName(method: MethodDeclaration): string {
-        const parent = method.getParent();
+    private getParentClassName(node: MethodDeclaration | ConstructorDeclaration): string {
+        const parent = node.getParent();
         if (!parent || !(parent instanceof ClassDeclaration)) {
             return '';
         }

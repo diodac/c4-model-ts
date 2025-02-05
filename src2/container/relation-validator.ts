@@ -1,7 +1,7 @@
-import { ClassDeclaration, MethodDeclaration, Node, Type, Project, SourceFile, Symbol, CallExpression, SyntaxKind } from 'ts-morph';
-import { ComponentInfo } from './component';
-import { RelationInfo } from './relation';
-import { ContainerConfig } from './config';
+import { Project, SourceFile, Symbol, CallExpression, SyntaxKind } from 'ts-morph';
+import { ComponentInfo } from './model/component';
+import { RelationInfo } from './model/relation';
+import { ContainerConfig } from './model/config';
 
 /**
  * Result of relation validation

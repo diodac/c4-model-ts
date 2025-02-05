@@ -3,7 +3,7 @@
 import { resolve, dirname } from 'path';
 import { readFileSync } from 'fs';
 import { Command } from 'commander';
-import { ContainerConfig } from '../container/config';
+import { ContainerConfig } from '../container/model/config';
 import { ComponentFinder } from '../container/component-finder';
 import { RelationFinder } from '../container/relation-finder';
 import { RelationValidator } from '../container/relation-validator';
@@ -13,7 +13,6 @@ const program = new Command();
 program
     .name('c4-container')
     .description('Analyze C4 container TypeScript codebase for components and relations')
-    .version('0.1.0')
     .argument('<config>', 'path to c4container.json file')
     .option('-u, --undeclared', 'show only undeclared relations')
     .option('-i, --invalid', 'show only invalid relations')
@@ -44,7 +43,20 @@ program
 
         if (options.json) {
             const output = {
-                components,
+                container: {
+                    name: config.name,
+                    description: config.description,
+                    technology: config.technology,
+                    tags: config.tags,
+                    properties: config.properties
+                },
+                components: components.map(component => ({
+                    ...component,
+                    relations: component.relations.map(relation => ({
+                        ...relation,
+                        sourceComponent: component.metadata.name
+                    }))
+                })),
                 undeclaredRelations: options.undeclared ? relationFinder.findRelations(components) : undefined,
                 invalidRelations: options.invalid ? relationValidator.validateRelations(components) : undefined
             };

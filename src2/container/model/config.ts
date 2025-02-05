@@ -28,7 +28,7 @@ export interface ContainerConfig {
     /** Container description */
     description: string;
     /** Technology stack */
-    technology: string;
+    technology?: string;
     /** Container tags */
     tags?: string[];
     /** Custom properties */

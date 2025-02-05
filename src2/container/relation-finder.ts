@@ -1,6 +1,6 @@
 import { ClassDeclaration, Symbol, SyntaxKind, Project } from 'ts-morph';
-import { ComponentInfo } from './component';
-import { RelationInfo } from './relation';
+import { ComponentInfo } from './model/component';
+import { RelationInfo } from './model/relation';
 
 /**
  * Information about found relation usage

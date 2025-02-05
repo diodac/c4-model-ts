@@ -1,5 +1,5 @@
 import { Project, SourceFile } from 'ts-morph';
-import { ComponentInfo } from './component';
+import { ComponentInfo } from './model/component';
 import { ComponentParser } from './component-parser';
 import { RelationParser } from './relation-parser';
 

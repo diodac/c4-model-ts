@@ -1,6 +1,6 @@
 import { default as Ajv } from 'ajv';
 import * as fs from 'fs';
-import { ContainerConfig } from './config';
+import { ContainerConfig } from './model/config';
 
 export class ContainerConfigError extends Error {
     constructor(

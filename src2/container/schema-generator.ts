@@ -3,9 +3,10 @@ import { writeFileSync } from 'fs';
 import { resolve } from 'path';
 
 /** Generate JSON schema from TypeScript interfaces */
-export function generateSchema(tsConfigPath: string, typeName: string, outPath: string) {
+export function generateSchema(sourcePath: string, typeName: string, outPath: string) {
     const config: Config = {
-        path: tsConfigPath,
+        path: sourcePath,
+        tsconfig: resolve(__dirname, '../../tsconfig.json'),
         type: typeName,
         expose: 'export' as const,  // generate only for exported types
         topRef: true,              // add $ref to main type

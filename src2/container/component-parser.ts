@@ -1,5 +1,5 @@
 import { ClassDeclaration, JSDoc } from 'ts-morph';
-import { ComponentInfo, ComponentMetadata } from './component';
+import { ComponentInfo, ComponentMetadata } from './model/component';
 import { TagParser, TagSchema } from './tag-parser';
 
 /**

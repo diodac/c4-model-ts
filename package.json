@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "c4-generator": "./dist/cli.js"
+    "c4-generator": "./dist/cli.js",
+    "c4-schema": "./dist/cli/schema.js"
   },
   "engines": {
     "node": ">=20.0.0"
