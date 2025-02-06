@@ -1,7 +1,7 @@
 import { Project, SourceFile, Symbol, CallExpression, SyntaxKind } from 'ts-morph';
 import { ComponentInfo } from './model/component';
 import { RelationInfo } from './model/relation';
-import { ContainerConfig } from './model/config';
+import { ContainerConfig } from './model/container';
 import { resolve, dirname } from 'path';
 
 /**
