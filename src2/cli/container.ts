@@ -32,7 +32,7 @@ program
         const relationValidator = new RelationValidator();
 
         // Set config for external components validation
-        relationValidator.setConfig(config);
+        relationValidator.setConfig(config, resolvedPath);
 
         // Add source files
         const sourcePatterns = config.source.map(pattern => resolve(configDir, pattern));
@@ -127,15 +127,19 @@ program
         // Show invalid relations if requested
         if (options.invalid || (!options.components && !options.undeclared)) {
             const validationResults = relationValidator.validateRelations(components);
-            const invalidRelations = validationResults.filter(r => !r.isUsed || !r.targetExists);
+            const invalidRelations = validationResults.filter(r => !r.isUsed || !r.targetExists || (r.errors && r.errors.length > 0));
             if (invalidRelations.length > 0) {
                 console.log('\nFound invalid relations:');
                 for (const result of invalidRelations) {
                     const relation = result.relation;
+
+                    // Show target validation errors
                     if (!result.targetExists) {
                         console.log(`\nInvalid target: ${relation.sourceComponent} → ${relation.metadata.target}`);
                         console.log(`Location: ${relation.location.filePath}:${relation.location.line}`);
                     }
+
+                    // Show usage validation errors
                     if (!result.isUsed) {
                         console.log(`\nUnused relation: ${relation.sourceComponent} → ${relation.metadata.target}`);
                         console.log(`Description: ${relation.metadata.description}`);
@@ -143,6 +147,14 @@ program
                             console.log(`Technology: ${relation.metadata.technology}`);
                         }
                         console.log(`Location: ${relation.location.filePath}:${relation.location.line}`);
+                    }
+
+                    // Show tag validation errors
+                    if (result.errors && result.errors.length > 0) {
+                        for (const error of result.errors) {
+                            console.log(`\nTag validation error: ${error}`);
+                            console.log(`Location: ${relation.location.filePath}:${relation.location.line}`);
+                        }
                     }
                 }
             } else if (options.invalid) {

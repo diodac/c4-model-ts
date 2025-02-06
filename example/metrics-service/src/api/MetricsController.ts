@@ -13,4 +13,8 @@ export class MetricsController {
      * - technology: Internal
      */
     constructor(private metricsService: MetricsService) {}
+
+    async collectMetrics(data: any): Promise<void> {
+        await this.metricsService.processMetrics(data);
+    }
 } 

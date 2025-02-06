@@ -1,6 +1,7 @@
 import { ClassDeclaration, MethodDeclaration, ConstructorDeclaration, JSDoc } from 'ts-morph';
 import { RelationInfo, RelationMetadata } from './model/relation';
 import { TagParser, TagSchema } from './tag-parser';
+import { RelationValidator } from './relation-validator';
 
 /**
  * Parser for @c4Relation tags
@@ -68,9 +69,10 @@ export class RelationParser {
             
             for (const tag of relationTags) {
                 const parsed = this.tagParser.parse(tag, this.schema);
+                const targetComponent = parsed.args[0];
                 
                 const metadata: RelationMetadata = {
-                    target: parsed.args[0],
+                    target: targetComponent,
                     description: parsed.args[1],
                     technology: (parsed.params.technology as string) || parsed.args[2],
                     tags: Array.isArray(parsed.params.tags) ? parsed.params.tags : [],
