@@ -24,32 +24,38 @@ export interface ValidationResult {
 }
 
 /**
+ * Configuration for relation validator
+ */
+export interface RelationValidatorConfig {
+    /** Path to tsconfig.json file */
+    tsConfigPath?: string;
+    /** Container configuration */
+    config: ContainerConfig;
+    /** Root directory of the container project */
+    rootDir: string;
+}
+
+/**
  * Validates relations between components
  */
 export class RelationValidator {
     private project: Project;
-    private config?: ContainerConfig;
-    private configDir?: string;
+    private config: ContainerConfig;
+    private configDir: string;
 
-    constructor(tsConfigPath?: string) {
+    constructor(config: RelationValidatorConfig) {
         this.project = new Project({
-            tsConfigFilePath: tsConfigPath
+            tsConfigFilePath: config.tsConfigPath
         });
-    }
-
-    /**
-     * Set container configuration for validating external components
-     */
-    setConfig(config: ContainerConfig, configPath: string) {
-        this.config = config;
-        this.configDir = dirname(configPath);
+        this.config = config.config;
+        this.configDir = config.rootDir;
 
         // Add source files to project
-        if (config.source && this.configDir) {
-            const sourcePaths = config.source.map(pattern => 
-                resolve(this.configDir!, pattern)
+        if (config.config.source) {
+            const sourcePaths = config.config.source.map(pattern => 
+                resolve(this.configDir, pattern)
             );
-            const files = this.project.addSourceFilesAtPaths(sourcePaths);
+            this.project.addSourceFilesAtPaths(sourcePaths);
         }
     }
 

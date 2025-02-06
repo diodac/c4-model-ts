@@ -17,6 +17,9 @@ export interface ContainerConfig {
     /** Source file patterns */
     source: string[];
     
+    /** Container properties */
+    properties?: Record<string, string>;
+    
     /** External components */
     external?: Record<string, ExternalElement>;
 }

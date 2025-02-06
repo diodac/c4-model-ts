@@ -33,9 +33,10 @@ export class RelationFinder {
     }
 
     /**
-     * Find all relations between components by analyzing code
+     * Find all relations between components by analyzing code.
+     * This includes both declared (documented in JSDoc) and undeclared (found in code) relations.
      */
-    findRelations(components: ComponentInfo[]): RelationUsage[] {
+    findAllRelations(components: ComponentInfo[]): RelationUsage[] {
         const usages: RelationUsage[] = [];
         const componentsBySymbol = new Map<Symbol, ComponentInfo>();
 
@@ -65,7 +66,16 @@ export class RelationFinder {
             this.findMethodUsages(sourceClass, sourceComponent, componentsBySymbol, usages);
         }
 
-        return this.filterOutDeclaredRelations(usages, components);
+        return usages;
+    }
+
+    /**
+     * Find only undeclared relations between components.
+     * These are relations that exist in code but are not documented in JSDoc tags.
+     */
+    findUndeclaredRelations(components: ComponentInfo[]): RelationUsage[] {
+        const allRelations = this.findAllRelations(components);
+        return this.filterOutDeclaredRelations(allRelations, components);
     }
 
     private getComponentSymbol(component: ComponentInfo): Symbol | undefined {
