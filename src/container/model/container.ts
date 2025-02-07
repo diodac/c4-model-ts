@@ -19,6 +19,9 @@ export interface ContainerConfig {
     
     /** Container properties */
     properties?: Record<string, string>;
+
+    /** Component groups */
+    groups?: Record<string, Record<string, unknown>>;
     
     /** External components */
     external?: Record<string, ExternalElement>;
@@ -39,6 +42,9 @@ export interface ExternalElement {
     
     /** Element tags */
     tags?: string[];
+
+    /** Element type (container, system, etc.) */
+    type?: string;
 }
 
 /**

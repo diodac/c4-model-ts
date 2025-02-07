@@ -1,6 +1,6 @@
 import { default as Ajv } from 'ajv';
 import * as fs from 'fs';
-import { ContainerConfig } from './model/config';
+import { ContainerConfig } from './model/container';
 
 export class ContainerConfigError extends Error {
     constructor(
@@ -89,7 +89,7 @@ export class ContainerConfigLoader {
     }
 
     private validateGroups(
-        groups: ContainerConfig['groups'], 
+        groups: Record<string, Record<string, unknown>> | undefined, 
         errors: string[],
         path: string[] = []
     ): void {
@@ -109,7 +109,7 @@ export class ContainerConfigLoader {
                 );
             }
 
-            this.validateGroups(subgroups, errors, [...path, name]);
+            this.validateGroups(subgroups as Record<string, Record<string, unknown>>, errors, [...path, name]);
         }
     }
 
