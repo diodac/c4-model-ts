@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/C4WorkspaceConfig",
+  "definitions": {
+    "C4WorkspaceConfig": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Workspace name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Workspace description"
+        },
+        "include": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/C4IncludeConfig"
+          },
+          "description": "Map of sources to include in workspace Key is an alias for the source"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "include"
+      ],
+      "additionalProperties": false,
+      "description": "Workspace configuration from c4workspace.json"
+    },
+    "C4IncludeConfig": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "c4container.json",
+          "description": "Type of source to include (currently only 'c4container.json' is supported)"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ],
+          "description": "Glob patterns for finding source files Can be a single pattern or array of patterns Patterns starting with ! are exclusions"
+        }
+      },
+      "required": [
+        "type",
+        "source"
+      ],
+      "additionalProperties": false,
+      "description": "Configuration for including external sources in workspace"
+    }
+  }
+}

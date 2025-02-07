@@ -1,4 +1,5 @@
 import { ContainerData } from '../../container/model/container';
+import { AnalysisResult } from '../../container/container-analyzer';
 
 /**
  * Configuration for including external sources in workspace
@@ -19,6 +20,12 @@ export interface C4IncludeConfig {
  * Workspace configuration from c4workspace.json
  */
 export interface C4WorkspaceConfig {
+    /** Workspace name */
+    name: string;
+
+    /** Workspace description */
+    description: string;
+
     /** 
      * Map of sources to include in workspace
      * Key is an alias for the source
@@ -26,6 +33,54 @@ export interface C4WorkspaceConfig {
     include: {
         [alias: string]: C4IncludeConfig;
     };
+}
+
+/**
+ * Represents a container in the workspace
+ */
+export interface C4Container {
+    /** Container alias from workspace config */
+    alias: string;
+
+    /** Container data */
+    data: ContainerData;
+
+    /** Analysis results */
+    analysis: AnalysisResult;
+}
+
+/**
+ * Represents a relation between containers
+ */
+export interface C4ContainerRelation {
+    /** Source container alias */
+    source: string;
+
+    /** Target container alias */
+    target: string;
+
+    /** Relation description */
+    description: string;
+
+    /** Technology used for communication */
+    technology?: string;
+}
+
+/**
+ * Represents the entire workspace model
+ */
+export interface C4WorkspaceModel {
+    /** Workspace name */
+    name: string;
+
+    /** Workspace description */
+    description: string;
+
+    /** Containers in the workspace */
+    containers: C4Container[];
+
+    /** Relations between containers */
+    relations: C4ContainerRelation[];
 }
 
 /**
@@ -57,8 +112,8 @@ export interface C4WorkspaceData {
  * Result of workspace data loading
  */
 export interface C4WorkspaceLoadResult {
-    /** Loaded workspace data */
-    data: C4WorkspaceData;
+    /** Loaded workspace model */
+    model: C4WorkspaceModel;
     
     /** Validation warnings */
     warnings: string[];

@@ -6,7 +6,9 @@
   "types": "dist/index.d.ts",
   "bin": {
     "c4-generator": "./dist/cli.js",
-    "c4-schema": "./dist/cli/schema.js"
+    "c4-schema": "./dist/cli/schema.js",
+    "c4-container": "./dist/cli/container.js",
+    "c4-workspace": "./dist/cli/workspace.js"
   },
   "engines": {
     "node": ">=20.0.0"
@@ -34,6 +36,7 @@
     "@microsoft/tsdoc-config": "^0.17.1",
     "ajv": "^8.17.1",
     "commander": "^13.1.0",
+    "glob": "^11.0.1",
     "liquidjs": "^10.20.2",
     "ts-json-schema-generator": "^2.3.0",
     "ts-morph": "^25.0.0"

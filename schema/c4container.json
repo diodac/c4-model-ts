@@ -24,23 +24,19 @@
           },
           "description": "Container tags"
         },
-        "properties": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Custom properties"
-        },
-        "groups": {
-          "$ref": "#/definitions/GroupHierarchy",
-          "description": "Group hierarchy"
-        },
         "source": {
           "type": "array",
           "items": {
             "type": "string"
           },
           "description": "Source file patterns"
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Container properties"
         },
         "external": {
           "type": "object",
@@ -56,21 +52,14 @@
         "source"
       ],
       "additionalProperties": false,
-      "description": "Container configuration"
-    },
-    "GroupHierarchy": {
-      "type": "object",
-      "additionalProperties": {
-        "$ref": "#/definitions/GroupHierarchy"
-      },
-      "description": "Hierarchical group structure"
+      "description": "Container configuration from c4container.json"
     },
     "ExternalElement": {
       "type": "object",
       "properties": {
-        "type": {
-          "$ref": "#/definitions/C4ElementType",
-          "description": "Element type"
+        "name": {
+          "type": "string",
+          "description": "Element name"
         },
         "description": {
           "type": "string",
@@ -78,7 +67,7 @@
         },
         "technology": {
           "type": "string",
-          "description": "Technology used"
+          "description": "Technology stack"
         },
         "tags": {
           "type": "array",
@@ -89,20 +78,11 @@
         }
       },
       "required": [
-        "type"
+        "name",
+        "description"
       ],
       "additionalProperties": false,
-      "description": "External element definition"
-    },
-    "C4ElementType": {
-      "type": "string",
-      "enum": [
-        "component",
-        "container",
-        "softwareSystem",
-        "person"
-      ],
-      "description": "C4 model element type"
+      "description": "External element configuration"
     }
   }
 }
