@@ -59,6 +59,9 @@ export interface ContainerData {
     
     /** Source file path */
     sourcePath: string;
+
+    /** External dependencies */
+    external?: Record<string, ExternalElement>;
 }
 
 /**

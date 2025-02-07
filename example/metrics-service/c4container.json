@@ -22,6 +22,9 @@
         },
         "config-service": {
             "type": "container"
+        },
+        "analytics-service": {
+            "type": "container"
         }
     }
 } 

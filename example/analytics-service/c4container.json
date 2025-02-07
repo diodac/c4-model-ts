@@ -1,0 +1,24 @@
+{
+    "name": "analytics-service",
+    "description": "Service for advanced metrics analysis and reporting",
+    "technology": "Node.js, TypeScript, Kafka",
+    "tags": ["backend", "analytics"],
+    "properties": {
+        "team": "analytics",
+        "criticality": "medium"
+    },
+    "groups": {
+        "API": {},
+        "Domain": {},
+        "Infrastructure": {}
+    },
+    "source": [
+        "src/**/*.ts",
+        "!**/*.spec.ts"
+    ],
+    "external": {
+        "metrics-service": {
+            "type": "container"
+        }
+    }
+} 
