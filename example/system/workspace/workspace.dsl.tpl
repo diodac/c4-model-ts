@@ -13,6 +13,6 @@ workspace {
     }
 
     views {
-
+        theme default
     }
 }

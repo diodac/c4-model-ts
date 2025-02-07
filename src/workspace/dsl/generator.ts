@@ -3,6 +3,30 @@ import { WorkspaceAnalyzer } from '../analyzer';
 import { C4WorkspaceConfig, C4WorkspaceModel, C4Container, C4ContainerRelation } from '../model/workspace';
 import { resolve, dirname } from 'path';
 import { readFileSync, writeFileSync } from 'fs';
+import { Groups } from '../../container/model/container';
+import { AnalysisResult } from '../../container/container-analyzer';
+
+/**
+ * Component metadata in DSL generation context
+ */
+interface ComponentMetadata {
+    /** Component name */
+    name: string;
+    /** Component description */
+    description: string;
+    /** Component technology */
+    technology?: string;
+    /** Component group */
+    group?: string;
+}
+
+/**
+ * Component in DSL generation context
+ */
+interface Component {
+    /** Component metadata */
+    metadata: ComponentMetadata;
+}
 
 /**
  * Represents a container in DSL generation context
@@ -16,6 +40,13 @@ interface Container {
     technology: string;
     /** Container description */
     description: string;
+    /** Container analysis results */
+    analysis?: {
+        /** Components in this container */
+        components: Component[];
+        /** Component groups */
+        groups?: Groups;
+    };
 }
 
 /**
@@ -116,15 +147,92 @@ export class DslGenerator {
      */
     private containersFilter(workspace: WorkspaceData): string {
         const containers = workspace.containers || [];
-        return containers.map((container: Container) => {
+        const parts: string[] = [];
+
+        // Helper function to render a component
+        const renderComponent = (component: any, indent: number): string => {
+            const indentation = ' '.repeat(indent);
+            return [
+                `${indentation}${component.metadata.name} = component "${component.metadata.name}" {`,
+                `${indentation}    technology "${component.metadata.technology || 'undefined'}"`,
+                `${indentation}    description "${component.metadata.description}"`,
+                `${indentation}}`
+            ].join('\n');
+        };
+
+        // Helper function to render components in a specific group
+        const renderComponentsInGroup = (group: string, components: any[], indent: number): string[] => {
+            const lines: string[] = [];
+            for (const component of components) {
+                if (component.metadata.group === group) {
+                    lines.push(renderComponent(component, indent));
+                }
+            }
+            return lines;
+        };
+
+        // Helper function to recursively render grouped components
+        const renderGroupedComponents = (groups: Record<string, any>, components: any[], indent: number): string[] => {
+            const lines: string[] = [];
+            for (const [group, subgroups] of Object.entries(groups)) {
+                // Get components in this group
+                const groupComponents = renderComponentsInGroup(group, components, indent + 4);
+                
+                // Get subgroup lines
+                const subgroupLines = Object.keys(subgroups).length > 0 
+                    ? renderGroupedComponents(subgroups, components, indent + 4)
+                    : [];
+
+                // Only render group if it has components or non-empty subgroups
+                if (groupComponents.length > 0 || subgroupLines.length > 0) {
+                    if (lines.length > 0) lines.push('');
+                    lines.push(`${' '.repeat(indent)}group "${group}" {`);
+                    
+                    // Add components
+                    if (groupComponents.length > 0) {
+                        lines.push(...groupComponents);
+                    }
+
+                    // Add subgroups
+                    if (subgroupLines.length > 0) {
+                        if (groupComponents.length > 0) lines.push('');
+                        lines.push(...subgroupLines);
+                    }
+
+                    lines.push(`${' '.repeat(indent)}}`);
+                }
+            }
+            return lines;
+        };
+
+        // Generate DSL for each container
+        for (const container of containers) {
             const lines = [
                 `${container.name} = container "${container.title}" {`,
                 `    technology "${container.technology}"`,
-                `    description "${container.description}"`,
-                '}'
+                `    description "${container.description}"`
             ];
-            return lines.join('\n');
-        }).join('\n\n');
+
+            if (container.analysis?.components) {
+                // First render ungrouped components
+                const ungroupedComponents = container.analysis.components.filter(c => !c.metadata.group);
+                if (ungroupedComponents.length > 0) {
+                    lines.push('');
+                    lines.push(...ungroupedComponents.map(component => renderComponent(component, 4)));
+                }
+
+                // Then render grouped components
+                if (container.analysis.groups && Object.keys(container.analysis.groups).length > 0) {
+                    if (ungroupedComponents.length > 0) lines.push('');
+                    lines.push(...renderGroupedComponents(container.analysis.groups, container.analysis.components, 4));
+                }
+            }
+
+            lines.push('}');
+            parts.push(lines.join('\n'));
+        }
+
+        return parts.join('\n\n');
     }
 
     /**
@@ -203,7 +311,8 @@ export class DslGenerator {
             name: container.data.name,
             title: container.data.name,
             technology: container.data.technology || 'undefined',
-            description: container.data.description || 'undefined'
+            description: container.data.description || 'undefined',
+            analysis: container.analysis
         }));
 
         // Get list of container names for validating targets

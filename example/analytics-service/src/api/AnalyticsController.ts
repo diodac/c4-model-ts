@@ -1,9 +1,8 @@
 /**
- * @c4Component
- * name: "AnalyticsController"
- * description: "Processes analytics data from Kafka"
- * technology: "TypeScript, Kafka"
- * tags: ["API", "Controller"]
+ * Processes analytics data from Kafka
+ * @c4Component AnalyticsController
+ * - technology: TypeScript, Kafka
+ * - tags: API, Controller
  */
 export class AnalyticsController {
     async processMetrics(): Promise<void> {
