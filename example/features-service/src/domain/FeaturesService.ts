@@ -1,4 +1,5 @@
 import { FeatureRepository } from '../infrastructure/FeatureRepository';
+import { ConfigClient } from '../infrastructure/ConfigClient';
 
 /**
  * Core service for feature flags management
@@ -9,18 +10,32 @@ import { FeatureRepository } from '../infrastructure/FeatureRepository';
  * @c4Group Domain
  */
 export class FeaturesService {
-    /**
-     * @c4Relation FeatureRepository | Stores feature data
-     * - technology: Internal
-     */
-    constructor(private repository: FeatureRepository) {}
+    private configClient: ConfigClient;
 
     /**
-     * @c4Relation config-service | Gets configuration
-     * - technology: HTTP
+     * @c4Relation FeatureRepository | Stores feature flags | Database
+     * - technology: MongoDB
+     * - tags: DirectRelation
      */
-    async getConfig(): Promise<any> {
-        // Implementation
+    constructor(
+        private repository: FeatureRepository
+    ) {
+        this.configClient = new ConfigClient();
+    }
+
+    /**
+     * @c4Relation config-service.ConfigService | Stores feature flags configuration | HTTP
+     * - technology: HTTP
+     * - tags: DirectRelation
+     */
+    async getFeatureConfig(name: string): Promise<any> {
+        return await this.configClient.getConfig(`features.${name}`);
+    }
+
+    async isEnabled(name: string): Promise<boolean> {
+        const config = await this.getFeatureConfig(name);
+        const feature = await this.repository.findByName(name);
+        return feature?.enabled && config?.enabled;
     }
 
     /**

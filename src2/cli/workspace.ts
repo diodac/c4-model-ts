@@ -44,7 +44,7 @@ program
             console.log(`\nFound ${result.containers.length} containers:`);
 
             for (const container of result.containers) {
-                console.log(`\n[${container.data.name}] (${container.alias})`);
+                console.log(`\n[${container.data.name}]`);
                 console.log(`Description: ${container.data.description}`);
                 if (container.data.technology) {
                     console.log(`Technology: ${container.data.technology}`);

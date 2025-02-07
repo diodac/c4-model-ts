@@ -4,6 +4,7 @@ import { Logger } from '../infrastructure/Logger';
 import { MetricsProcessor } from './MetricsProcessor';
 import { DataValidator } from './DataValidator';
 import { AlertService } from '../infrastructure/AlertService';
+import { FeaturesClient } from '../infrastructure/FeaturesClient';
 
 /**
  * Core service for metrics processing and analysis
@@ -17,6 +18,7 @@ export class MetricsService {
     private processor: MetricsProcessor;
     private validator: DataValidator;
     private alertService: AlertService;
+    private featuresClient: FeaturesClient;
 
     /**
      * @c4Relation MetricsRepository | Stores metrics data | Database
@@ -31,15 +33,21 @@ export class MetricsService {
          * - tags: IndirectRelation
          */
         private logger: Logger,
+        /**
+         * @c4Relation config-service.ConfigService | Gets configuration from config service | HTTP
+         * - technology: HTTP
+         * - tags: DirectRelation
+         */
         private configService: ConfigService
     ) {
         this.processor = new MetricsProcessor();
         this.validator = new DataValidator();
         this.alertService = new AlertService();
+        this.featuresClient = new FeaturesClient();
     }
 
     /**
-     * @c4Relation ConfigService | Gets metrics configuration | HTTP
+     * @c4Relation config-service.ConfigService | Gets metrics configuration | HTTP
      * - technology: HTTP
      * - tags: DirectRelation
      */
@@ -49,12 +57,28 @@ export class MetricsService {
     }
 
     /**
+     * @c4Relation features-service.FeaturesService | Checks if metrics collection is enabled | HTTP
+     * - technology: HTTP
+     * - tags: DirectRelation
+     */
+    private async isMetricsEnabled(type: string): Promise<boolean> {
+        return await this.featuresClient.isFeatureEnabled(`metrics.${type}`);
+    }
+
+    /**
      * @c4Relation MetricsProcessor | Processes metrics data | Internal
      * - technology: Internal
      * - tags: DirectRelation
      */
     async processMetrics(data: any): Promise<void> {
         this.logger.log('Processing metrics');
+        
+        // Check if metrics collection is enabled
+        if (!await this.isMetricsEnabled(data.type)) {
+            this.logger.log('Metrics collection disabled');
+            return;
+        }
+
         if (this.validator.validate(data)) {
             const processor = new MetricsProcessor();
             await processor.process(data);

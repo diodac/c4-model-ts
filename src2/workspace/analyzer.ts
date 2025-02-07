@@ -41,9 +41,9 @@ export class WorkspaceAnalyzer {
 
         // Analyze containers
         const containers: C4Container[] = [];
-        const failures: { alias: string; error: string }[] = [];
+        const failures: { name: string; error: string }[] = [];
 
-        for (const [alias, includeConfig] of Object.entries(workspaceConfig.include)) {
+        for (const includeConfig of Object.values(workspaceConfig.include)) {
             try {
                 // Only support c4container.json for now
                 if (includeConfig.type !== 'c4container.json') {
@@ -78,7 +78,6 @@ export class WorkspaceAnalyzer {
 
                     // Add to containers list
                     containers.push({
-                        alias,
                         data: {
                             name: containerConfig.name,
                             description: containerConfig.description,
@@ -91,7 +90,7 @@ export class WorkspaceAnalyzer {
                 }
             } catch (error) {
                 failures.push({
-                    alias,
+                    name: includeConfig.type,
                     error: error instanceof Error ? error.message : String(error)
                 });
             }
@@ -132,12 +131,12 @@ export class WorkspaceAnalyzer {
                         if (targetContainer && targetContainer !== container) {
                             // Create unique key for this relation direction and technology
                             const technology = relation.metadata.technology || 'unknown';
-                            const relationKey = `${container.alias}->${targetContainer.alias}:${technology}`;
+                            const relationKey = `${container.data.name}->${targetContainer.data.name}:${technology}`;
 
                             if (!relationsMap.has(relationKey)) {
                                 relationsMap.set(relationKey, {
-                                    source: container.alias,
-                                    target: targetContainer.alias,
+                                    source: container.data.name,
+                                    target: targetContainer.data.name,
                                     description: `${container.data.name} uses ${targetContainer.data.name}`,
                                     technology: technology !== 'unknown' ? technology : undefined
                                 });

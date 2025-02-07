@@ -39,9 +39,6 @@ export interface C4WorkspaceConfig {
  * Represents a container in the workspace
  */
 export interface C4Container {
-    /** Container alias from workspace config */
-    alias: string;
-
     /** Container data */
     data: ContainerData;
 
@@ -53,10 +50,10 @@ export interface C4Container {
  * Represents a relation between containers
  */
 export interface C4ContainerRelation {
-    /** Source container alias */
+    /** Source container name */
     source: string;
 
-    /** Target container alias */
+    /** Target container name */
     target: string;
 
     /** Relation description */
