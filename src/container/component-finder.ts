@@ -2,17 +2,18 @@ import { Project, SourceFile } from 'ts-morph';
 import { ComponentInfo } from './model/component';
 import { ComponentParser } from './component-parser';
 import { RelationParser } from './relation-parser';
+import { ContainerConfig } from './model/container';
 
 export class ComponentFinder {
     private project: Project;
     private componentParser: ComponentParser;
     private relationParser: RelationParser;
 
-    constructor(tsConfigPath?: string) {
+    constructor(tsConfigPath?: string, containerConfig?: ContainerConfig) {
         this.project = new Project({
             tsConfigFilePath: tsConfigPath
         });
-        this.componentParser = new ComponentParser();
+        this.componentParser = new ComponentParser(containerConfig);
         this.relationParser = new RelationParser();
     }
 

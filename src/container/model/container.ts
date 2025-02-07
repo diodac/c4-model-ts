@@ -1,4 +1,11 @@
 /**
+ * Recursive group structure
+ */
+export interface Groups {
+    [key: string]: Groups | Record<string, never>;
+}
+
+/**
  * Container configuration from c4container.json
  */
 export interface ContainerConfig {
@@ -21,7 +28,7 @@ export interface ContainerConfig {
     properties?: Record<string, string>;
 
     /** Component groups */
-    groups?: Record<string, Record<string, unknown>>;
+    groups?: Groups;
     
     /** External components */
     external?: Record<string, ExternalElement>;

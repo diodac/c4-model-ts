@@ -1,12 +1,18 @@
 import { ClassDeclaration, JSDoc } from 'ts-morph';
 import { ComponentInfo, ComponentMetadata } from './model/component';
 import { TagParser, TagSchema } from './tag-parser';
+import { ContainerConfig } from './model/container';
 
 /**
  * Parser for @c4Component tags
  */
 export class ComponentParser {
     private tagParser = new TagParser();
+    private containerConfig?: ContainerConfig;
+
+    constructor(containerConfig?: ContainerConfig) {
+        this.containerConfig = containerConfig;
+    }
 
     /**
      * Schema for @c4Component tag
