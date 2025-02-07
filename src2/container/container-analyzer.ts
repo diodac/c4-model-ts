@@ -87,7 +87,12 @@ export class ContainerAnalyzer {
 
         // Add invalid relations if requested
         if (options.includeInvalid) {
-            result.invalidRelations = this.relationValidator.validateRelations(components);
+            const validationResults = this.relationValidator.validateRelations(components);
+            result.invalidRelations = validationResults.filter(result => 
+                !result.targetExists || 
+                !result.isUsed || 
+                (result.errors && result.errors.length > 0)
+            );
         }
 
         return result;
