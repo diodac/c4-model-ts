@@ -1,24 +1,25 @@
 # C4 Model Generator
 
-This module automatically generates C4 model documentation from TypeScript code using [TSDoc](https://tsdoc.org/) annotations. It follows the [Structurizr DSL](https://docs.structurizr.com/dsl) format and C4 model principles.
+This module automatically generates C4 model documentation from TypeScript code using JSDoc annotations. It follows the [Structurizr DSL](https://docs.structurizr.com/dsl) format and C4 model principles.
 
 ## Features
 
 - Extracts C4 components and relationships from TypeScript code
-- Uses TSDoc standard for documentation comments
-- Implements custom TSDoc block tags (@c4Component and @c4Relation)
-- Supports all Structurizr DSL parameters for components and relationships
-- Handles perspectives with descriptions and optional values
-- Supports properties and custom metadata
+- Uses JSDoc standard for documentation comments
+- Implements custom JSDoc block tags (@c4Component, @c4Relation, and @c4Group)
+- Supports core Structurizr DSL parameters for components and relationships
+- Validates relationships and detects undeclared dependencies
+- Supports direct and indirect relationship detection
+- Groups components logically with hierarchical group structures
 - Configurable source file patterns with glob support
-- Command-line interface (CLI) for easy integration
+- Command-line interface (CLI) with component and relation validation
+- External component definitions support
 
 ## Technical Details
 
 The module uses:
-- [@microsoft/tsdoc](https://www.npmjs.com/package/@microsoft/tsdoc) for parsing documentation comments
-- [ts-morph](https://github.com/dsherret/ts-morph) for TypeScript code analysis
-- Custom block tags that extend the TSDoc standard:
+- [ts-morph](https://github.com/dsherret/ts-morph) for TypeScript code analysis and JSDoc parsing
+- Custom block tags that extend the JSDoc standard:
   - `@c4Component` - Marks a class as a C4 component
   - `@c4Relation` - Defines relationships between components
   - `@c4Group` - Defines logical grouping of components
@@ -37,125 +38,86 @@ npm install -g @rhino/c4-generator
 
 ### Command Line Interface
 
-The generator can be run from the command line:
+The generator can be run from the command line with various options:
 
 ```bash
-# Using global installation
+# Basic usage
 c4-generator [config-path]
 
-# Using local installation
-npx c4-generator [config-path]
+# Show components and their relations
+c4-generator [config-path] --components
+
+# Show undeclared relations
+c4-generator [config-path] --undeclared
+
+# Show invalid relations
+c4-generator [config-path] --invalid
 ```
 
-The `config-path` argument is optional:
-- If provided, it should point to a `c4model.json` file
-- If omitted, the generator will search for `c4model.json` in the current directory and its parent directories
+The `config-path` argument should point to a `c4container.json` file.
 
-Example:
-```bash
-# Using specific config file
-c4-generator ./path/to/c4model.json
+### Container Configuration
 
-# Using automatic config file detection
-c4-generator
-```
-
-The generator will:
-1. Load the configuration from `c4model.json`
-2. Look for `tsconfig.json` in the same directory
-3. Generate the C4 model
-4. Output the result as JSON to stdout
-
-### Programmatic Usage
-
-### 1. Configure Container
-
-Create a `c4model.json` file in your project root:
+Create a `c4container.json` file in your project root:
 
 ```json
 {
     "name": "your-service-name",
     "description": "Service description",
     "technology": "technology stack",
+    "tags": ["tag1", "tag2"],
+    "properties": {
+        "criticality": "high",
+        "maintainer": "team-core"
+    },
     "source": [
-        "**/*.ts",
+        "src/**/*.ts",
         "!node_modules/**",
         "!dist/**",
         "!test/**"
-    ]
-}
-```
-
-The configuration file follows a JSON schema that supports:
-- Required fields:
-  - `name` - Container/service name
-  - `description` - Container purpose description
-  - `source` - Array of glob patterns for source files
-- Optional fields:
-  - `technology` - Primary technology stack
-  - `tags` - Array of container tags
-  - `properties` - Custom name/value properties
-  - `groups` - Hierarchical structure of component groups
-
-Full schema definition is available in `schema/c4container.json`.
-
-Example of a complete configuration:
-```json
-{
-  "name": "features-service",
-  "description": "Feature flags management service",
-  "technology": "Node.js + Express",
-  "tags": ["backend", "features"],
-  "properties": {
-    "criticality": "high",
-    "maintainer": "team-core"
-  },
-  "groups": {
-    "API": {
-      "Controllers": {},
-      "Middleware": {}
-    },
-    "Domain": {
-      "Services": {},
-      "Models": {}
+    ],
+    "external": {
+        "external-service": {
+            "name": "External Service",
+            "description": "Description of external service",
+            "technology": "REST API"
+        }
     }
-  },
-  "source": [
-    "src/**/*.ts",
-    "!**/*.spec.ts"
-  ]
 }
 ```
 
-### 2. Annotate Your Code
+### Code Annotations
 
-Add C4 annotations using TSDoc syntax:
+Add C4 annotations using JSDoc syntax:
 
 ```typescript
 /**
- * @c4Component "Component name" "Technology" "Tags"
- *   description "Detailed description"
- *   tags "Additional,Tags"
- *   url "https://docs.example.com"
- *   properties {
- *     criticality high
- *     maintainer "team-name"
- *   }
- *   perspectives {
- *     security "Security requirements" "high"
- *     performance "Performance requirements"
- *   }
- *   !docs "./docs/component"
- *   !adrs "./docs/decisions"
+ * @c4Component [name]
+ * - description: Component description
+ * - technology: Technology stack
+ * - url: Documentation URL
+ * - properties:
+ *   criticality: high
+ *   maintainer: team-name
+ * - tags: tag1, tag2
+ * 
+ * @c4Group "Group Name"
  */
 export class ExampleService {
     /**
-     * @c4Relation "DatabaseService" "Stores application data" "PostgreSQL" "Database,Core"
+     * @c4Relation target | description | technology
+     * - technology: Technology used (overrides the argument if specified)
+     * - url: Documentation URL
+     * - properties:
+     *   key1: value1
+     *   key2: value2
+     * - tags: DirectRelation, tag2
      */
     constructor(private db: DatabaseService) {}
 
     /**
-     * @c4Relation "NotificationService" "Sends email notifications" "SMTP" "External"
+     * @c4Relation NotificationService | Sends notifications | SMTP
+     * - tags: IndirectRelation
      */
     async notifyUser(userId: string): Promise<void> {
         // Implementation
@@ -163,65 +125,31 @@ export class ExampleService {
 }
 ```
 
-### 3. Generate Model
+### Relationship Types
 
-```typescript
-import { C4Generator } from './c4';
+The generator automatically detects and validates two types of relationships:
 
-const generator = new C4Generator("tsconfig.json");
-const model = generator.generate([
-    "**/*.ts",
-    "!node_modules/**/*.ts",
-    "!dist/**/*.ts",
-    "!test/**/*.ts"
-]);
-```
+- **Direct Relations**: When a component directly uses another component (e.g., through constructor injection or class properties)
+- **Indirect Relations**: When a component creates or uses another component indirectly (e.g., creating new instances or using in method calls)
 
-## Annotations
+Relationships can be explicitly tagged with `DirectRelation` or `IndirectRelation` tags. The generator validates these tags against actual usage patterns in the code.
 
-### @c4Component
-Defines a C4 component with its metadata:
-- Can only be used on class declarations
-- First line: `"name" "technology" "tags"`
-- Additional parameters:
-  - `description` - Detailed component description
-  - `tags` - Additional tags (comma-separated)
-  - `url` - Documentation URL
-  - `properties` - Custom properties in key-value format
-  - `perspectives` - Component perspectives with descriptions and optional values
-  - `!docs` - Path to documentation
-  - `!adrs` - Path to architecture decision records
+### Analysis Output
 
-### @c4Group
-Defines a logical group of components:
-- Can only be used in conjunction with @c4Component on the same class
-- Format: `"name"`
+The analysis produces detailed information about:
 
-### @c4Relation
-Defines a relationship between components:
-- Format: `"target" "description" "technology" "tags"`
-- Additional parameters:
-  - `url` - Documentation URL for the relationship
-  - `properties` - Custom relationship properties
-  - `perspectives` - Relationship perspectives
-- Can be used on:
-  - Class declarations (for component-level relationships)
-  - Class methods (for behavioral relationships)
-  - Constructor parameters (for dependency relationships)
+- Components with their metadata and locations
+- Declared relationships between components
+- Undeclared relationships found in the code
+- Invalid relationships (missing targets, unused relations, or incorrect tags)
+- Component grouping structure
 
-## Output
-
-The generator produces a `C4ModelData` object containing:
-- Container metadata
-- List of components with their metadata
-- List of relationships between components
-
-This data can be used to:
-- Generate Structurizr DSL
-- Create C4 diagrams
-- Build documentation
-- Analyze architecture
+Components are organized by their logical groups, making it easier to understand the system structure.
 
 ## Example
 
-See `example.ts` for a complete example of component and relationship definitions.
+See the `example` directory for complete examples of:
+- Container configuration
+- Component and relationship definitions
+- Group structures
+- External component definitions
