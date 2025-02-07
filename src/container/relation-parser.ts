@@ -64,6 +64,11 @@ export class RelationParser {
         const jsDocs = node.getJsDocs();
         if (!jsDocs.length) return;
 
+        // Get the actual class name for the source component
+        const className = node instanceof ClassDeclaration 
+            ? node.getName() || '' 
+            : this.getParentClassName(node);
+
         for (const jsDoc of jsDocs) {
             const relationTags = jsDoc.getTags().filter(tag => tag.getTagName() === 'c4Relation');
             
@@ -80,13 +85,9 @@ export class RelationParser {
                     properties: parsed.params.properties as Record<string, string>
                 };
 
-                const className = node instanceof ClassDeclaration 
-                    ? node.getName() || '' 
-                    : this.getParentClassName(node);
-
                 relations.push({
                     metadata,
-                    sourceComponent: componentName,
+                    sourceComponent: className,  // Use class name instead of component name
                     location: {
                         filePath: node.getSourceFile().getFilePath(),
                         className,

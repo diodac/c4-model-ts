@@ -153,3 +153,76 @@ See the `example` directory for complete examples of:
 - Component and relationship definitions
 - Group structures
 - External component definitions
+
+## DSL Templates
+
+The generator uses Liquid templates to generate Structurizr DSL files. Templates should be placed in the workspace directory with `.dsl.tpl` extension.
+
+### Template Variables
+
+- `workspace` - Contains analyzed workspace data:
+  - `containers` - List of containers with their properties
+  - `relationships` - List of relationships between containers
+
+### Template Filters
+
+- `containers` - Generates DSL code for containers
+- `relationships` - Generates DSL code for relationships
+- `indent` - Indents content by specified number of spaces
+
+### Example Template
+
+```
+workspace {
+    model {
+        enterprise "Example Corp" {
+            mySystem = softwareSystem "My System" {
+                description "Example system description"
+                
+                # Generate container definitions
+                {{ workspace | containers | indent: 16 }}
+                
+                # Generate relationships
+                {{ workspace | relationships | indent: 16 }}
+            }
+        }
+    }
+    
+    views {
+        systemContext mySystem "SystemContext" {
+            include *
+            autoLayout
+        }
+        
+        container mySystem "Containers" {
+            include *
+            autoLayout
+        }
+    }
+}
+```
+
+### Template Location
+
+By default, the generator looks for templates in:
+- `<workspace_dir>/workspace.dsl.tpl`
+
+You can override the template location using:
+- `workspaceDir` in c4workspace.json
+- `--workspace-dir` CLI option
+- Custom template path in API options
+
+### Generated DSL Format
+
+Container definitions:
+```
+containerName = container "Container Title" {
+    technology "Technology Stack"
+    description "Container description"
+}
+```
+
+Relationship definitions:
+```
+sourceContainer -> targetContainer "Relationship description" "Technology"
+```

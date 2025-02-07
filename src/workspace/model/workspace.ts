@@ -33,6 +33,18 @@ export interface C4WorkspaceConfig {
     include: {
         [alias: string]: C4IncludeConfig;
     };
+
+    /** 
+     * Directory for workspace files (templates, output)
+     * Relative to basePath or absolute
+     */
+    workspaceDir?: string;
+
+    /**
+     * Base path for resolving relative paths
+     * If not provided, defaults to the directory containing c4workspace.json
+     */
+    basePath?: string;
 }
 
 /**

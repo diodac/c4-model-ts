@@ -1,9 +1,8 @@
 /**
- * @c4Component
- * name: "MetricsPublisher"
- * description: "Publishes metrics data to Kafka for analytics"
- * technology: "TypeScript, Kafka"
- * tags: ["Infrastructure", "Messaging"]
+ * Publishes metrics data to Kafka for analytics
+ * @c4Component MetricsPublisher
+ * - technology: TypeScript, Kafka
+ * - tags: Infrastructure, Messaging
  */
 export class MetricsPublisher {
     /**

@@ -1,0 +1,281 @@
+import { Liquid } from 'liquidjs';
+import { WorkspaceAnalyzer } from '../analyzer';
+import { C4WorkspaceConfig, C4WorkspaceModel, C4Container, C4ContainerRelation } from '../model/workspace';
+import { resolve, dirname } from 'path';
+import { readFileSync, writeFileSync } from 'fs';
+
+/**
+ * Represents a container in DSL generation context
+ */
+interface Container {
+    /** Container identifier used in DSL */
+    name: string;
+    /** Container display name */
+    title: string;
+    /** Container technology stack */
+    technology: string;
+    /** Container description */
+    description: string;
+}
+
+/**
+ * Represents a relationship between containers in DSL generation context
+ */
+interface Relationship {
+    /** Source container identifier */
+    source: string;
+    /** Target container identifier */
+    target: string;
+    /** Relationship description */
+    description: string;
+    /** Technology used for communication */
+    technology: string;
+}
+
+/**
+ * Data structure passed to DSL template
+ */
+interface WorkspaceData {
+    /** List of containers in the workspace */
+    containers: Container[];
+    /** List of relationships between containers */
+    relationships: Relationship[];
+}
+
+/**
+ * Generator for Structurizr DSL files from workspace data
+ * Uses liquid templates for generating DSL code
+ */
+export class DslGenerator {
+    private readonly analyzer: WorkspaceAnalyzer;
+    private readonly config: C4WorkspaceConfig;
+    private readonly engine: Liquid;
+    private readonly workspaceDir: string;
+    private readonly templateFile: string;
+    private readonly outputFile: string;
+    private readonly configPath: string;
+
+    /**
+     * Creates a new DSL generator instance
+     * 
+     * @param analyzer - Workspace analyzer instance
+     * @param config - Workspace configuration
+     * @param configPath - Path to workspace configuration file (used for resolving relative paths)
+     * @param options - Optional generator settings
+     * @param options.workspaceDir - Custom workspace directory (overrides config.workspaceDir)
+     * @param options.templateFile - Custom template file path (default: workspace.dsl.tpl)
+     * @param options.outputFile - Custom output file path (default: workspace.dsl)
+     */
+    constructor(
+        analyzer: WorkspaceAnalyzer,
+        config: C4WorkspaceConfig,
+        configPath: string,
+        options?: {
+            workspaceDir?: string;
+            templateFile?: string;
+            outputFile?: string;
+        }
+    ) {
+        this.analyzer = analyzer;
+        this.config = config;
+        this.configPath = configPath;
+        
+        // Get base path - either from config or from config file location
+        const basePath = config.basePath || dirname(configPath);
+        
+        // Setup workspace directory using resolve instead of join
+        this.workspaceDir = options?.workspaceDir || 
+            config.workspaceDir || 
+            resolve(basePath, 'workspace');
+
+        // Setup template and output files
+        this.templateFile = options?.templateFile || 
+            resolve(this.workspaceDir, 'workspace.dsl.tpl');
+        this.outputFile = options?.outputFile || 
+            resolve(this.workspaceDir, 'workspace.dsl');
+
+        // Initialize Liquid engine
+        this.engine = new Liquid();
+        this.registerFilters();
+    }
+
+    /**
+     * Registers custom filters for DSL template processing
+     */
+    private registerFilters(): void {
+        this.engine.registerFilter('containers', this.containersFilter.bind(this));
+        this.engine.registerFilter('relationships', this.relationshipsFilter.bind(this));
+        this.engine.registerFilter('indent', this.indentFilter.bind(this));
+    }
+
+    /**
+     * Liquid filter for generating container DSL code
+     * 
+     * @param workspace - Workspace data containing containers
+     * @returns Generated DSL code for containers
+     */
+    private containersFilter(workspace: WorkspaceData): string {
+        const containers = workspace.containers || [];
+        return containers.map((container: Container) => {
+            const lines = [
+                `${container.name} = container "${container.title}" {`,
+                `    technology "${container.technology}"`,
+                `    description "${container.description}"`,
+                '}'
+            ];
+            return lines.join('\n');
+        }).join('\n\n');
+    }
+
+    /**
+     * Liquid filter for generating relationship DSL code
+     * 
+     * @param workspace - Workspace data containing relationships
+     * @returns Generated DSL code for relationships
+     */
+    private relationshipsFilter(workspace: WorkspaceData): string {
+        const relationships = workspace.relationships || [];
+
+        // Group relationships
+        const containerRelations = relationships.filter(rel => !rel.source.includes('.') && !rel.target.includes('.'));
+        const componentRelations = relationships.filter(rel => rel.source.includes('.'));
+
+        // Group component relations by source container
+        const componentRelationsByContainer = new Map<string, Relationship[]>();
+        for (const rel of componentRelations) {
+            const containerName = rel.source.split('.')[0];
+            if (!componentRelationsByContainer.has(containerName)) {
+                componentRelationsByContainer.set(containerName, []);
+            }
+            componentRelationsByContainer.get(containerName)!.push(rel);
+        }
+
+        // Generate DSL for each group
+        const parts = [
+            // Container-to-container relations
+            ...containerRelations.map(rel => 
+                `${rel.source} -> ${rel.target} "${rel.description}" "${rel.technology}"`
+            )
+        ];
+
+        // Add component relations grouped by container
+        for (const [containerName, relations] of componentRelationsByContainer) {
+            // Add empty line before container group
+            if (parts.length > 0) {
+                parts.push('');
+            }
+
+            // Add relations for this container
+            parts.push(...relations.map(rel => 
+                `${rel.source} -> ${rel.target} "${rel.description}" "${rel.technology}"`
+            ));
+        }
+
+        return parts.join('\n');
+    }
+
+    /**
+     * Liquid filter for indenting DSL code
+     * 
+     * @param content - Content to indent
+     * @param spaces - Number of spaces to indent
+     * @returns Indented content
+     */
+    private indentFilter(content: string, spaces: number): string {
+        const indent = ' '.repeat(spaces);
+        const lines = content.split('\n');
+        
+        // First line should not be indented as it replaces a placeholder
+        if (lines.length <= 1) return content;
+        
+        return [
+            lines[0],
+            ...lines.slice(1).map(line => line.trim() ? indent + line : line)
+        ].join('\n');
+    }
+
+    /**
+     * Transforms workspace model from analyzer to template format
+     */
+    private transformWorkspaceData(model: C4WorkspaceModel): WorkspaceData {
+        // Transform containers
+        const containers = model.containers.map(container => ({
+            name: container.data.name,
+            title: container.data.name,
+            technology: container.data.technology || 'undefined',
+            description: container.data.description || 'undefined'
+        }));
+
+        // Get list of container names for validating targets
+        const containerNames = new Set(containers.map(c => c.name));
+
+        // Collect all relationships
+        const relationships = [
+            // Container-level relations from workspace model
+            ...model.relations.map(relation => ({
+                source: relation.source,
+                target: relation.target,
+                description: relation.description,
+                technology: relation.technology || 'undefined'
+            })),
+            // Component-level relations from containers
+            ...model.containers.flatMap(container => 
+                container.analysis.components.flatMap(component => 
+                    component.relations.map(relation => {
+                        const source = `${container.data.name}.${relation.sourceComponent}`;
+                        let target = relation.metadata.target;
+
+                        // If target doesn't contain a dot and is not a container name,
+                        // it's an internal component - add container prefix
+                        if (!target.includes('.') && !containerNames.has(target)) {
+                            target = `${container.data.name}.${target}`;
+                        }
+                        
+                        return {
+                            source,
+                            target,
+                            description: relation.metadata.description,
+                            technology: relation.metadata.technology || 'undefined'
+                        };
+                    })
+                )
+            )
+        ];
+
+        return {
+            containers,
+            relationships
+        };
+    }
+
+    /**
+     * Generates DSL file from workspace data
+     * 
+     * @throws Error if generation fails
+     */
+    public async generate(): Promise<void> {
+        try {
+            // Analyze workspace
+            const workspaceModel = await this.analyzer.analyze();
+
+            // Transform data to template format
+            const workspaceData = this.transformWorkspaceData(workspaceModel);
+
+            // Read template
+            const template = readFileSync(this.templateFile, 'utf-8');
+
+            // Generate DSL
+            const dsl = await this.engine.parseAndRender(template, {
+                workspace: workspaceData
+            });
+
+            // Write output
+            writeFileSync(this.outputFile, dsl, 'utf-8');
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                throw new Error(`DSL generation failed: ${error.message}`);
+            }
+            throw new Error('DSL generation failed with unknown error');
+        }
+    }
+} 
