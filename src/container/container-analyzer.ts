@@ -7,12 +7,6 @@ import { ComponentInfo } from './model/component';
 import { RelationUsage } from './relation-finder';
 import { ValidationResult } from './relation-validator';
 
-export interface GroupHierarchy {
-    name: string;
-    components: ComponentInfo[];
-    subgroups: GroupHierarchy[];
-}
-
 export interface AnalysisResult {
     container: {
         name: string;
@@ -22,7 +16,7 @@ export interface AnalysisResult {
         properties?: Record<string, string>;
     };
     components: Array<ComponentInfo & { relations: Array<{ sourceComponent: string }> }>;
-    groupHierarchy: GroupHierarchy[];
+    groups: Groups;
     undeclaredRelations?: RelationUsage[];
     invalidRelations?: ValidationResult[];
 }
@@ -69,9 +63,6 @@ export class ContainerAnalyzer {
         // Find components and relations
         const components = this.componentFinder.findComponents();
 
-        // Build group hierarchy
-        const groupHierarchy = this.buildGroupHierarchy(components);
-
         // Prepare result
         const result: AnalysisResult = {
             container: {
@@ -88,7 +79,7 @@ export class ContainerAnalyzer {
                     sourceComponent: component.metadata.name
                 }))
             })),
-            groupHierarchy
+            groups: this.containerConfig.groups || {}
         };
 
         // Add undeclared relations if requested
@@ -107,82 +98,5 @@ export class ContainerAnalyzer {
         }
 
         return result;
-    }
-
-    /**
-     * Build hierarchical group structure from components using configuration
-     */
-    private buildGroupHierarchy(components: ComponentInfo[]): GroupHierarchy[] {
-        const result: GroupHierarchy[] = [];
-        const ungroupedComponents: ComponentInfo[] = [];
-
-        // Collect ungrouped components
-        for (const component of components) {
-            if (!component.metadata.group) {
-                ungroupedComponents.push(component);
-            }
-        }
-
-        // Add ungrouped components if any
-        if (ungroupedComponents.length > 0) {
-            result.push({
-                name: "(no group)",
-                components: ungroupedComponents,
-                subgroups: []
-            });
-        }
-
-        // Build hierarchy from configuration
-        if (this.containerConfig.groups) {
-            for (const [groupName, subgroups] of Object.entries(this.containerConfig.groups)) {
-                result.push(this.buildGroupFromConfig(
-                    groupName,
-                    subgroups,
-                    components.filter(c => c.metadata.group === groupName)
-                ));
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Build group hierarchy from configuration recursively
-     */
-    private buildGroupFromConfig(name: string, subgroups: Groups | Record<string, never>, components: ComponentInfo[]): GroupHierarchy {
-        const result: GroupHierarchy = {
-            name,
-            components,
-            subgroups: []
-        };
-
-        // Process subgroups if any
-        for (const [subgroupName, nestedSubgroups] of Object.entries(subgroups)) {
-            result.subgroups.push(this.buildGroupFromConfig(
-                subgroupName,
-                nestedSubgroups,
-                components.filter(c => c.metadata.group === subgroupName)
-            ));
-        }
-
-        return result;
-    }
-
-    /**
-     * Group components by their immediate group
-     * @deprecated Use buildGroupHierarchy instead for hierarchical grouping
-     */
-    groupComponents(components: ComponentInfo[]): Map<string, ComponentInfo[]> {
-        const groupedComponents = new Map<string, ComponentInfo[]>();
-        
-        for (const component of components) {
-            const group = component.metadata.group || '(no group)';
-            if (!groupedComponents.has(group)) {
-                groupedComponents.set(group, []);
-            }
-            groupedComponents.get(group)!.push(component);
-        }
-
-        return groupedComponents;
     }
 } 

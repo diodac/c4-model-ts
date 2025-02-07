@@ -3,8 +3,8 @@
 import { resolve, dirname } from 'path';
 import { readFileSync } from 'fs';
 import { Command } from 'commander';
-import { ContainerConfig } from '../container/model/container';
-import { ContainerAnalyzer, ContainerAnalyzerConfig, GroupHierarchy } from '../container/container-analyzer';
+import { ContainerConfig, Groups } from '../container/model/container';
+import { ContainerAnalyzer, ContainerAnalyzerConfig } from '../container/container-analyzer';
 
 const program = new Command();
 
@@ -48,9 +48,38 @@ program
         if (options.components || (!options.undeclared && !options.invalid)) {
             console.log(`\nFound ${result.components.length} components:`);
 
-            // Display components by group hierarchy
-            for (const group of result.groupHierarchy) {
-                displayGroupHierarchy(group);
+            // Display group hierarchy
+            if (Object.keys(result.groups).length > 0) {
+                console.log('\nGroup hierarchy:');
+                displayGroups(result.groups);
+            }
+
+            // Display components
+            console.log('\nComponents:');
+            for (const component of result.components) {
+                console.log(`\n[${component.metadata.name}]`);
+                console.log(`Group: ${component.metadata.group || '(no group)'}`);
+                console.log(`Description: ${component.metadata.description}`);
+                if (component.metadata.technology) {
+                    console.log(`Technology: ${component.metadata.technology}`);
+                }
+                if (component.metadata.tags?.length) {
+                    console.log(`Tags: ${component.metadata.tags.join(', ')}`);
+                }
+                if (component.relations.length > 0) {
+                    console.log('Relations:');
+                    for (const relation of component.relations) {
+                        console.log(`  → ${relation.metadata.target}`);
+                        console.log(`    Description: ${relation.metadata.description}`);
+                        if (relation.metadata.technology) {
+                            console.log(`    Technology: ${relation.metadata.technology}`);
+                        }
+                        if (relation.metadata.tags?.length) {
+                            console.log(`    Tags: ${relation.metadata.tags.join(', ')}`);
+                        }
+                    }
+                }
+                console.log(`Location: ${component.location.filePath}:${component.location.line}`);
             }
         }
 
@@ -102,41 +131,15 @@ program
     });
 
 /**
- * Display a group hierarchy with proper indentation
+ * Display groups recursively
  */
-function displayGroupHierarchy(group: GroupHierarchy, level: number = 0): void {
+function displayGroups(groups: Groups, level: number = 0): void {
     const indent = '  '.repeat(level);
-    console.log(`\n${indent}=== ${group.name} ===`);
-    
-    // Display components in this group
-    for (const component of group.components) {
-        console.log(`\n${indent}[${component.metadata.name}]`);
-        console.log(`${indent}Description: ${component.metadata.description}`);
-        if (component.metadata.technology) {
-            console.log(`${indent}Technology: ${component.metadata.technology}`);
+    for (const [name, subgroups] of Object.entries(groups)) {
+        console.log(`${indent}${name}`);
+        if (Object.keys(subgroups).length > 0) {
+            displayGroups(subgroups, level + 1);
         }
-        if (component.metadata.tags?.length) {
-            console.log(`${indent}Tags: ${component.metadata.tags.join(', ')}`);
-        }
-        if (component.relations.length > 0) {
-            console.log(`${indent}Relations:`);
-            for (const relation of component.relations) {
-                console.log(`${indent}  → ${relation.metadata.target}`);
-                console.log(`${indent}    Description: ${relation.metadata.description}`);
-                if (relation.metadata.technology) {
-                    console.log(`${indent}    Technology: ${relation.metadata.technology}`);
-                }
-                if (relation.metadata.tags?.length) {
-                    console.log(`${indent}    Tags: ${relation.metadata.tags.join(', ')}`);
-                }
-            }
-        }
-        console.log(`${indent}Location: ${component.location.filePath}:${component.location.line}`);
-    }
-
-    // Display subgroups
-    for (const subgroup of group.subgroups) {
-        displayGroupHierarchy(subgroup, level + 1);
     }
 }
 
