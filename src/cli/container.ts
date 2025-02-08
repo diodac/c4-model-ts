@@ -85,52 +85,57 @@ program
 
         // Show undeclared relations if requested
         if (result.undeclaredRelations?.length) {
-            console.log('\nFound undeclared relations:');
+            console.log('\nWarning: Found undeclared relations in code:');
+            console.log('Consider documenting these relations with @c4Relation tag if they are significant dependencies.\n');
+            
             for (const relation of result.undeclaredRelations) {
-                console.log(`\n${relation.calledFrom.component.metadata.name} → ${relation.method.component.metadata.name}`);
+                console.log(`${relation.calledFrom.component.metadata.name} → ${relation.method.component.metadata.name}`);
                 console.log(`Method: ${relation.method.name}`);
                 console.log(`Called from: ${relation.calledFrom.method || '(constructor)'}`);
                 console.log(`Location: ${relation.calledFrom.filePath}:${relation.calledFrom.line}`);
                 if (relation.callChain.length > 1) {
                     console.log(`Call chain: ${relation.callChain.join(' → ')}`);
                 }
+                console.log('');
             }
         } else if (options.undeclared) {
-            console.log('\nNo undeclared relations found.');
+            console.log('\nAll code relations are properly documented.');
         }
 
         // Show invalid relations if requested
         if (result.invalidRelations?.length) {
-            console.log('\nFound invalid relations:');
+            console.log('\nError: Found invalid relations:');
             for (const validationResult of result.invalidRelations) {
                 const relation = validationResult.relation;
 
-                // Show target validation errors
+                // Invalid target is an error
                 if (!validationResult.targetExists) {
-                    console.log(`\nInvalid target: ${relation.sourceComponent} → ${relation.metadata.target}`);
+                    console.log(`\nError: Invalid target component: ${relation.sourceComponent} → ${relation.metadata.target}`);
                     console.log(`Location: ${relation.location.filePath}:${relation.location.line}`);
+                    console.log('The target component does not exist in the codebase.');
                 }
 
-                // Show usage validation errors
+                // Unused relation is an error
                 if (!validationResult.isUsed) {
-                    console.log(`\nUnused relation: ${relation.sourceComponent} → ${relation.metadata.target}`);
+                    console.log(`\nError: Declared but unused relation: ${relation.sourceComponent} → ${relation.metadata.target}`);
                     console.log(`Description: ${relation.metadata.description}`);
                     if (relation.metadata.technology) {
                         console.log(`Technology: ${relation.metadata.technology}`);
                     }
                     console.log(`Location: ${relation.location.filePath}:${relation.location.line}`);
+                    console.log('This relation is documented but not found in the code. Either implement the relation or remove its documentation.');
                 }
 
-                // Show tag validation errors
+                // Tag validation errors
                 if (validationResult.errors?.length) {
                     for (const error of validationResult.errors) {
-                        console.log(`\nTag validation error: ${error}`);
+                        console.log(`\nError: ${error}`);
                         console.log(`Location: ${relation.location.filePath}:${relation.location.line}`);
                     }
                 }
             }
         } else if (options.invalid) {
-            console.log('\nNo invalid relations found.');
+            console.log('\nAll declared relations are valid.');
         }
     });
 

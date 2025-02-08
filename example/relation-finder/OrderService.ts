@@ -12,7 +12,7 @@ import { ShippingService } from './ShippingService';
  *   criticality: high
  *   maintainer: team-core
  * 
- * @c4Relation target | description | technology
+ * @c4Relation PaymentService | Processes payments for orders | HTTP/REST
  * - technology: HTTP/REST
  * - tags: DirectRelation
  * - properties:

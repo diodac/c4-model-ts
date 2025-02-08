@@ -1,5 +1,3 @@
-import { NotificationService } from './NotificationService';
-
 /**
  * Service managing shipping and delivery operations
  * @c4Component
@@ -13,11 +11,4 @@ import { NotificationService } from './NotificationService';
  * - properties:
  *   reliability: high
  */
-export class ShippingService {
-    constructor(private notificationService: NotificationService) {}
-
-    async scheduleDelivery(orderId: string): Promise<void> {
-        // Schedule delivery logic
-        await this.notificationService.notifyCustomer(orderId, "Your order has been scheduled for delivery");
-    }
-} 
+ 

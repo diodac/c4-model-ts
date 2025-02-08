@@ -1,0 +1,11 @@
+{
+    "name": "E-Commerce System",
+    "description": "E-commerce system handling orders, payments, and shipping",
+    "technology": "TypeScript",
+    "tags": ["core", "e-commerce"],
+    "source": [
+        "*.ts",
+        "!node_modules/**"
+    ],
+    "groups": {}
+} 

@@ -41,7 +41,7 @@ export class ContainerAnalyzer {
 
         // Initialize finders
         this.componentFinder = new ComponentFinder(config.tsConfigPath, config.config);
-        this.relationFinder = new RelationFinder();
+        this.relationFinder = new RelationFinder(config.tsConfigPath);
         this.relationValidator = new RelationValidator({
             tsConfigPath: config.tsConfigPath,
             config: config.config,
