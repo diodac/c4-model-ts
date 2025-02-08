@@ -1,7 +1,7 @@
 {
-  "name": "@rhino/c4-generator",
+  "name": "c4-model-ts",
   "version": "0.1.0",
-  "description": "C4 model generator from TypeScript code using TSDoc annotations",
+  "description": "C4 model generator from TypeScript code using JSDoc-style annotations",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
@@ -29,14 +29,11 @@
     "architecture",
     "documentation",
     "typescript",
-    "tsdoc",
     "structurizr"
   ],
   "author": "Rhino Team",
   "license": "MIT",
   "dependencies": {
-    "@microsoft/tsdoc": "^0.15.1",
-    "@microsoft/tsdoc-config": "^0.17.1",
     "ajv": "^8.17.1",
     "commander": "^13.1.0",
     "glob": "^11.0.1",
@@ -61,7 +58,6 @@
   "files": [
     "dist",
     "README.md",
-    "LICENSE",
-    "tsdoc.json"
+    "LICENSE"
   ]
 }

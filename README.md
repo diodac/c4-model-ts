@@ -1,12 +1,12 @@
 # C4 Model Generator
 
-This module automatically generates C4 model documentation from TypeScript code using JSDoc annotations. It follows the [Structurizr DSL](https://docs.structurizr.com/dsl) format and C4 model principles.
+This module automatically generates C4 model documentation from TypeScript code using JSDoc-style annotations. It follows the [Structurizr DSL](https://docs.structurizr.com/dsl) format and C4 model principles.
 
 ## Features
 
 - Extracts C4 components and relationships from TypeScript code
-- Uses JSDoc standard for documentation comments
-- Implements custom JSDoc block tags (@c4Component, @c4Relation, and @c4Group)
+- Uses JSDoc-style annotations with custom C4 tags
+- Implements custom block tags (@c4Component, @c4Relation, and @c4Group)
 - Supports core Structurizr DSL parameters for components and relationships
 - Validates relationships and detects undeclared dependencies
 - Supports direct and indirect relationship detection
@@ -15,80 +15,9 @@ This module automatically generates C4 model documentation from TypeScript code 
 - Command-line interface (CLI) with component and relation validation
 - External component definitions support
 
-## Technical Details
+## Annotation Format
 
-The module uses:
-- [ts-morph](https://github.com/dsherret/ts-morph) for TypeScript code analysis and JSDoc parsing
-- Custom block tags that extend the JSDoc standard:
-  - `@c4Component` - Marks a class as a C4 component
-  - `@c4Relation` - Defines relationships between components
-  - `@c4Group` - Defines logical grouping of components
-
-## Installation
-
-```bash
-# Local installation
-npm install @rhino/c4-generator
-
-# Global installation (for CLI usage)
-npm install -g @rhino/c4-generator
-```
-
-## Usage
-
-### Command Line Interface
-
-The generator can be run from the command line with various options:
-
-```bash
-# Basic usage
-c4-generator [config-path]
-
-# Show components and their relations
-c4-generator [config-path] --components
-
-# Show undeclared relations
-c4-generator [config-path] --undeclared
-
-# Show invalid relations
-c4-generator [config-path] --invalid
-```
-
-The `config-path` argument should point to a `c4container.json` file.
-
-### Container Configuration
-
-Create a `c4container.json` file in your project root:
-
-```json
-{
-    "name": "your-service-name",
-    "description": "Service description",
-    "technology": "technology stack",
-    "tags": ["tag1", "tag2"],
-    "properties": {
-        "criticality": "high",
-        "maintainer": "team-core"
-    },
-    "source": [
-        "src/**/*.ts",
-        "!node_modules/**",
-        "!dist/**",
-        "!test/**"
-    ],
-    "external": {
-        "external-service": {
-            "name": "External Service",
-            "description": "Description of external service",
-            "technology": "REST API"
-        }
-    }
-}
-```
-
-### Code Annotations
-
-Add C4 annotations using JSDoc syntax:
+The generator uses JSDoc-style block comments with custom C4 tags. Each tag supports structured property definitions:
 
 ```typescript
 /**
@@ -123,7 +52,328 @@ export class ExampleService {
         // Implementation
     }
 }
-```### Relationship Types
+```
+
+### Tag Format
+
+Each C4 tag supports the following format:
+- `@c4Component [name]` - Defines a component with optional inline name
+- `@c4Relation target | description | technology` - Defines a relationship with target, description, and technology
+- `@c4Group name` - Assigns component to a group
+
+Properties are defined using a simple structured format:
+- Each property starts with `-` followed by a property name and value separated by `:`
+- Nested properties are indented under their parent property
+- Multiple values can be separated by commas
+- Properties are optional and can be omitted if not needed
+
+## Technical Details
+
+The module uses:
+- [ts-morph](https://github.com/dsherret/ts-morph) for TypeScript code analysis and JSDoc parsing
+- Custom block tags that extend the JSDoc standard:
+  - `@c4Component` - Marks a class as a C4 component
+  - `@c4Relation` - Defines relationships between components
+  - `@c4Group` - Defines logical grouping of components
+
+## Installation
+
+This project is currently in development. To use it:
+
+1. Get the source code
+2. Install project dependencies and build:
+```bash
+npm install
+npm run build
+```
+
+## Usage
+
+### Command Line Interface
+
+The project provides several CLI commands:
+
+#### Container Analysis
+
+Analyze components and relations within a container:
+
+```bash
+# Basic usage
+npm run c4-container [config-path]
+
+# Show only components
+npm run c4-container [config-path] --components
+
+# Show only undeclared relations
+npm run c4-container [config-path] --undeclared
+
+# Show only invalid relations
+npm run c4-container [config-path] --invalid
+
+# Output raw JSON
+npm run c4-container [config-path] --json
+```
+
+#### Workspace Analysis
+
+Analyze containers and their relations in a workspace:
+
+```bash
+# Basic usage
+npm run c4-workspace [config-path]
+
+# Show only containers
+npm run c4-workspace [config-path] --containers
+
+# Show only undeclared relations
+npm run c4-workspace [config-path] --undeclared
+
+# Show only invalid relations
+npm run c4-workspace [config-path] --invalid
+
+# Output raw JSON
+npm run c4-workspace [config-path] --json
+```
+
+#### DSL Generation
+
+Generate Structurizr DSL from workspace configuration:
+
+```bash
+# Basic usage
+npm run c4-dsl [config-path]
+
+# Use custom template
+npm run c4-dsl [config-path] --template path/to/template.dsl.tpl
+
+# Specify output file
+npm run c4-dsl [config-path] --output path/to/output.dsl
+
+# Use custom workspace directory
+npm run c4-dsl [config-path] --workspace-dir path/to/workspace
+```
+
+#### Schema Generation
+
+Generate JSON schemas for configuration files:
+
+```bash
+# Generate container config schema
+npm run c4-schema c4container
+
+# Generate workspace config schema
+npm run c4-schema c4workspace
+
+# Specify output directory
+npm run c4-schema c4container --output path/to/dir
+```
+
+### Configuration Files
+
+#### Container Configuration (c4container.json)
+
+Create a `c4container.json` file in your project root to define a container:
+
+```json
+{
+    "name": "your-service-name",
+    "description": "Service description",
+    "technology": "technology stack",
+    "tags": ["tag1", "tag2"],
+    "properties": {
+        "criticality": "high",
+        "maintainer": "team-core"
+    },
+    "source": [
+        "src/**/*.ts",
+        "!node_modules/**",
+        "!dist/**",
+        "!test/**"
+    ],
+    "external": {
+        "external-service": {
+            "name": "External Service",
+            "description": "Description of external service",
+            "technology": "REST API"
+        }
+    },
+    "groups": {
+        "Core": {
+            "CustomerManagement": {},
+            "OrderProcessing": {}
+        },
+        "Infrastructure": {
+            "Database": {},
+            "Messaging": {}
+        }
+    }
+}
+```
+
+#### Workspace Configuration (c4workspace.json)
+
+Create a `c4workspace.json` file to define your C4 workspace structure:
+
+```json
+{
+    "name": "Example System",
+    "description": "Example system description",
+    "containers": [
+        {
+            "path": "path/to/service1/c4container.json"
+        },
+        {
+            "path": "path/to/service2/c4container.json"
+        }
+    ],
+    "external": {
+        "external-system": {
+            "name": "External System",
+            "description": "External system description",
+            "containers": {
+                "external-service": {
+                    "name": "External Service",
+                    "description": "External service description",
+                    "technology": "REST API"
+                }
+            }
+        }
+    },
+    "properties": {
+        "criticality": "high",
+        "team": "core"
+    },
+    "tags": ["system", "core"]
+}
+```
+
+The workspace configuration allows you to:
+- Define multiple containers and their locations
+- Specify external systems and their containers
+- Add workspace-level properties and tags
+- Group containers into a cohesive system view
+
+### Code Annotations
+
+The generator uses JSDoc-style block comments with custom C4 tags to document your architecture.
+
+#### @c4Component [name]
+
+Marks a class as a C4 component. The name argument is optional - if omitted, the class name will be used.
+
+Properties (all optional):
+- `description` - Component description
+- `technology` - Technology stack used by the component
+- `url` - Link to component documentation
+- `properties` - Custom key-value pairs
+- `tags` - List of tags for filtering and styling
+
+Example:
+```typescript
+/**
+ * @c4Component PaymentProcessor
+ * - description: Processes customer payments
+ * - technology: Node.js, Stripe API
+ * - url: https://docs/payment-processor
+ * - properties:
+ *   criticality: high
+ *   maintainer: team-payments
+ * - tags: core, payment
+ */
+export class PaymentProcessor {
+    // Implementation
+}
+```
+
+#### @c4Relation target | description | technology
+
+Defines a relationship between components. Typically used on methods to document their dependencies, but can also be used on constructors or at the class level.
+All three arguments are required and should be separated by `|`:
+- `target` - Name of the target component
+- `description` - Description of the relationship
+- `technology` - Technology used for communication
+
+Additional properties (all optional):
+- `url` - Link to relationship documentation
+- `properties` - Custom key-value pairs
+- `tags` - List of tags (including DirectRelation/IndirectRelation)
+
+Example:
+```typescript
+/**
+ * @c4Component OrderService
+ * @c4Relation PaymentGateway | Uses for payment processing | HTTPS
+ */
+export class OrderService {
+    /**
+     * @c4Relation Database | Persists order data | SQL
+     */
+    constructor(private db: Database) {}
+
+    /**
+     * @c4Relation NotificationService | Sends order confirmations | Message Queue
+     * - technology: RabbitMQ
+     * - tags: IndirectRelation
+     */
+    async notifyCustomer(): Promise<void> {
+        // Implementation
+    }
+
+    /**
+     * @c4Relation PaymentProcessor | Processes refunds | REST API
+     */
+    async processRefund(orderId: string): Promise<void> {
+        // Implementation
+    }
+}
+```
+
+In the example above:
+- Class-level relation defines a general dependency on PaymentGateway
+- Constructor relation documents database dependency
+- Method relations show specific interactions with other services
+
+#### @c4Group name
+
+Assigns a component to a logical group. The group name must match one of the groups defined in `c4container.json`.
+
+Example:
+```typescript
+/**
+ * @c4Component
+ * - description: Manages customer data
+ * - technology: Node.js
+ * @c4Group CustomerManagement
+ */
+export class CustomerService {
+    // Implementation
+}
+```
+
+Groups and their hierarchy are defined in the container configuration:
+
+```json
+{
+    "name": "your-service-name",
+    "groups": {
+        "Core": {
+            "CustomerManagement": {},
+            "OrderProcessing": {}
+        },
+        "Infrastructure": {
+            "Database": {},
+            "Messaging": {}
+        }
+    }
+}
+```
+
+In this example:
+- `CustomerManagement` is a subgroup of `Core`
+- Components can be assigned to any group (`Core`, `CustomerManagement`, `Infrastructure`, etc.)
+- Group hierarchy is used for visualization and organization
+
+### Relationship Types
 
 The generator automatically detects and validates two types of relationships:
 
@@ -154,74 +404,57 @@ See the `example` directory for complete examples of:
 
 ## DSL Templates
 
-The generator uses Liquid templates to generate Structurizr DSL files. Templates should be placed in the workspace directory with `.dsl.tpl` extension.
+The generator uses [Liquid](https://liquidjs.com/) templates to generate Structurizr DSL files. Templates should be placed in the workspace directory with `.dsl.tpl` extension.
 
 ### Template Variables
 
-- `workspace` - Contains analyzed workspace data:
-  - `containers` - List of containers with their properties
-  - `relationships` - List of relationships between containers
+The template has access to a `workspace` object containing:
 
-### Template Filters
+- `containers` - List of containers with their properties:
+  - `name` - Container identifier used in DSL
+  - `title` - Container display name
+  - `technology` - Technology stack
+  - `description` - Container description
+  - `analysis` - Container analysis results:
+    - `components` - List of components with their metadata
+    - `groups` - Component group hierarchy
 
-- `containers` - Generates DSL code for containers
-- `relationships` - Generates DSL code for relationships
+- `relationships` - List of relationships between elements:
+  - `source` - Source element identifier (container.component or container)
+  - `target` - Target element identifier
+  - `description` - Relationship description
+  - `technology` - Technology used for communication
+
+### Custom Filters
+
+The template engine provides custom filters for DSL generation:
+
+- `containers` - Generates container and component DSL code
+- `relationships` - Generates relationship DSL code
 - `indent` - Indents content by specified number of spaces
 
 ### Example Template
 
-```
+```liquid
 workspace {
     model {
-        enterprise "Example Corp" {
-            mySystem = softwareSystem "My System" {
-                description "Example system description"
-                
-                # Generate container definitions
-                {{ workspace | containers | indent: 16 }}
-                
-                # Generate relationships
-                {{ workspace | relationships | indent: 16 }}
-            }
-        }
+        {{ workspace | containers }}
+
+        # Relationships
+        {{ workspace | relationships }}
     }
-    
+
     views {
-        systemContext mySystem "SystemContext" {
+        container system "Containers" {
             include *
-            autoLayout
-        }
-        
-        container mySystem "Containers" {
-            include *
-            autoLayout
+            autolayout
         }
     }
 }
 ```
 
-### Template Location
-
-By default, the generator looks for templates in:
-- `<workspace_dir>/workspace.dsl.tpl`
-
-You can override the template location using:
-- `workspaceDir` in c4workspace.json
-- `--workspace-dir` CLI option
-- Custom template path in API options
-
-### Generated DSL Format
-
-Container definitions:
-```
-containerName = container "Container Title" {
-    technology "Technology Stack"
-    description "Container description"
-}
-```
-
-Relationship definitions:
-```
-sourceContainer -> targetContainer "Relationship description" "Technology"
-```
-
+The template will generate a Structurizr DSL file with:
+- Container definitions with their components
+- Component grouping structure
+- All relationships between containers and components
+- A container diagram view with auto-layout
