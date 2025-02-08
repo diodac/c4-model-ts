@@ -1,13 +1,12 @@
 {
-    "name": "Example System",
-    "description": "Example system with multiple containers",
-    "include": {
-        "containers": {
-            "type": "c4container.json",
-            "source": [
-                "../*/c4container.json",
-                "!../system"
-            ]
+    "systems": {
+        "RR": {
+            "containers": {
+                "source": [
+                    "../*/c4container.json",
+                    "!../system"
+                ]
+            }
         }
     }
 }

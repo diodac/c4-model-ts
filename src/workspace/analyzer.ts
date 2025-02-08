@@ -5,7 +5,8 @@ import { ContainerAnalyzer } from '../container/container-analyzer';
 import { 
     C4WorkspaceConfig, 
     C4WorkspaceModel,
-    C4Container
+    C4Container,
+    C4System
 } from './model/workspace';
 import { WorkspaceConfigLoader } from './config-loader';
 import { ContainerRelationsAnalyzer } from './container-relations-analyzer';
@@ -32,7 +33,7 @@ export class WorkspaceAnalyzer {
     }
 
     /**
-     * Analyze all containers in the workspace and build workspace model
+     * Analyze all systems in the workspace and build workspace model
      */
     async analyze(options: {
         includeUndeclared?: boolean;
@@ -41,21 +42,15 @@ export class WorkspaceAnalyzer {
         // Load and validate workspace configuration
         const workspaceConfig = this.configLoader.load(this.configPath);
 
-        // Analyze containers
-        const containers: C4Container[] = [];
-        const failures: { name: string; error: string }[] = [];
+        // Analyze each system
+        const systems: C4System[] = [];
 
-        for (const includeConfig of Object.values(workspaceConfig.include)) {
+        for (const [systemId, systemConfig] of Object.entries(workspaceConfig.systems)) {
             try {
-                // Only support c4container.json for now
-                if (includeConfig.type !== 'c4container.json') {
-                    continue;
-                }
-
                 // Find container configuration files
-                const patterns = Array.isArray(includeConfig.source) 
-                    ? includeConfig.source 
-                    : [includeConfig.source];
+                const patterns = Array.isArray(systemConfig.containers.source) 
+                    ? systemConfig.containers.source 
+                    : [systemConfig.containers.source];
 
                 // Find all matching config files
                 const configPaths = globSync(patterns[0], {
@@ -64,7 +59,9 @@ export class WorkspaceAnalyzer {
                     absolute: true
                 });
 
-                // Process each config file
+                // Process containers for this system
+                const containers: C4Container[] = [];
+
                 for (const configPath of configPaths) {
                     const containerConfig = JSON.parse(readFileSync(configPath, 'utf-8'));
 
@@ -91,23 +88,25 @@ export class WorkspaceAnalyzer {
                         analysis
                     });
                 }
-            } catch (error) {
-                failures.push({
-                    name: includeConfig.type,
-                    error: error instanceof Error ? error.message : String(error)
+
+                // Find relations between containers in this system
+                const relations = this.relationsAnalyzer.analyze(containers);
+
+                // Add system to the model
+                systems.push({
+                    id: systemId,
+                    name: systemConfig.name || systemId,
+                    description: systemConfig.description || '',
+                    containers,
+                    relations
                 });
+            } catch (error) {
+                console.error(`Error analyzing system ${systemId}:`, error);
+                // Continue with other systems
             }
         }
 
-        // Find relations between containers
-        const relations = this.relationsAnalyzer.analyze(containers);
-
         // Build workspace model
-        return {
-            name: workspaceConfig.name,
-            description: workspaceConfig.description,
-            containers,
-            relations
-        };
+        return { systems };
     }
 } 

@@ -68,10 +68,19 @@ interface Relationship {
  * Data structure passed to DSL template
  */
 interface WorkspaceData {
-    /** List of containers in the workspace */
-    containers: Container[];
-    /** List of relationships between containers */
-    relationships: Relationship[];
+    /** Map of systems in the workspace */
+    systems: {
+        [systemId: string]: {
+            /** System name */
+            name: string;
+            /** System description */
+            description: string;
+            /** List of containers in the system */
+            containers: Container[];
+            /** List of relationships between containers in this system */
+            relationships: Relationship[];
+        }
+    };
 }
 
 /**
@@ -143,11 +152,11 @@ export class DslGenerator {
     /**
      * Liquid filter for generating container DSL code
      * 
-     * @param workspace - Workspace data containing containers
+     * @param system - Workspace data containing containers
      * @returns Generated DSL code for containers
      */
-    private containersFilter(workspace: WorkspaceData): string {
-        const containers = workspace.containers || [];
+    private containersFilter(system: WorkspaceData['systems'][string]): string {
+        const containers = system.containers || [];
         const parts: string[] = [];
 
         // Helper function to render a component
@@ -239,11 +248,11 @@ export class DslGenerator {
     /**
      * Liquid filter for generating relationship DSL code
      * 
-     * @param workspace - Workspace data containing relationships
+     * @param system - Workspace data containing relationships
      * @returns Generated DSL code for relationships
      */
-    private relationshipsFilter(workspace: WorkspaceData): string {
-        const relationships = workspace.relationships || [];
+    private relationshipsFilter(system: WorkspaceData['systems'][string]): string {
+        const relationships = system.relationships || [];
 
         // Split relationships into declared and undeclared
         const declaredRelations = relationships.filter(rel => !rel.tags?.includes('UndeclaredRelation'));
@@ -343,75 +352,49 @@ export class DslGenerator {
     }
 
     /**
-     * Transforms workspace model from analyzer to template format
+     * Transforms workspace model into template-friendly format
      */
     private transformWorkspaceData(model: C4WorkspaceModel): WorkspaceData {
-        // Transform containers
-        const containers = model.containers.map(container => ({
-            name: container.data.name,
-            title: container.data.name,
-            technology: container.data.technology || 'undefined',
-            description: container.data.description || 'undefined',
-            analysis: container.analysis
-        }));
+        const systems: WorkspaceData['systems'] = {};
 
-        // Get list of container names for validating targets
-        const containerNames = new Set(containers.map(c => c.name));
+        for (const system of model.systems) {
+            // Transform containers
+            const containers: Container[] = system.containers.map(container => ({
+                name: container.data.name,
+                title: container.data.name,
+                technology: container.data.technology || '',
+                description: container.data.description || '',
+                analysis: container.analysis && {
+                    components: container.analysis.components.map(component => ({
+                        metadata: {
+                            name: component.metadata.name,
+                            description: component.metadata.description || '',
+                            technology: component.metadata.technology,
+                            group: component.metadata.group
+                        }
+                    })),
+                    groups: container.analysis.groups
+                }
+            }));
 
-        // Collect all relationships
-        const relationships = [
-            // Container-level relations from workspace model
-            ...model.relations.map(relation => ({
+            // Transform relationships
+            const relationships: Relationship[] = system.relations.map(relation => ({
                 source: relation.source,
                 target: relation.target,
                 description: relation.description,
-                technology: relation.technology || 'undefined',
-                tags: []
-            })),
-            // Component-level relations from containers
-            ...model.containers.flatMap(container => 
-                container.analysis.components.flatMap(component => 
-                    component.relations.map(relation => {
-                        const source = `${container.data.name}.${relation.sourceComponent}`;
-                        let target = relation.metadata.target;
+                technology: relation.technology || ''
+            }));
 
-                        // If target doesn't contain a dot and is not a container name,
-                        // it's an internal component - add container prefix
-                        if (!target.includes('.') && !containerNames.has(target)) {
-                            target = `${container.data.name}.${target}`;
-                        }
-                        
-                        return {
-                            source,
-                            target,
-                            description: relation.metadata.description,
-                            technology: relation.metadata.technology || 'undefined',
-                            tags: relation.metadata.tags || []
-                        };
-                    })
-                )
-            ),
-            // Add undeclared relations from containers if enabled
-            ...(this.includeUndeclared ? model.containers.flatMap(container => 
-                container.analysis.undeclaredRelations?.map(relation => {
-                    const source = `${container.data.name}.${relation.calledFrom.component.metadata.name}`;
-                    const target = `${container.data.name}.${relation.method.component.metadata.name}`;
-                    
-                    return {
-                        source,
-                        target,
-                        description: `Calls ${relation.method.name}() from ${relation.calledFrom.method || 'constructor'}`,
-                        technology: 'Internal',
-                        tags: ['UndeclaredRelation']
-                    };
-                }) || []
-            ) : [])
-        ];
+            // Add system to the map using id as key
+            systems[system.id] = {
+                name: system.name,
+                description: system.description,
+                containers,
+                relationships
+            };
+        }
 
-        return {
-            containers,
-            relationships
-        };
+        return { systems };
     }
 
     /**

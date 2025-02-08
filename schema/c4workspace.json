@@ -5,38 +5,53 @@
     "C4WorkspaceConfig": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "Workspace name"
-        },
-        "description": {
-          "type": "string",
-          "description": "Workspace description"
-        },
-        "include": {
+        "systems": {
           "type": "object",
           "additionalProperties": {
-            "$ref": "#/definitions/C4IncludeConfig"
+            "$ref": "#/definitions/C4SystemConfig"
           },
-          "description": "Map of sources to include in workspace Key is an alias for the source"
+          "description": "Map of systems in the workspace Key is the system identifier"
+        },
+        "workspaceDir": {
+          "type": "string",
+          "description": "Directory for workspace files (templates, output) Relative to basePath or absolute"
+        },
+        "basePath": {
+          "type": "string",
+          "description": "Base path for resolving relative paths If not provided, defaults to the directory containing c4workspace.json"
         }
       },
       "required": [
-        "name",
-        "description",
-        "include"
+        "systems"
       ],
       "additionalProperties": false,
       "description": "Workspace configuration from c4workspace.json"
     },
-    "C4IncludeConfig": {
+    "C4SystemConfig": {
       "type": "object",
       "properties": {
-        "type": {
+        "name": {
           "type": "string",
-          "const": "c4container.json",
-          "description": "Type of source to include (currently only 'c4container.json' is supported)"
+          "description": "System name"
         },
+        "description": {
+          "type": "string",
+          "description": "System description"
+        },
+        "containers": {
+          "$ref": "#/definitions/C4SystemContainersConfig",
+          "description": "Container configuration"
+        }
+      },
+      "required": [
+        "containers"
+      ],
+      "additionalProperties": false,
+      "description": "Configuration for a software system"
+    },
+    "C4SystemContainersConfig": {
+      "type": "object",
+      "properties": {
         "source": {
           "anyOf": [
             {
@@ -49,15 +64,14 @@
               }
             }
           ],
-          "description": "Glob patterns for finding source files Can be a single pattern or array of patterns Patterns starting with ! are exclusions"
+          "description": "Glob patterns for finding container source files Can be a single pattern or array of patterns Patterns starting with ! are exclusions"
         }
       },
       "required": [
-        "type",
         "source"
       ],
       "additionalProperties": false,
-      "description": "Configuration for including external sources in workspace"
+      "description": "Configuration for a system's containers"
     }
   }
 }

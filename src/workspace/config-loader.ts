@@ -78,13 +78,13 @@ export class WorkspaceConfigLoader {
     private validateBusinessRules(config: C4WorkspaceConfig): void {
         const errors: string[] = [];
 
-        // Validate source patterns
-        for (const [alias, includeConfig] of Object.entries(config.include)) {
-            if (Array.isArray(includeConfig.source)) {
-                this.validateSourcePatterns(includeConfig.source, errors, alias);
-            } else {
-                this.validateSourcePatterns([includeConfig.source], errors, alias);
-            }
+        // Validate source patterns for each system
+        for (const [systemId, systemConfig] of Object.entries(config.systems)) {
+            const patterns = Array.isArray(systemConfig.containers.source)
+                ? systemConfig.containers.source
+                : [systemConfig.containers.source];
+
+            this.validateSourcePatterns(patterns, errors, systemId);
         }
 
         if (errors.length > 0) {
@@ -92,11 +92,11 @@ export class WorkspaceConfigLoader {
         }
     }
 
-    private validateSourcePatterns(patterns: string[], errors: string[], alias: string): void {
+    private validateSourcePatterns(patterns: string[], errors: string[], systemId: string): void {
         const hasIncludePattern = patterns.some(p => !p.startsWith('!'));
         if (!hasIncludePattern) {
             errors.push(
-                `Source patterns for "${alias}" must include at least one positive pattern`
+                `Source patterns for system "${systemId}" must include at least one positive pattern`
             );
         }
     }

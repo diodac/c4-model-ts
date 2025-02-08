@@ -17,21 +17,41 @@ export interface C4IncludeConfig {
 }
 
 /**
+ * Configuration for a system's containers
+ */
+export interface C4SystemContainersConfig {
+    /** 
+     * Glob patterns for finding container source files
+     * Can be a single pattern or array of patterns
+     * Patterns starting with ! are exclusions
+     */
+    source: string | string[];
+}
+
+/**
+ * Configuration for a software system
+ */
+export interface C4SystemConfig {
+    /** System name */
+    name?: string;
+
+    /** System description */
+    description?: string;
+
+    /** Container configuration */
+    containers: C4SystemContainersConfig;
+}
+
+/**
  * Workspace configuration from c4workspace.json
  */
 export interface C4WorkspaceConfig {
-    /** Workspace name */
-    name: string;
-
-    /** Workspace description */
-    description: string;
-
     /** 
-     * Map of sources to include in workspace
-     * Key is an alias for the source
+     * Map of systems in the workspace
+     * Key is the system identifier
      */
-    include: {
-        [alias: string]: C4IncludeConfig;
+    systems: {
+        [systemId: string]: C4SystemConfig;
     };
 
     /** 
@@ -76,20 +96,31 @@ export interface C4ContainerRelation {
 }
 
 /**
+ * Represents a software system in the workspace
+ */
+export interface C4System {
+    /** System identifier */
+    id: string;
+
+    /** System name */
+    name: string;
+
+    /** System description */
+    description: string;
+
+    /** Containers in the system */
+    containers: C4Container[];
+
+    /** Relations between containers in this system */
+    relations: C4ContainerRelation[];
+}
+
+/**
  * Represents the entire workspace model
  */
 export interface C4WorkspaceModel {
-    /** Workspace name */
-    name: string;
-
-    /** Workspace description */
-    description: string;
-
-    /** Containers in the workspace */
-    containers: C4Container[];
-
-    /** Relations between containers */
-    relations: C4ContainerRelation[];
+    /** Systems in the workspace */
+    systems: C4System[];
 }
 
 /**
