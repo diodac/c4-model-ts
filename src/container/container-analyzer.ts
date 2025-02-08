@@ -4,7 +4,7 @@ import { ComponentFinder } from './component-finder';
 import { RelationFinder } from './relation-finder';
 import { RelationValidator, RelationValidatorConfig } from './relation-validator';
 import { ComponentInfo } from './model/component';
-import { RelationUsage } from './relation-finder';
+import { MethodUsage } from './relation-finder';
 import { ValidationResult } from './relation-validator';
 
 export interface AnalysisResult {
@@ -17,7 +17,7 @@ export interface AnalysisResult {
     };
     components: Array<ComponentInfo & { relations: Array<{ sourceComponent: string }> }>;
     groups: Groups;
-    undeclaredRelations?: RelationUsage[];
+    undeclaredRelations?: MethodUsage[];
     invalidRelations?: ValidationResult[];
 }
 

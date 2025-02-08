@@ -19,7 +19,10 @@
     "lint": "eslint src/**/*.ts",
     "clean": "rimraf dist",
     "prepare": "npm run clean && npm run build",
-    "generate": "ts-node src/cli.ts"
+    "c4-dsl": "ts-node src/cli/dsl.ts",
+    "c4-schema": "ts-node src/cli/schema.ts",
+    "c4-container": "ts-node src/cli/container.ts",
+    "c4-workspace": "ts-node src/cli/workspace.ts"
   },
   "keywords": [
     "c4",

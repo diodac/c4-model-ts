@@ -101,7 +101,7 @@ Add C4 annotations using JSDoc syntax:
  *   maintainer: team-name
  * - tags: tag1, tag2
  * 
- * @c4Group "Group Name"
+ * @c4Group GroupName
  */
 export class ExampleService {
     /**
@@ -123,9 +123,7 @@ export class ExampleService {
         // Implementation
     }
 }
-```
-
-### Relationship Types
+```### Relationship Types
 
 The generator automatically detects and validates two types of relationships:
 
@@ -226,3 +224,4 @@ Relationship definitions:
 ```
 sourceContainer -> targetContainer "Relationship description" "Technology"
 ```
+

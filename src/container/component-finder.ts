@@ -45,7 +45,7 @@ export class ComponentFinder {
             const componentInfo = this.componentParser.parse(classDecl);
             if (componentInfo) {
                 // Find relations in the component
-                const relations = this.relationParser.findRelations(classDecl, componentInfo.metadata.name);
+                const relations = this.relationParser.findRelations(classDecl);
                 componentInfo.relations = relations;
                 
                 components.push(componentInfo);

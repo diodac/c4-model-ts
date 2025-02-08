@@ -1,10 +1,9 @@
 import { Liquid } from 'liquidjs';
 import { WorkspaceAnalyzer } from '../analyzer';
-import { C4WorkspaceConfig, C4WorkspaceModel, C4Container, C4ContainerRelation } from '../model/workspace';
+import { C4WorkspaceConfig, C4WorkspaceModel } from '../model/workspace';
 import { resolve, dirname } from 'path';
 import { readFileSync, writeFileSync } from 'fs';
 import { Groups } from '../../container/model/container';
-import { AnalysisResult } from '../../container/container-analyzer';
 
 /**
  * Component metadata in DSL generation context
@@ -79,12 +78,10 @@ interface WorkspaceData {
  */
 export class DslGenerator {
     private readonly analyzer: WorkspaceAnalyzer;
-    private readonly config: C4WorkspaceConfig;
     private readonly engine: Liquid;
     private readonly workspaceDir: string;
     private readonly templateFile: string;
     private readonly outputFile: string;
-    private readonly configPath: string;
 
     /**
      * Creates a new DSL generator instance
@@ -108,8 +105,6 @@ export class DslGenerator {
         }
     ) {
         this.analyzer = analyzer;
-        this.config = config;
-        this.configPath = configPath;
         
         // Get base path - either from config or from config file location
         const basePath = config.basePath || dirname(configPath);

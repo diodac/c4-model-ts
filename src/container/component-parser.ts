@@ -76,7 +76,7 @@ export class ComponentParser {
         
         // Parse group tag and remove quotes from group name
         const groupName = groupTag 
-            ? this.tagParser.parse(groupTag, this.groupSchema).args[0].replace(/^"|"$/g, '')
+            ? this.tagParser.parse(groupTag, this.groupSchema).args[0]
             : undefined;
         
         // Convert to component metadata

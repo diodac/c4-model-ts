@@ -87,9 +87,13 @@ program
         if (result.undeclaredRelations?.length) {
             console.log('\nFound undeclared relations:');
             for (const relation of result.undeclaredRelations) {
-                console.log(`\n${relation.sourceComponent.metadata.name} → ${relation.targetComponent.metadata.name}`);
-                console.log(`Type: ${relation.usageType}`);
-                console.log(`Location: ${relation.location.filePath}:${relation.location.line}`);
+                console.log(`\n${relation.calledFrom.component.metadata.name} → ${relation.method.component.metadata.name}`);
+                console.log(`Method: ${relation.method.name}`);
+                console.log(`Called from: ${relation.calledFrom.method || '(constructor)'}`);
+                console.log(`Location: ${relation.calledFrom.filePath}:${relation.calledFrom.line}`);
+                if (relation.callChain.length > 1) {
+                    console.log(`Call chain: ${relation.callChain.join(' → ')}`);
+                }
             }
         } else if (options.undeclared) {
             console.log('\nNo undeclared relations found.');

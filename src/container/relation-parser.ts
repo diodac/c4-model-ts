@@ -1,7 +1,6 @@
 import { ClassDeclaration, MethodDeclaration, ConstructorDeclaration, JSDoc } from 'ts-morph';
 import { RelationInfo, RelationMetadata } from './model/relation';
 import { TagParser, TagSchema } from './tag-parser';
-import { RelationValidator } from './relation-validator';
 
 /**
  * Parser for @c4Relation tags
@@ -35,21 +34,21 @@ export class RelationParser {
     /**
      * Find all relations in a component
      */
-    findRelations(classDecl: ClassDeclaration, componentName: string): RelationInfo[] {
+    findRelations(classDecl: ClassDeclaration): RelationInfo[] {
         const relations: RelationInfo[] = [];
 
         // Check class level relations
-        this.findRelationsInNode(classDecl, componentName, relations);
+        this.findRelationsInNode(classDecl, relations);
 
         // Check constructor relations
         const constructor = classDecl.getConstructors()[0];
         if (constructor) {
-            this.findRelationsInNode(constructor, componentName, relations, 'constructor');
+            this.findRelationsInNode(constructor, relations, 'constructor');
         }
 
         // Check method level relations
         for (const method of classDecl.getMethods()) {
-            this.findRelationsInNode(method, componentName, relations, method.getName());
+            this.findRelationsInNode(method, relations, method.getName());
         }
 
         return relations;
@@ -57,7 +56,6 @@ export class RelationParser {
 
     private findRelationsInNode(
         node: ClassDeclaration | MethodDeclaration | ConstructorDeclaration, 
-        componentName: string, 
         relations: RelationInfo[],
         methodName?: string
     ): void {
