@@ -16,6 +16,7 @@ program
     .option('-t, --template <path>', 'Custom template file path')
     .option('-o, --output <path>', 'Custom output file path')
     .option('-w, --workspace-dir <path>', 'Custom workspace directory')
+    .option('-u, --include-undeclared', 'Include undeclared relations in DSL output')
     .action(async (configPath: string, options: any) => {
         try {
             const resolvedPath = resolve(configPath);
@@ -38,7 +39,8 @@ program
             const generator = new DslGenerator(analyzer, workspaceConfig, resolvedPath, {
                 workspaceDir: options.workspaceDir,
                 templateFile: options.template,
-                outputFile: options.output
+                outputFile: options.output,
+                includeUndeclared: options.includeUndeclared
             });
             
             // Generate DSL

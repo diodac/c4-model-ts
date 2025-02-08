@@ -60,6 +60,8 @@ interface Relationship {
     description: string;
     /** Technology used for communication */
     technology: string;
+    /** Relationship tags */
+    tags?: string[];
 }
 
 /**
@@ -82,6 +84,7 @@ export class DslGenerator {
     private readonly workspaceDir: string;
     private readonly templateFile: string;
     private readonly outputFile: string;
+    private readonly includeUndeclared: boolean;
 
     /**
      * Creates a new DSL generator instance
@@ -93,6 +96,7 @@ export class DslGenerator {
      * @param options.workspaceDir - Custom workspace directory (overrides config.workspaceDir)
      * @param options.templateFile - Custom template file path (default: workspace.dsl.tpl)
      * @param options.outputFile - Custom output file path (default: workspace.dsl)
+     * @param options.includeUndeclared - Whether to include undeclared relations in DSL output (default: false)
      */
     constructor(
         analyzer: WorkspaceAnalyzer,
@@ -102,9 +106,11 @@ export class DslGenerator {
             workspaceDir?: string;
             templateFile?: string;
             outputFile?: string;
+            includeUndeclared?: boolean;
         }
     ) {
         this.analyzer = analyzer;
+        this.includeUndeclared = options?.includeUndeclared || false;
         
         // Get base path - either from config or from config file location
         const basePath = config.basePath || dirname(configPath);
@@ -239,9 +245,13 @@ export class DslGenerator {
     private relationshipsFilter(workspace: WorkspaceData): string {
         const relationships = workspace.relationships || [];
 
-        // Group relationships
-        const containerRelations = relationships.filter(rel => !rel.source.includes('.') && !rel.target.includes('.'));
-        const componentRelations = relationships.filter(rel => rel.source.includes('.'));
+        // Split relationships into declared and undeclared
+        const declaredRelations = relationships.filter(rel => !rel.tags?.includes('UndeclaredRelation'));
+        const undeclaredRelations = relationships.filter(rel => rel.tags?.includes('UndeclaredRelation'));
+
+        // Group declared relationships
+        const containerRelations = declaredRelations.filter(rel => !rel.source.includes('.') && !rel.target.includes('.'));
+        const componentRelations = declaredRelations.filter(rel => rel.source.includes('.'));
 
         // Group component relations by source container
         const componentRelationsByContainer = new Map<string, Relationship[]>();
@@ -253,12 +263,21 @@ export class DslGenerator {
             componentRelationsByContainer.get(containerName)!.push(rel);
         }
 
-        // Generate DSL for each group
+        // Helper function to format a relationship
+        const formatRelation = (rel: Relationship) => {
+            let dsl = `${rel.source} -> ${rel.target} "${rel.description}" "${rel.technology}"`;
+            if (rel.tags && rel.tags.length > 0) {
+                dsl += ` {
+    tags "${rel.tags.join(',')}"
+}`;
+            }
+            return dsl;
+        };
+
+        // Generate DSL for declared relations
         const parts = [
             // Container-to-container relations
-            ...containerRelations.map(rel => 
-                `${rel.source} -> ${rel.target} "${rel.description}" "${rel.technology}"`
-            )
+            ...containerRelations.map(formatRelation)
         ];
 
         // Add component relations grouped by container
@@ -269,9 +288,35 @@ export class DslGenerator {
             }
 
             // Add relations for this container
-            parts.push(...relations.map(rel => 
-                `${rel.source} -> ${rel.target} "${rel.description}" "${rel.technology}"`
-            ));
+            parts.push(...relations.map(formatRelation));
+        }
+
+        // Add undeclared relations if any exist
+        if (undeclaredRelations.length > 0) {
+            // Add separator
+            if (parts.length > 0) {
+                parts.push('');
+                parts.push('# Undeclared relations found in code analysis');
+                parts.push('');
+            }
+
+            // Group undeclared relations by container
+            const undeclaredByContainer = new Map<string, Relationship[]>();
+            for (const rel of undeclaredRelations) {
+                const containerName = rel.source.split('.')[0];
+                if (!undeclaredByContainer.has(containerName)) {
+                    undeclaredByContainer.set(containerName, []);
+                }
+                undeclaredByContainer.get(containerName)!.push(rel);
+            }
+
+            // Add undeclared relations grouped by container
+            for (const [containerName, relations] of undeclaredByContainer) {
+                if (parts[parts.length - 1] !== '') {
+                    parts.push('');
+                }
+                parts.push(...relations.map(formatRelation));
+            }
         }
 
         return parts.join('\n');
@@ -320,7 +365,8 @@ export class DslGenerator {
                 source: relation.source,
                 target: relation.target,
                 description: relation.description,
-                technology: relation.technology || 'undefined'
+                technology: relation.technology || 'undefined',
+                tags: []
             })),
             // Component-level relations from containers
             ...model.containers.flatMap(container => 
@@ -339,11 +385,27 @@ export class DslGenerator {
                             source,
                             target,
                             description: relation.metadata.description,
-                            technology: relation.metadata.technology || 'undefined'
+                            technology: relation.metadata.technology || 'undefined',
+                            tags: relation.metadata.tags || []
                         };
                     })
                 )
-            )
+            ),
+            // Add undeclared relations from containers if enabled
+            ...(this.includeUndeclared ? model.containers.flatMap(container => 
+                container.analysis.undeclaredRelations?.map(relation => {
+                    const source = `${container.data.name}.${relation.calledFrom.component.metadata.name}`;
+                    const target = `${container.data.name}.${relation.method.component.metadata.name}`;
+                    
+                    return {
+                        source,
+                        target,
+                        description: `Calls ${relation.method.name}() from ${relation.calledFrom.method || 'constructor'}`,
+                        technology: 'Internal',
+                        tags: ['UndeclaredRelation']
+                    };
+                }) || []
+            ) : [])
         ];
 
         return {
@@ -359,8 +421,11 @@ export class DslGenerator {
      */
     public async generate(): Promise<void> {
         try {
-            // Analyze workspace
-            const workspaceModel = await this.analyzer.analyze();
+            // Analyze workspace with undeclared relations if enabled
+            const workspaceModel = await this.analyzer.analyze({
+                includeUndeclared: this.includeUndeclared,
+                includeInvalid: false
+            });
 
             // Transform data to template format
             const workspaceData = this.transformWorkspaceData(workspaceModel);
