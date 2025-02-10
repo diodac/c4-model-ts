@@ -1,4 +1,4 @@
-import { MethodUsage } from '../container/relation-finder';
+import { MethodUsage } from '../container/relationship-finder';
 
 /**
  * Simplifies component information in undeclared relations by keeping only essential data

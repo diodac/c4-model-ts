@@ -1,4 +1,4 @@
-import { RelationFinder } from '../../src/container/relation-finder';
+import { RelationshipFinder } from '../../src/container/relationship-finder';
 import { ComponentInfo } from '../../src/container/model/component';
 import { OrderService } from './OrderService';
 import { PaymentService } from './PaymentService';
@@ -144,15 +144,15 @@ const components: ComponentInfo[] = [
 ];
 
 async function main() {
-    const finder = new RelationFinder(path.resolve(WORKSPACE_ROOT, "tsconfig.json"));
+    const finder = new RelationshipFinder(path.resolve(WORKSPACE_ROOT, "tsconfig.json"));
     
     console.log("All method usages between components:");
-    const allRelations = finder.findAllRelations(components);
-    console.log(JSON.stringify(allRelations, null, 2));
+    const allUsages = finder.findAllRelationships(components);
+    console.log(JSON.stringify(allUsages, null, 2));
 
     console.log("\nUndeclared relations (found in code but not in @c4Relation tags):");
-    const undeclaredRelations = finder.findUndeclaredRelations(components);
-    console.log(JSON.stringify(undeclaredRelations, null, 2));
+    const undeclaredUsages = finder.findUndeclaredRelationships(components);
+    console.log(JSON.stringify(undeclaredUsages, null, 2));
 }
 
 main().catch(console.error); 

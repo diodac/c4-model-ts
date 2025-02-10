@@ -23,9 +23,9 @@ export interface MethodUsage {
 }
 
 /**
- * Finds relations between components by analyzing method usage
+ * Finds relationships between components by analyzing method usage
  */
-export class RelationFinder {
+export class RelationshipFinder {
     private project: Project;
     private componentMethods: Map<string, { component: ComponentInfo; methods: MethodDeclaration[] }>;
     private methodUsages: MethodUsage[];
@@ -39,10 +39,10 @@ export class RelationFinder {
     }
 
     /**
-     * Find all relations between components by analyzing method usage patterns.
+     * Find all relationships between components by analyzing method usage patterns.
      * This includes both direct and indirect method calls between components.
      */
-    findAllRelations(components: ComponentInfo[]): MethodUsage[] {
+    findAllRelationships(components: ComponentInfo[]): MethodUsage[] {
         this.componentMethods.clear();
         this.methodUsages = [];
 
@@ -56,22 +56,22 @@ export class RelationFinder {
     }
 
     /**
-     * Find only undeclared relations between components.
-     * These are relations that exist in code through method calls but are not documented with @c4Relationship tags.
+     * Find only undeclared relationships between components.
+     * These are relationships that exist in code through method calls but are not documented with @c4Relationship tags.
      */
-    findUndeclaredRelations(components: ComponentInfo[]): MethodUsage[] {
-        const allUsages = this.findAllRelations(components);
+    findUndeclaredRelationships(components: ComponentInfo[]): MethodUsage[] {
+        const allUsages = this.findAllRelationships(components);
         
         return allUsages.filter(usage => {
-            // Get all declared relations from source component
-            const declaredRelations = usage.calledFrom.component.relations;
+            // Get all declared relationships from source component
+            const declaredRelationships = usage.calledFrom.component.relations;
             
-            // Check if there's a declared relation matching this usage
-            const isDeclared = declaredRelations.some(relation => 
-                relation.metadata.target === usage.method.component.metadata.name
+            // Check if there's a declared relationship matching this usage
+            const isDeclared = declaredRelationships.some(relationship => 
+                relationship.metadata.target === usage.method.component.metadata.name
             );
 
-            // Keep only undeclared relations
+            // Keep only undeclared relationships
             return !isDeclared;
         });
     }

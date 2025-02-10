@@ -1,10 +1,10 @@
 import { resolve, dirname } from 'path';
 import { ContainerConfig, Groups, ContainerRelation } from './model/container';
 import { ComponentFinder } from './component-finder';
-import { RelationFinder } from './relation-finder';
+import { RelationshipFinder } from './relationship-finder';
 import { RelationValidator, RelationValidatorConfig } from './relation-validator';
 import { ComponentInfo } from './model/component';
-import { MethodUsage } from './relation-finder';
+import { MethodUsage } from './relationship-finder';
 import { ValidationResult } from './relation-validator';
 
 export interface AnalysisResult {
@@ -33,7 +33,7 @@ export interface ContainerAnalyzerConfig {
 
 export class ContainerAnalyzer {
     private componentFinder: ComponentFinder;
-    private relationFinder: RelationFinder;
+    private relationshipFinder: RelationshipFinder;
     private relationValidator: RelationValidator;
     private containerConfig: ContainerConfig;
 
@@ -42,7 +42,7 @@ export class ContainerAnalyzer {
 
         // Initialize finders
         this.componentFinder = new ComponentFinder(config.tsConfigPath, config.config);
-        this.relationFinder = new RelationFinder(config.tsConfigPath);
+        this.relationshipFinder = new RelationshipFinder(config.tsConfigPath);
         this.relationValidator = new RelationValidator({
             tsConfigPath: config.tsConfigPath,
             config: config.config,
@@ -86,7 +86,7 @@ export class ContainerAnalyzer {
 
         // Add undeclared relations if requested
         if (options.includeUndeclared) {
-            result.undeclaredRelations = this.relationFinder.findUndeclaredRelations(components);
+            result.undeclaredRelations = this.relationshipFinder.findUndeclaredRelationships(components);
         }
 
         // Add invalid relations if requested
