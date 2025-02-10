@@ -1,4 +1,4 @@
-import { C4Container, C4ContainerRelation } from './model/workspace';
+import { C4Container, C4ContainerRelationship } from './model/workspace';
 
 const TECHNOLOGY_DESCRIPTIONS: Record<string, string> = {
     'http': 'makes HTTP calls to',
@@ -30,9 +30,9 @@ export class ContainerRelationshipsAnalyzer {
     /**
      * Find relationships between containers based on their analysis results
      */
-    analyze(containers: C4Container[]): C4ContainerRelation[] {
+    analyze(containers: C4Container[]): C4ContainerRelationship[] {
         // Use Map to store unique relationships by source-target-technology key
-        const relationshipsMap = new Map<string, C4ContainerRelation>();
+        const relationshipsMap = new Map<string, C4ContainerRelationship>();
         const containersByName = new Map(
             containers.map(c => [c.data.name, c])
         );

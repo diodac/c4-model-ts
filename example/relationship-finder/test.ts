@@ -23,13 +23,7 @@ const components: ComponentInfo[] = [
             className: "OrderService",
             line: 1
         },
-        rawJSDoc: `/**
- * @c4Component
- * - description: Component that manages order processing
- * - technology: TypeScript
- * - tags: core
- */`,
-        relations: [
+        relationships: [
             {
                 metadata: {
                     target: "PaymentService",
@@ -41,8 +35,7 @@ const components: ComponentInfo[] = [
                     className: "OrderService",
                     line: 8
                 },
-                sourceComponent: "OrderService",
-                rawJSDoc: "@c4Relation target | description | technology"
+                sourceComponent: "OrderService"
             }
         ]
     },
@@ -58,13 +51,7 @@ const components: ComponentInfo[] = [
             className: "ShippingService",
             line: 1
         },
-        rawJSDoc: `/**
- * @c4Component
- * - description: Manages shipping
- * - technology: TypeScript
- * - tags: core
- */`,
-        relations: [
+        relationships: [
             {
                 metadata: {
                     target: "NotificationService",
@@ -76,8 +63,7 @@ const components: ComponentInfo[] = [
                     className: "ShippingService",
                     line: 10
                 },
-                sourceComponent: "ShippingService",
-                rawJSDoc: "@c4Relation target | description | technology"
+                sourceComponent: "ShippingService"
             }
         ]
     },
@@ -93,13 +79,7 @@ const components: ComponentInfo[] = [
             className: "PaymentService",
             line: 1
         },
-        rawJSDoc: `/**
- * @c4Component
- * - description: Handles payment processing
- * - technology: TypeScript, Stripe API
- * - tags: core, payment
- */`,
-        relations: []
+        relationships: []
     },
     {
         metadata: {
@@ -113,13 +93,7 @@ const components: ComponentInfo[] = [
             className: "InventoryService",
             line: 1
         },
-        rawJSDoc: `/**
- * @c4Component
- * - description: Manages product inventory
- * - technology: TypeScript, Redis
- * - tags: core, inventory
- */`,
-        relations: []
+        relationships: []
     },
     {
         metadata: {
@@ -133,13 +107,7 @@ const components: ComponentInfo[] = [
             className: "NotificationService",
             line: 1
         },
-        rawJSDoc: `/**
- * @c4Component
- * - description: Handles customer notifications
- * - technology: TypeScript, SMTP
- * - tags: core, notifications
- */`,
-        relations: []
+        relationships: []
     }
 ];
 

@@ -57,15 +57,15 @@ program
         if (options.relations) {
             console.log('\nRelations across all systems:');
             for (const system of result.systems) {
-                if (system.relations.length > 0) {
+                if (system.relationships.length > 0) {
                     console.log(`\n[System: ${system.name}]`);
-                    for (const relation of system.relations) {
-                        console.log(`\n${relation.source} → ${relation.target}`);
-                        if (relation.description) {
-                            console.log(`Description: ${relation.description}`);
+                    for (const relationship of system.relationships) {
+                        console.log(`\n${relationship.source} → ${relationship.target}`);
+                        if (relationship.description) {
+                            console.log(`Description: ${relationship.description}`);
                         }
-                        if (relation.technology) {
-                            console.log(`Technology: ${relation.technology}`);
+                        if (relationship.technology) {
+                            console.log(`Technology: ${relationship.technology}`);
                         }
                     }
                 }
@@ -117,16 +117,16 @@ program
                     }
                 }
 
-                // Show relations between containers in this system
-                if (system.relations.length > 0) {
-                    console.log('\nContainer Relations:');
-                    for (const relation of system.relations) {
-                        console.log(`\n${relation.source} → ${relation.target}`);
-                        if (relation.description) {
-                            console.log(`Description: ${relation.description}`);
+                // Show relationships between containers in this system
+                if (system.relationships.length > 0) {
+                    console.log('\nContainer Relationships:');
+                    for (const relationship of system.relationships) {
+                        console.log(`\n${relationship.source} → ${relationship.target}`);
+                        if (relationship.description) {
+                            console.log(`Description: ${relationship.description}`);
                         }
-                        if (relation.technology) {
-                            console.log(`Technology: ${relation.technology}`);
+                        if (relationship.technology) {
+                            console.log(`Technology: ${relationship.technology}`);
                         }
                     }
                 }

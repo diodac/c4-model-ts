@@ -18,27 +18,27 @@ function generateMarkdown(): string {
         md += `- **Technology:** ${component.metadata.technology}\n`;
         md += `- **Tags:** ${component.metadata.tags.join(', ')}\n\n`;
         
-        if (component.relations.length > 0) {
-            md += `#### Relations\n\n`;
-            for (const relation of component.relations) {
-                md += `- → ${relation.metadata.target}\n`;
-                md += `  - Description: ${relation.metadata.description}\n`;
-                md += `  - Technology: ${relation.metadata.technology}\n`;
-                if (relation.metadata.tags) {
-                    md += `  - Tags: ${relation.metadata.tags.join(', ')}\n`;
+        if (component.relationships.length > 0) {
+            md += `#### Relationships\n\n`;
+            for (const relationship of component.relationships) {
+                md += `- → ${relationship.metadata.target}\n`;
+                md += `  - Description: ${relationship.metadata.description}\n`;
+                md += `  - Technology: ${relationship.metadata.technology}\n`;
+                if (relationship.metadata.tags) {
+                    md += `  - Tags: ${relationship.metadata.tags.join(', ')}\n`;
                 }
                 md += '\n';
             }
         }
     }
 
-    if (data.undeclaredRelations?.length > 0) {
-        md += `## Undeclared Relations\n\n`;
-        for (const relation of data.undeclaredRelations) {
-            md += `- ${relation.calledFrom.component.metadata.name} → ${relation.method.component.metadata.name}\n`;
-            md += `  - Method: ${relation.method.name}\n`;
-            md += `  - Called from: ${relation.calledFrom.method}\n`;
-            md += `  - Location: ${relation.calledFrom.filePath}:${relation.calledFrom.line}\n\n`;
+    if (data.undeclaredRelationships?.length > 0) {
+        md += `## Undeclared Relationships\n\n`;
+        for (const relationship of data.undeclaredRelationships) {
+            md += `- ${relationship.calledFrom.component.metadata.name} → ${relationship.method.component.metadata.name}\n`;
+            md += `  - Method: ${relationship.method.name}\n`;
+            md += `  - Called from: ${relationship.calledFrom.method}\n`;
+            md += `  - Location: ${relationship.calledFrom.filePath}:${relationship.calledFrom.line}\n\n`;
         }
     }
 
@@ -60,22 +60,22 @@ function generatePlantUML(): string {
         puml += `end note\n\n`;
     }
 
-    // Declared relations
+    // Declared relationships
     for (const component of data.components) {
-        for (const relation of component.relations) {
+        for (const relationship of component.relationships) {
             const sourceId = component.metadata.name.replace(/\s+/g, '');
-            const targetId = relation.metadata.target.replace(/\s+/g, '');
-            puml += `${sourceId} --> ${targetId}: ${relation.metadata.technology}\n`;
+            const targetId = relationship.metadata.target.replace(/\s+/g, '');
+            puml += `${sourceId} --> ${targetId}: ${relationship.metadata.technology}\n`;
         }
     }
 
-    // Undeclared relations (as dashed lines)
-    if (data.undeclaredRelations) {
-        puml += '\n' + '/' + '* Undeclared Relations *' + '/\n';
-        for (const relation of data.undeclaredRelations) {
-            const sourceId = relation.calledFrom.component.metadata.name.replace(/\s+/g, '');
-            const targetId = relation.method.component.metadata.name.replace(/\s+/g, '');
-            puml += `${sourceId} ..> ${targetId}: ${relation.method.name}()\n`;
+    // Undeclared relationships (as dashed lines)
+    if (data.undeclaredRelationships) {
+        puml += '\n' + '/' + '* Undeclared Relationships *' + '/\n';
+        for (const relationship of data.undeclaredRelationships) {
+            const sourceId = relationship.calledFrom.component.metadata.name.replace(/\s+/g, '');
+            const targetId = relationship.method.component.metadata.name.replace(/\s+/g, '');
+            puml += `${sourceId} ..> ${targetId}: ${relationship.method.name}()\n`;
         }
     }
 
@@ -88,7 +88,7 @@ function generateHTML(): string {
     let html = `<!DOCTYPE html>
 <html>
 <head>
-    <title>${data.container.name} - Component Relations</title>
+    <title>${data.container.name} - Component Relationships</title>
     <style>
         table { border-collapse: collapse; width: 100%; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
@@ -99,7 +99,7 @@ function generateHTML(): string {
 </head>
 <body>
     <h1>${data.container.name}</h1>
-    <h2>Component Relations</h2>
+    <h2>Component Relationships</h2>
     <table>
         <tr>
             <th>Source</th>
@@ -110,32 +110,32 @@ function generateHTML(): string {
             <th>Description</th>
         </tr>`;
 
-    // Declared relations
+    // Declared relationships
     for (const component of data.components) {
-        for (const relation of component.relations) {
+        for (const relationship of component.relationships) {
             html += `
         <tr class="declared">
             <td>${component.metadata.name}</td>
-            <td>${relation.metadata.target}</td>
+            <td>${relationship.metadata.target}</td>
             <td>Declared</td>
             <td>-</td>
-            <td>${relation.metadata.technology}</td>
-            <td>${relation.metadata.description}</td>
+            <td>${relationship.metadata.technology}</td>
+            <td>${relationship.metadata.description}</td>
         </tr>`;
         }
     }
 
-    // Undeclared relations
-    if (data.undeclaredRelations) {
-        for (const relation of data.undeclaredRelations) {
+    // Undeclared relationships
+    if (data.undeclaredRelationships) {
+        for (const relationship of data.undeclaredRelationships) {
             html += `
         <tr class="undeclared">
-            <td>${relation.calledFrom.component.metadata.name}</td>
-            <td>${relation.method.component.metadata.name}</td>
+            <td>${relationship.calledFrom.component.metadata.name}</td>
+            <td>${relationship.method.component.metadata.name}</td>
             <td>Undeclared</td>
-            <td>${relation.method.name}</td>
+            <td>${relationship.method.name}</td>
             <td>Internal</td>
-            <td>Called from ${relation.calledFrom.method}</td>
+            <td>Called from ${relationship.calledFrom.method}</td>
         </tr>`;
         }
     }
@@ -156,4 +156,4 @@ fs.writeFileSync('docs/relations.html', generateHTML());
 console.log('Documentation generated:');
 console.log('- docs/components.md (Markdown documentation)');
 console.log('- docs/components.puml (PlantUML diagram)');
-console.log('- docs/relations.html (HTML relations table)'); 
+console.log('- docs/relations.html (HTML relationships table)'); 

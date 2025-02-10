@@ -91,7 +91,7 @@ export class WorkspaceAnalyzer {
                 }
 
                 // Find relations between containers in this system
-                const relations = this.relationshipsAnalyzer.analyze(containers);
+                const relationships = this.relationshipsAnalyzer.analyze(containers);
 
                 // Add system to the model
                 systems.push({
@@ -99,7 +99,7 @@ export class WorkspaceAnalyzer {
                     name: systemConfig.name || systemId,
                     description: systemConfig.description || '',
                     containers,
-                    relations
+                    relationships
                 });
             } catch (error) {
                 console.error(`Error analyzing system ${systemId}:`, error);

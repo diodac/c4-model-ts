@@ -129,7 +129,7 @@
         },
         "technology": {
           "type": "string",
-          "description": "Technology used for the relation"
+          "description": "Technology used for the relationship"
         },
         "tags": {
           "type": "array",

@@ -79,19 +79,19 @@ export interface C4Container {
 }
 
 /**
- * Represents a relation between containers
+ * Represents a relationship between containers
  */
-export interface C4ContainerRelation {
+export interface C4ContainerRelationship {
     /** Source container name */
     source: string;
 
     /** Target container name */
     target: string;
 
-    /** Relation description */
+    /** Description of the relationship */
     description: string;
 
-    /** Technology used for communication */
+    /** Technology used for the relationship */
     technology?: string;
 }
 
@@ -111,8 +111,8 @@ export interface C4System {
     /** Containers in the system */
     containers: C4Container[];
 
-    /** Relations between containers in this system */
-    relations: C4ContainerRelation[];
+    /** Relationships between containers in this system */
+    relationships: C4ContainerRelationship[];
 }
 
 /**

@@ -112,23 +112,23 @@ program
             if (result.invalidRelationships?.length) {
                 console.log('\nError: Found invalid relationships:');
                 for (const validationResult of result.invalidRelationships) {
-                    const relation = validationResult.relation;
+                    const relationship = validationResult.relationship;
 
                     // Invalid target is an error
                     if (!validationResult.targetExists) {
-                        console.log(`\nError: Invalid target component: ${relation.sourceComponent} → ${relation.metadata.target}`);
-                        console.log(`Location: ${relation.location.filePath}:${relation.location.line}`);
+                        console.log(`\nError: Invalid target component: ${relationship.sourceComponent} → ${relationship.metadata.target}`);
+                        console.log(`Location: ${relationship.location.filePath}:${relationship.location.line}`);
                         console.log('The target component does not exist in the codebase.');
                     }
 
                     // Unused relation is an error
                     if (!validationResult.isUsed) {
-                        console.log(`\nError: Declared but unused relationship: ${relation.sourceComponent} → ${relation.metadata.target}`);
-                        console.log(`Description: ${relation.metadata.description}`);
-                        if (relation.metadata.technology) {
-                            console.log(`Technology: ${relation.metadata.technology}`);
+                        console.log(`\nError: Declared but unused relationship: ${relationship.sourceComponent} → ${relationship.metadata.target}`);
+                        console.log(`Description: ${relationship.metadata.description}`);
+                        if (relationship.metadata.technology) {
+                            console.log(`Technology: ${relationship.metadata.technology}`);
                         }
-                        console.log(`Location: ${relation.location.filePath}:${relation.location.line}`);
+                        console.log(`Location: ${relationship.location.filePath}:${relationship.location.line}`);
                         console.log('This relationship is documented but not found in the code. Either implement the relationship or remove its documentation.');
                     }
 
@@ -136,7 +136,7 @@ program
                     if (validationResult.errors?.length) {
                         for (const error of validationResult.errors) {
                             console.log(`\nError: ${error}`);
-                            console.log(`Location: ${relation.location.filePath}:${relation.location.line}`);
+                            console.log(`Location: ${relationship.location.filePath}:${relationship.location.line}`);
                         }
                     }
                 }

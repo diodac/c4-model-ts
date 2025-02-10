@@ -9,7 +9,7 @@ import { resolve, dirname } from 'path';
  */
 export interface ValidationResult {
     /** Relationship being validated */
-    relation: RelationshipInfo;
+    relationship: RelationshipInfo;
     /** Whether target component exists */
     targetExists: boolean;
     /** Whether relationship is actually used in code */
@@ -151,7 +151,7 @@ export class RelationshipValidator {
                 };
 
                 results.push({
-                    relation,
+                    relationship: relation,
                     targetExists: true,
                     isUsed: true,
                     usageLocation: usage,
@@ -187,7 +187,7 @@ export class RelationshipValidator {
 
         if (!sourceComponent) {
             return {
-                relation,
+                relationship: relation,
                 targetExists: !!targetComponent || !!isExternalTarget || !!isRelationshipTarget,
                 isUsed: false,
                 errors
@@ -197,7 +197,7 @@ export class RelationshipValidator {
         // If target is external or defined in relationships, we consider it exists but don't validate usage
         if (isExternalTarget || isRelationshipTarget) {
             return {
-                relation,
+                relationship: relation,
                 targetExists: true,
                 isUsed: true,
                 errors
@@ -207,7 +207,7 @@ export class RelationshipValidator {
         // If target is internal but not found, it's invalid
         if (!targetComponent) {
             return {
-                relation,
+                relationship: relation,
                 targetExists: false,
                 isUsed: false,
                 errors
@@ -218,7 +218,7 @@ export class RelationshipValidator {
         const sourceFile = this.project.getSourceFile(sourceComponent.location.filePath);
         if (!sourceFile) {
             return {
-                relation,
+                relationship: relation,
                 targetExists: true,
                 isUsed: false,
                 errors
@@ -229,7 +229,7 @@ export class RelationshipValidator {
         const targetFile = this.project.getSourceFile(targetComponent.location.filePath);
         if (!targetFile) {
             return {
-                relation,
+                relationship: relation,
                 targetExists: true,
                 isUsed: false,
                 errors
@@ -239,7 +239,7 @@ export class RelationshipValidator {
         const targetClass = targetFile.getClass(targetComponent.location.className);
         if (!targetClass) {
             return {
-                relation,
+                relationship: relation,
                 targetExists: true,
                 isUsed: false,
                 errors
@@ -250,7 +250,7 @@ export class RelationshipValidator {
         const targetSymbol = targetClass.getSymbol();
         if (!targetSymbol) {
             return {
-                relation,
+                relationship: relation,
                 targetExists: true,
                 isUsed: false,
                 errors
@@ -354,7 +354,7 @@ export class RelationshipValidator {
         }
 
         return {
-            relation,
+            relationship: relation,
             targetExists: true,
             isUsed: !!usageLocation,
             usageLocation,
