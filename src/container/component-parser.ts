@@ -1,7 +1,17 @@
 import { ClassDeclaration, JSDoc } from 'ts-morph';
 import { ComponentInfo, ComponentMetadata } from './model/component';
 import { TagParser, TagSchema } from './tag-parser';
-import { ContainerConfig } from './model/container';
+import { ContainerConfig, Groups } from './model/container';
+
+/**
+ * Error thrown when a group is not declared in container configuration
+ */
+export class UndeclaredGroupError extends Error {
+    constructor(groupName: string) {
+        super(`Group "${groupName}" is not declared in container configuration`);
+        this.name = 'UndeclaredGroupError';
+    }
+}
 
 /**
  * Parser for @c4Component tags
@@ -49,6 +59,39 @@ export class ComponentParser {
     };
 
     /**
+     * Validate if a group exists in the container configuration
+     */
+    private validateGroup(groupName: string): void {
+        if (!this.containerConfig?.groups) {
+            throw new UndeclaredGroupError(groupName);
+        }
+
+        const isGroupDeclared = this.isGroupInHierarchy(groupName, this.containerConfig.groups);
+        if (!isGroupDeclared) {
+            throw new UndeclaredGroupError(groupName);
+        }
+    }
+
+    /**
+     * Recursively check if a group exists in the group hierarchy
+     */
+    private isGroupInHierarchy(groupName: string, groups: Groups): boolean {
+        // Check if group exists at current level
+        if (groupName in groups) {
+            return true;
+        }
+
+        // Recursively check subgroups
+        for (const subgroups of Object.values(groups)) {
+            if (this.isGroupInHierarchy(groupName, subgroups)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Parse component metadata from class declaration
      */
     parse(classDecl: ClassDeclaration): ComponentInfo | null {
@@ -75,9 +118,14 @@ export class ComponentParser {
         const componentName = parsed.args[0] || className;
         
         // Parse group tag and remove quotes from group name
-        const groupName = groupTag 
-            ? this.tagParser.parse(groupTag, this.groupSchema).args[0]
-            : undefined;
+        let groupName: string | undefined;
+        if (groupTag) {
+            groupName = this.tagParser.parse(groupTag, this.groupSchema).args[0];
+            // Validate group if container config is provided
+            if (groupName && this.containerConfig) {
+                this.validateGroup(groupName);
+            }
+        }
         
         // Convert to component metadata
         const metadata: ComponentMetadata = {
