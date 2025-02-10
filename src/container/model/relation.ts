@@ -35,6 +35,4 @@ export interface RelationInfo {
         /** Line number in file */
         line: number;
     };
-    /** Raw JSDoc comment */
-    rawJSDoc: string;
 } 

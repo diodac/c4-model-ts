@@ -92,7 +92,6 @@ export class RelationParser {
                         methodName,
                         line: node.getStartLineNumber()
                     },
-                    rawJSDoc: jsDoc.getText()
                 });
             }
         }

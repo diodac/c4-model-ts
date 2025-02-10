@@ -95,7 +95,6 @@ export class ComponentParser {
                 className,
                 line: classDecl.getStartLineNumber()
             },
-            rawJSDoc: jsDoc.getText(),
             relations: []
         };
     }

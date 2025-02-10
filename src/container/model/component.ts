@@ -37,9 +37,6 @@ export interface ComponentInfo {
         line: number;
     };
     
-    /** Raw JSDoc comment */
-    rawJSDoc: string;
-
     /** Relations defined in this component */
     relations: RelationInfo[];
 } 

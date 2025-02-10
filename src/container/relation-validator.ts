@@ -148,7 +148,6 @@ export class RelationValidator {
                         className: component.location.className,
                         line: usage.line
                     },
-                    rawJSDoc: ''  // No JSDoc for undeclared relations
                 };
 
                 results.push({
