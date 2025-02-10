@@ -3,8 +3,9 @@
 import { resolve, dirname } from 'path';
 import { readFileSync } from 'fs';
 import { Command } from 'commander';
-import { WorkspaceAnalyzer } from '../workspace/analyzer';
-import { simplifyUndeclaredRelations } from '../common/relation-simplifier';
+import { WorkspaceAnalyzer, WorkspaceAnalyzerConfig } from '../workspace/analyzer';
+import { WorkspaceConfigLoader } from '../workspace/config-loader';
+import { simplifyUndeclaredRelationships } from '../common/relationship-simplifier';
 
 const program = new Command();
 
@@ -44,7 +45,7 @@ program
                     ...system,
                     containers: system.containers.map(container => ({
                         ...container,
-                        analysis: simplifyUndeclaredRelations(container.analysis)
+                        analysis: simplifyUndeclaredRelationships(container.analysis)
                     }))
                 }))
             };
