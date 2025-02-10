@@ -10,7 +10,7 @@ import { ConfigService } from '../domain/ConfigService';
  */
 export class ConfigController {
     /**
-     * @c4Relation ConfigService | Uses for config management
+     * @c4Relationship ConfigService | Uses for config management
      * - technology: Internal
      */
     constructor(private configService: ConfigService) {}

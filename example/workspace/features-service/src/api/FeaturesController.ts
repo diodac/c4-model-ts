@@ -10,7 +10,7 @@ import { FeaturesService } from '../domain/FeaturesService';
  */
 export class FeaturesController {
     /**
-     * @c4Relation FeaturesService | Uses for feature management
+     * @c4Relationship FeaturesService | Uses for feature management
      * - technology: Internal
      */
     constructor(private featuresService: FeaturesService) {}

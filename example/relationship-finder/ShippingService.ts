@@ -7,7 +7,7 @@ import { NotificationService } from './NotificationService';
  * - technology: TypeScript, Logistics API
  * - tags: core, shipping
  * 
- * @c4Relation NotificationService | Sends delivery notifications | Message Queue
+ * @c4Relationship NotificationService | Sends delivery notifications | Message Queue
  * - technology: Message Queue
  * - tags: DirectRelation
  * - properties:

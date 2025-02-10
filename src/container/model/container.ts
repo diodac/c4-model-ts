@@ -35,7 +35,7 @@ export interface ContainerConfig {
     name: string;
     
     /** Container description */
-    description: string;
+    description?: string;
     
     /** Technology stack */
     technology?: string;
@@ -56,7 +56,7 @@ export interface ContainerConfig {
     external?: Record<string, ExternalElement>;
 
     /** Container-level relationships */
-    relationships?: ContainerRelation[];
+    relationships?: ContainerRelationship[];
 }
 
 /**
@@ -82,13 +82,13 @@ export interface ContainerData {
     external?: Record<string, ExternalElement>;
 
     /** Container-level relationships */
-    relationships?: ContainerRelation[];
+    relationships?: ContainerRelationship[];
 }
 
 /**
  * Container-level relationship configuration
  */
-export interface ContainerRelation extends RelationshipMetadata {
+export interface ContainerRelationship extends RelationshipMetadata {
     /** Target container or system name */
     target: string;
 }

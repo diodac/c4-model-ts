@@ -13,7 +13,7 @@ export class FeaturesService {
     private configClient: ConfigClient;
 
     /**
-     * @c4Relation FeatureRepository | Stores feature flags | Database
+     * @c4Relationship FeatureRepository | Stores feature flags | Database
      * - technology: MongoDB
      * - tags: DirectRelation
      */
@@ -24,7 +24,7 @@ export class FeaturesService {
     }
 
     /**
-     * @c4Relation config-service.ConfigService | Stores feature flags configuration | HTTP
+     * @c4Relationship config-service.ConfigService | Stores feature flags configuration | HTTP
      * - technology: HTTP
      * - tags: DirectRelation
      */
@@ -39,7 +39,7 @@ export class FeaturesService {
     }
 
     /**
-     * @c4Relation metrics-service | Sends usage metrics
+     * @c4Relationship metrics-service | Sends usage metrics
      * - technology: Kafka
      */
     async trackFeatureUsage(featureId: string): Promise<void> {

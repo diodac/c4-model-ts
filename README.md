@@ -12,7 +12,7 @@ This module automatically generates C4 model documentation from TypeScript code 
 - Supports direct and indirect relationship detection
 - Groups components logically with hierarchical group structures
 - Configurable source file patterns with glob support
-- Command-line interface (CLI) with component and relation validation
+- Command-line interface (CLI) with component and relationship validation
 - External component definitions support
 
 ## Annotation Format
@@ -342,9 +342,11 @@ export class OrderService {
 ```
 
 In the example above:
-- Class-level relation defines a general dependency on PaymentGateway
-- Constructor relation documents database dependency
+- Class-level relationship defines a general dependency on PaymentGateway
+- Constructor relationship documents database dependency
 - Method relations show specific interactions with other services
+
+Relationships can be explicitly tagged with `DirectRelation` or `IndirectRelation` tags. The generator validates these tags against actual usage patterns in the code.
 
 #### @c4Group name
 

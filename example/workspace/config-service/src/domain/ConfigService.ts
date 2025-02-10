@@ -9,13 +9,13 @@ import { ConfigRepository } from '../infrastructure/ConfigRepository';
  */
 export class ConfigService {
     /**
-     * @c4Relation ConfigRepository | Stores configuration
+     * @c4Relationship ConfigRepository | Stores configuration
      * - technology: Internal
      */
     constructor(private repository: ConfigRepository) {}
 
     /**
-     * @c4Relation metrics-service | Sends config access metrics
+     * @c4Relationship metrics-service | Sends config access metrics
      * - technology: Kafka
      */
     async trackConfigAccess(configId: string): Promise<void> {

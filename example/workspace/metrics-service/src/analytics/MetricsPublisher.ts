@@ -6,7 +6,7 @@
  */
 export class MetricsPublisher {
     /**
-     * @c4Relation analytics-service | publishes metrics data to | kafka
+     * @c4Relationship analytics-service | publishes metrics data to | kafka
      */
     async publishMetrics(metrics: any): Promise<void> {
         // Implementation would use Kafka client to publish metrics

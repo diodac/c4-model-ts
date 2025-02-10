@@ -7,7 +7,7 @@
  */
 export class FeaturesClient {
     /**
-     * @c4Relation features-service.FeaturesService | Checks feature flags | HTTP
+     * @c4Relationship features-service.FeaturesService | Checks feature flags | HTTP
      * - technology: HTTP
      * - tags: DirectRelation
      */

@@ -21,20 +21,20 @@ export class MetricsService {
     private featuresClient: FeaturesClient;
 
     /**
-     * @c4Relation MetricsRepository | Stores metrics data | Database
+     * @c4Relationship MetricsRepository | Stores metrics data | Database
      * - technology: Internal
      * - tags: DirectRelation
      */
     constructor(
         private repository: MetricsRepository,
         /**
-         * @c4Relation Logger | Logs service operations | Logging
+         * @c4Relationship Logger | Logs service operations | Logging
          * - technology: Internal
          * - tags: IndirectRelation
          */
         private logger: Logger,
         /**
-         * @c4Relation config-service.ConfigService | Gets configuration from config service | HTTP
+         * @c4Relationship config-service.ConfigService | Gets configuration from config service | HTTP
          * - technology: HTTP
          * - tags: DirectRelation
          */
@@ -47,7 +47,7 @@ export class MetricsService {
     }
 
     /**
-     * @c4Relation config-service.ConfigService | Gets metrics configuration | HTTP
+     * @c4Relationship config-service.ConfigService | Gets metrics configuration | HTTP
      * - technology: HTTP
      * - tags: DirectRelation
      */
@@ -57,7 +57,7 @@ export class MetricsService {
     }
 
     /**
-     * @c4Relation features-service.FeaturesService | Checks if metrics collection is enabled | HTTP
+     * @c4Relationship features-service.FeaturesService | Checks if metrics collection is enabled | HTTP
      * - technology: HTTP
      * - tags: DirectRelation
      */
@@ -66,7 +66,7 @@ export class MetricsService {
     }
 
     /**
-     * @c4Relation MetricsProcessor | Processes metrics data | Internal
+     * @c4Relationship MetricsProcessor | Processes metrics data | Internal
      * - technology: Internal
      * - tags: DirectRelation
      */
@@ -88,7 +88,7 @@ export class MetricsService {
     }
 
     /**
-     * @c4Relation DataValidator | Validates metrics data | Internal
+     * @c4Relationship DataValidator | Validates metrics data | Internal
      * - technology: Internal
      * - tags: DirectRelation
      */

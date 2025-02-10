@@ -7,7 +7,7 @@
  */
 export class ConfigClient {
     /**
-     * @c4Relation config-service.ConfigService | Gets configuration | HTTP
+     * @c4Relationship config-service.ConfigService | Gets configuration | HTTP
      * - technology: HTTP
      * - tags: DirectRelation
      */

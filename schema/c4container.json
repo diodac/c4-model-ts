@@ -39,20 +39,43 @@
           "description": "Container properties"
         },
         "groups": {
-          "$ref": "#/definitions/Groups",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "description": {
+                "type": "string",
+                "description": "Group description"
+              },
+              "parent": {
+                "type": "string",
+                "description": "Parent group name"
+              }
+            }
+          },
           "description": "Component groups"
         },
         "external": {
           "type": "object",
           "additionalProperties": {
-            "$ref": "#/definitions/ExternalElement"
+            "type": "object",
+            "properties": {
+              "description": {
+                "type": "string",
+                "description": "External component description"
+              },
+              "technology": {
+                "type": "string",
+                "description": "External component technology"
+              }
+            }
           },
           "description": "External components"
         },
         "relationships": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/ContainerRelation"
+            "$ref": "#/definitions/ContainerRelationship"
           },
           "description": "Container-level relationships"
         }
@@ -65,58 +88,7 @@
       "additionalProperties": false,
       "description": "Container configuration from c4container.json"
     },
-    "Groups": {
-      "type": "object",
-      "additionalProperties": {
-        "anyOf": [
-          {
-            "$ref": "#/definitions/Groups"
-          },
-          {
-            "type": "object",
-            "additionalProperties": {
-              "not": {}
-            }
-          }
-        ]
-      },
-      "description": "Recursive group structure"
-    },
-    "ExternalElement": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Element name"
-        },
-        "description": {
-          "type": "string",
-          "description": "Element description"
-        },
-        "technology": {
-          "type": "string",
-          "description": "Technology stack"
-        },
-        "tags": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Element tags"
-        },
-        "type": {
-          "type": "string",
-          "description": "Element type (container, system, etc.)"
-        }
-      },
-      "required": [
-        "name",
-        "description"
-      ],
-      "additionalProperties": false,
-      "description": "External element configuration"
-    },
-    "ContainerRelation": {
+    "ContainerRelationship": {
       "type": "object",
       "properties": {
         "target": {
@@ -125,37 +97,23 @@
         },
         "description": {
           "type": "string",
-          "description": "Relation description"
+          "description": "Relationship description"
         },
         "technology": {
           "type": "string",
-          "description": "Technology used for the relationship"
+          "description": "Relationship technology"
         },
         "tags": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Relation tags"
-        },
-        "url": {
-          "type": "string",
-          "description": "URL with documentation"
-        },
-        "properties": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Custom properties"
+          "description": "Relationship tags"
         }
       },
       "required": [
-        "description",
         "target"
-      ],
-      "additionalProperties": false,
-      "description": "Container-level relationship configuration"
+      ]
     }
   }
 }

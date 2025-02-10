@@ -68,9 +68,9 @@ export class RelationshipParser {
             : this.getParentClassName(node);
 
         for (const jsDoc of jsDocs) {
-            const relationTags = jsDoc.getTags().filter(tag => tag.getTagName() === 'c4Relationship');
+            const relationshipTags = jsDoc.getTags().filter(tag => tag.getTagName() === 'c4Relationship');
             
-            for (const tag of relationTags) {
+            for (const tag of relationshipTags) {
                 const parsed = this.tagParser.parse(tag, this.schema);
                 const targetComponent = parsed.args[0];
                 

@@ -9,7 +9,7 @@ import { MetricsService } from '../domain/MetricsService';
  */
 export class MetricsController {
     /**
-     * @c4Relation MetricsService | Uses for metrics processing
+     * @c4Relationship MetricsService | Uses for metrics processing
      * - technology: TypeScript
      */
     constructor(private metricsService: MetricsService) {}

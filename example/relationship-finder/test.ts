@@ -118,7 +118,7 @@ async function main() {
     const allUsages = finder.findAllRelationships(components);
     console.log(JSON.stringify(allUsages, null, 2));
 
-    console.log("\nUndeclared relations (found in code but not in @c4Relation tags):");
+    console.log("\nUndeclared relationships (found in code but not in @c4Relationship tags):");
     const undeclaredUsages = finder.findUndeclaredRelationships(components);
     console.log(JSON.stringify(undeclaredUsages, null, 2));
 }
