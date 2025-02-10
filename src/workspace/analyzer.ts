@@ -83,7 +83,8 @@ export class WorkspaceAnalyzer {
                             technology: containerConfig.technology,
                             tags: containerConfig.tags,
                             sourcePath: configPath,
-                            external: containerConfig.external
+                            external: containerConfig.external,
+                            relationships: containerConfig.relationships
                         },
                         analysis
                     });

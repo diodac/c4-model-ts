@@ -1,5 +1,5 @@
 import { resolve, dirname } from 'path';
-import { ContainerConfig, Groups } from './model/container';
+import { ContainerConfig, Groups, ContainerRelation } from './model/container';
 import { ComponentFinder } from './component-finder';
 import { RelationFinder } from './relation-finder';
 import { RelationValidator, RelationValidatorConfig } from './relation-validator';
@@ -14,6 +14,7 @@ export interface AnalysisResult {
         technology?: string;
         tags?: string[];
         properties?: Record<string, string>;
+        relationships?: ContainerRelation[];
     };
     components: Array<ComponentInfo & { relations: Array<{ sourceComponent: string }> }>;
     groups: Groups;
@@ -70,7 +71,8 @@ export class ContainerAnalyzer {
                 description: this.containerConfig.description,
                 technology: this.containerConfig.technology,
                 tags: this.containerConfig.tags,
-                properties: this.containerConfig.properties
+                properties: this.containerConfig.properties,
+                relationships: this.containerConfig.relationships
             },
             components: components.map(component => ({
                 ...component,

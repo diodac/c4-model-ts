@@ -197,6 +197,19 @@ Create a `c4container.json` file in your project root to define a container:
             "technology": "REST API"
         }
     },
+    "relationships": [
+        {
+            "target": "external-service",
+            "description": "Sends data to",
+            "technology": "HTTP/REST",
+            "tags": ["api", "external"],
+            "url": "https://api.docs.example.com",
+            "properties": {
+                "criticality": "high",
+                "sla": "99.9%"
+            }
+        }
+    ],
     "groups": {
         "Core": {
             "CustomerManagement": {},
@@ -458,3 +471,30 @@ The template will generate a Structurizr DSL file with:
 - Component grouping structure
 - All relationships between containers and components
 - A container diagram view with auto-layout
+
+This allows for flexible relationship definitions while maintaining validation and consistency.
+
+### Relationship Validation
+
+The generator validates relationships in several ways:
+
+1. **Target Existence**: For relationships defined with `@c4Relation`, the target must exist as one of:
+   - A component defined with `@c4Component`
+   - An external component defined in the `external` section
+   - A target defined in the `relationships` section
+
+2. **Usage Validation**: For relationships between internal components, the generator checks if the relationship is actually used in the code:
+   - Direct usage through constructor injection, properties, or method parameters
+   - Indirect usage through method calls or instance creation
+   - The validation adds appropriate tags (`DirectRelation` or `IndirectRelation`)
+
+3. **Tag Consistency**: The generator validates that:
+   - A relationship cannot be both direct and indirect
+   - Tags match the actual usage pattern in code
+
+4. **Undeclared Relations**: The generator can detect relationships that exist in code but are not documented with `@c4Relation`
+
+For container-level relationships defined in `c4container.json`:
+- No code-level validation is performed
+- The target must be defined in the `external` section
+- Basic validation of required fields (target, description) and field formats

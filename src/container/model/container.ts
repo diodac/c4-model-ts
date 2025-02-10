@@ -1,8 +1,30 @@
+import { RelationMetadata } from './relation';
+
 /**
  * Recursive group structure
  */
 export interface Groups {
     [key: string]: Groups | Record<string, never>;
+}
+
+/**
+ * External element configuration
+ */
+export interface ExternalElement {
+    /** Element name */
+    name: string;
+    
+    /** Element description */
+    description: string;
+    
+    /** Technology stack */
+    technology?: string;
+    
+    /** Element tags */
+    tags?: string[];
+
+    /** Element type (container, system, etc.) */
+    type?: string;
 }
 
 /**
@@ -32,26 +54,9 @@ export interface ContainerConfig {
     
     /** External components */
     external?: Record<string, ExternalElement>;
-}
 
-/**
- * External element configuration
- */
-export interface ExternalElement {
-    /** Element name */
-    name: string;
-    
-    /** Element description */
-    description: string;
-    
-    /** Technology stack */
-    technology?: string;
-    
-    /** Element tags */
-    tags?: string[];
-
-    /** Element type (container, system, etc.) */
-    type?: string;
+    /** Container-level relationships */
+    relationships?: ContainerRelation[];
 }
 
 /**
@@ -75,6 +80,17 @@ export interface ContainerData {
 
     /** External dependencies */
     external?: Record<string, ExternalElement>;
+
+    /** Container-level relationships */
+    relationships?: ContainerRelation[];
+}
+
+/**
+ * Container-level relationship configuration
+ */
+export interface ContainerRelation extends RelationMetadata {
+    /** Target container or system name */
+    target: string;
 }
 
 /**

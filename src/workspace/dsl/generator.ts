@@ -1,6 +1,6 @@
 import { Liquid } from 'liquidjs';
 import { WorkspaceAnalyzer } from '../analyzer';
-import { C4WorkspaceConfig, C4WorkspaceModel } from '../model/workspace';
+import { C4WorkspaceConfig, C4WorkspaceModel, C4Container } from '../model/workspace';
 import { resolve, dirname } from 'path';
 import { readFileSync, writeFileSync } from 'fs';
 import { Groups } from '../../container/model/container';
@@ -217,24 +217,32 @@ export class DslGenerator {
 
         // Generate DSL for each container
         for (const container of containers) {
+            const dslContainer: Container = {
+                name: container.name,
+                title: container.title,
+                technology: container.technology,
+                description: container.description,
+                analysis: container.analysis
+            };
+
             const lines = [
-                `${container.name} = container "${container.title}" {`,
-                `    technology "${container.technology}"`,
-                `    description "${container.description}"`
+                `${dslContainer.name} = container "${dslContainer.title}" {`,
+                `    technology "${dslContainer.technology}"`,
+                `    description "${dslContainer.description}"`
             ];
 
-            if (container.analysis?.components) {
+            if (dslContainer.analysis?.components) {
                 // First render ungrouped components
-                const ungroupedComponents = container.analysis.components.filter(c => !c.metadata.group);
+                const ungroupedComponents = dslContainer.analysis.components.filter(c => !c.metadata.group);
                 if (ungroupedComponents.length > 0) {
                     lines.push('');
                     lines.push(...ungroupedComponents.map(component => renderComponent(component, 4)));
                 }
 
                 // Then render grouped components
-                if (container.analysis.groups && Object.keys(container.analysis.groups).length > 0) {
+                if (dslContainer.analysis.groups && Object.keys(dslContainer.analysis.groups).length > 0) {
                     if (ungroupedComponents.length > 0) lines.push('');
-                    lines.push(...renderGroupedComponents(container.analysis.groups, container.analysis.components, 4));
+                    lines.push(...renderGroupedComponents(dslContainer.analysis.groups, dslContainer.analysis.components, 4));
                 }
             }
 
@@ -259,7 +267,7 @@ export class DslGenerator {
         const undeclaredRelations = relationships.filter(rel => rel.tags?.includes('UndeclaredRelation'));
 
         // Group declared relationships
-        const containerRelations = declaredRelations.filter(rel => !rel.source.includes('.') && !rel.target.includes('.'));
+        const containerRelations = declaredRelations.filter(rel => !rel.source.includes('.'));
         const componentRelations = declaredRelations.filter(rel => rel.source.includes('.'));
 
         // Group component relations by source container
@@ -284,29 +292,28 @@ export class DslGenerator {
         };
 
         // Generate DSL for declared relations
-        const parts = [
-            // Container-to-container relations
-            ...containerRelations.map(formatRelation)
-        ];
+        const parts = [];
 
-        // Add component relations grouped by container
-        for (const [containerName, relations] of componentRelationsByContainer) {
-            // Add empty line before container group
-            if (parts.length > 0) {
-                parts.push('');
+        // First add container-to-container relations
+        if (containerRelations.length > 0) {
+            parts.push('# Container relationships');
+            parts.push(...containerRelations.map(formatRelation));
+        }
+
+        // Then add component relations grouped by container
+        if (componentRelations.length > 0) {
+            if (parts.length > 0) parts.push('');
+            parts.push('# Component relationships');
+            for (const [containerName, relations] of componentRelationsByContainer) {
+                parts.push(...relations.map(formatRelation));
             }
-
-            // Add relations for this container
-            parts.push(...relations.map(formatRelation));
         }
 
         // Add undeclared relations if any exist
         if (undeclaredRelations.length > 0) {
-            // Add separator
             if (parts.length > 0) {
                 parts.push('');
                 parts.push('# Undeclared relations found in code analysis');
-                parts.push('');
             }
 
             // Group undeclared relations by container
@@ -362,15 +369,15 @@ export class DslGenerator {
             const containers: Container[] = [];
             const relationships: Relationship[] = [];
 
-            for (const container of system.containers) {
+            for (const c4container of system.containers) {
                 // Add container
                 containers.push({
-                    name: container.data.name,
-                    title: container.data.name,
-                    technology: container.data.technology || '',
-                    description: container.data.description || '',
-                    analysis: container.analysis && {
-                        components: container.analysis.components.map(component => ({
+                    name: c4container.data.name,
+                    title: c4container.data.name,
+                    technology: c4container.data.technology || '',
+                    description: c4container.data.description || '',
+                    analysis: c4container.analysis && {
+                        components: c4container.analysis.components.map(component => ({
                             metadata: {
                                 name: component.metadata.name,
                                 description: component.metadata.description || '',
@@ -378,22 +385,33 @@ export class DslGenerator {
                                 group: component.metadata.group
                             }
                         })),
-                        groups: container.analysis.groups
+                        groups: c4container.analysis.groups
                     }
                 });
 
+                // Add container-level relationships from c4container.json
+                if (c4container.data.relationships) {
+                    relationships.push(...c4container.data.relationships.map(relation => ({
+                        source: c4container.data.name,
+                        target: relation.target,
+                        description: relation.description,
+                        technology: relation.technology || '',
+                        tags: relation.tags
+                    })));
+                }
+
                 // Extract relationships from components
-                if (container.analysis?.components) {
-                    for (const component of container.analysis.components) {
+                if (c4container.analysis?.components) {
+                    for (const component of c4container.analysis.components) {
                         if (component.relations) {
                             relationships.push(...component.relations.map(relation => {
                                 // First check if the entire target is defined in external
-                                const isFullPathExternal = container.data.external && 
-                                    relation.metadata.target in container.data.external;
+                                const isFullPathExternal = c4container.data.external && 
+                                    relation.metadata.target in c4container.data.external;
                                 
                                 if (isFullPathExternal) {
                                     return {
-                                        source: `${container.data.name}.${component.metadata.name}`,
+                                        source: `${c4container.data.name}.${component.metadata.name}`,
                                         target: relation.metadata.target,
                                         description: relation.metadata.description || '',
                                         technology: relation.metadata.technology || '',
@@ -404,11 +422,11 @@ export class DslGenerator {
                                 // If not external as full path, check if needs container prefix
                                 const targetParts = relation.metadata.target.split('.');
                                 const target = targetParts.length === 1 
-                                    ? `${container.data.name}.${relation.metadata.target}`
+                                    ? `${c4container.data.name}.${relation.metadata.target}`
                                     : relation.metadata.target;
 
                                 return {
-                                    source: `${container.data.name}.${component.metadata.name}`,
+                                    source: `${c4container.data.name}.${component.metadata.name}`,
                                     target,
                                     description: relation.metadata.description || '',
                                     technology: relation.metadata.technology || '',

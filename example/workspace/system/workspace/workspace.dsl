@@ -142,12 +142,58 @@ workspace {
             }
             
             # relationships
-            metrics-service -> analytics-service "publishes/subscribes messages via Kafka to" "kafka"
-            metrics-service -> config-service "makes HTTP calls to" "HTTP"
-            metrics-service -> features-service "makes HTTP calls to" "HTTP"
-            features-service -> config-service "makes HTTP calls to" "HTTP"
-            features-service -> metrics-service "publishes/subscribes messages via Kafka to" "Kafka"
-            config-service -> metrics-service "publishes/subscribes messages via Kafka to" "Kafka"
+            # Container relationships
+            metrics-service -> analytics-service "Sends metrics data to" "Kafka" {
+                tags "metrics,streaming"
+            }
+            metrics-service -> config-service "Gets configuration from" "HTTP/REST" {
+                tags "config"
+            }
+            metrics-service -> features-service "Checks feature flags using" "HTTP/REST" {
+                tags "features"
+            }
+            config-service -> metrics-service "Sends telemetry data to" "HTTP/REST" {
+                tags "metrics,telemetry"
+            }
+            config-service -> analytics-system "Provides configuration data to" "HTTP/REST" {
+                tags "analytics,config"
+            }
+
+            # Component relationships
+            metrics-service.MetricsPublisher -> analytics-service "publishes metrics data to" "kafka"
+            metrics-service.MetricsController -> metrics-service.MetricsService "Uses for metrics processing" "TypeScript"
+            metrics-service.MetricsService -> metrics-service.MetricsRepository "Stores metrics data" "Internal" {
+                tags "DirectRelation"
+            }
+            metrics-service.MetricsService -> config-service.ConfigService "Gets metrics configuration" "HTTP" {
+                tags "DirectRelation"
+            }
+            metrics-service.MetricsService -> features-service.FeaturesService "Checks if metrics collection is enabled" "HTTP" {
+                tags "DirectRelation"
+            }
+            metrics-service.MetricsService -> metrics-service.MetricsProcessor "Processes metrics data" "Internal" {
+                tags "DirectRelation"
+            }
+            metrics-service.MetricsService -> metrics-service.DataValidator "Validates metrics data" "Internal" {
+                tags "DirectRelation"
+            }
+            metrics-service.FeaturesClient -> features-service.FeaturesService "Checks feature flags" "HTTP" {
+                tags "DirectRelation"
+            }
+            features-service.FeaturesController -> features-service.FeaturesService "Uses for feature management" "Internal"
+            features-service.FeaturesService -> features-service.FeatureRepository "Stores feature flags" "MongoDB" {
+                tags "DirectRelation"
+            }
+            features-service.FeaturesService -> config-service.ConfigService "Stores feature flags configuration" "HTTP" {
+                tags "DirectRelation"
+            }
+            features-service.FeaturesService -> metrics-service "Sends usage metrics" "Kafka"
+            features-service.ConfigClient -> config-service.ConfigService "Gets configuration" "HTTP" {
+                tags "DirectRelation"
+            }
+            config-service.ConfigController -> config-service.ConfigService "Uses for config management" "Internal"
+            config-service.ConfigService -> config-service.ConfigRepository "Stores configuration" "Internal"
+            config-service.ConfigService -> metrics-service "Sends config access metrics" "Kafka"
         }
     }
 

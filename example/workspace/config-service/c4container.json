@@ -18,7 +18,28 @@
     ],
     "external": {
         "metrics-service": {
+            "name": "metrics-service",
+            "description": "Service for collecting and processing metrics",
             "type": "container"
+        },
+        "analytics-system": {
+            "name": "analytics-system",
+            "description": "System for data analytics",
+            "type": "system"
         }
-    }
+    },
+    "relationships": [
+        {
+            "target": "metrics-service",
+            "description": "Sends telemetry data to",
+            "technology": "HTTP/REST",
+            "tags": ["metrics", "telemetry"]
+        },
+        {
+            "target": "analytics-system",
+            "description": "Provides configuration data to",
+            "technology": "HTTP/REST",
+            "tags": ["analytics", "config"]
+        }
+    ]
 } 

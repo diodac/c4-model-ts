@@ -44,6 +44,13 @@
             "$ref": "#/definitions/ExternalElement"
           },
           "description": "External components"
+        },
+        "relationships": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ContainerRelation"
+          },
+          "description": "Container-level relationships"
         }
       },
       "required": [
@@ -83,6 +90,47 @@
       ],
       "additionalProperties": false,
       "description": "External element configuration"
+    },
+    "ContainerRelation": {
+      "type": "object",
+      "properties": {
+        "target": {
+          "type": "string",
+          "description": "Target container or system name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Relationship description"
+        },
+        "technology": {
+          "type": "string",
+          "description": "Technology used for communication"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Relationship tags"
+        },
+        "url": {
+          "type": "string",
+          "description": "Documentation URL"
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Custom properties"
+        }
+      },
+      "required": [
+        "target",
+        "description"
+      ],
+      "additionalProperties": false,
+      "description": "Container-level relationship configuration"
     }
   }
 }

@@ -181,20 +181,21 @@ export class RelationValidator {
         const targetComponent = componentsByName.get(relation.metadata.target);
         const sourceComponent = componentsByName.get(relation.sourceComponent);
 
-        // Check if target is an external component
+        // Check if target is an external component or defined in relationships
         const isExternalTarget = this.config?.external?.[relation.metadata.target];
+        const isRelationshipTarget = this.config?.relationships?.some(rel => rel.target === relation.metadata.target);
 
         if (!sourceComponent) {
             return {
                 relation,
-                targetExists: !!targetComponent || !!isExternalTarget,
+                targetExists: !!targetComponent || !!isExternalTarget || !!isRelationshipTarget,
                 isUsed: false,
                 errors
             };
         }
 
-        // If target is external, we consider it exists but don't validate usage
-        if (isExternalTarget) {
+        // If target is external or defined in relationships, we consider it exists but don't validate usage
+        if (isExternalTarget || isRelationshipTarget) {
             return {
                 relation,
                 targetExists: true,

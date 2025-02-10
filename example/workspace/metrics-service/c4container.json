@@ -26,5 +26,25 @@
         "analytics-service": {
             "type": "container"
         }
-    }
+    },
+    "relationships": [
+        {
+            "target": "analytics-service",
+            "description": "Sends metrics data to",
+            "technology": "Kafka",
+            "tags": ["metrics", "streaming"]
+        },
+        {
+            "target": "config-service",
+            "description": "Gets configuration from",
+            "technology": "HTTP/REST",
+            "tags": ["config"]
+        },
+        {
+            "target": "features-service",
+            "description": "Checks feature flags using",
+            "technology": "HTTP/REST",
+            "tags": ["features"]
+        }
+    ]
 } 
