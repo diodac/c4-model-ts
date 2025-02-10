@@ -39,36 +39,13 @@
           "description": "Container properties"
         },
         "groups": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "description": {
-                "type": "string",
-                "description": "Group description"
-              },
-              "parent": {
-                "type": "string",
-                "description": "Parent group name"
-              }
-            }
-          },
+          "$ref": "#/definitions/Groups",
           "description": "Component groups"
         },
         "external": {
           "type": "object",
           "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "description": {
-                "type": "string",
-                "description": "External component description"
-              },
-              "technology": {
-                "type": "string",
-                "description": "External component technology"
-              }
-            }
+            "$ref": "#/definitions/ExternalElement"
           },
           "description": "External components"
         },
@@ -82,11 +59,61 @@
       },
       "required": [
         "name",
-        "description",
         "source"
       ],
       "additionalProperties": false,
       "description": "Container configuration from c4container.json"
+    },
+    "Groups": {
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/Groups"
+          },
+          {
+            "type": "object",
+            "additionalProperties": {
+              "not": {}
+            }
+          }
+        ]
+      },
+      "description": "Recursive group structure"
+    },
+    "ExternalElement": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Element name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Element description"
+        },
+        "technology": {
+          "type": "string",
+          "description": "Technology stack"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Element tags"
+        },
+        "type": {
+          "type": "string",
+          "description": "Element type (container, system, etc.)"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "additionalProperties": false,
+      "description": "External element configuration"
     },
     "ContainerRelationship": {
       "type": "object",
@@ -101,7 +128,7 @@
         },
         "technology": {
           "type": "string",
-          "description": "Relationship technology"
+          "description": "Technology used for the relationship"
         },
         "tags": {
           "type": "array",
@@ -109,11 +136,25 @@
             "type": "string"
           },
           "description": "Relationship tags"
+        },
+        "url": {
+          "type": "string",
+          "description": "URL with documentation"
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Custom properties"
         }
       },
       "required": [
+        "description",
         "target"
-      ]
+      ],
+      "additionalProperties": false,
+      "description": "Container-level relationship configuration"
     }
   }
 }

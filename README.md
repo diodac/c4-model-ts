@@ -326,7 +326,7 @@ export class OrderService {
     /**
      * @c4Relationship NotificationService | Sends order confirmations | Message Queue
      * - technology: RabbitMQ
-     * - tags: IndirectRelation
+     * - tags: IndirectRelationship
      */
     async notifyCustomer(): Promise<void> {
         // Implementation
@@ -346,7 +346,7 @@ In the example above:
 - Constructor relationship documents database dependency
 - Method relations show specific interactions with other services
 
-Relationships can be explicitly tagged with `DirectRelation` or `IndirectRelation` tags. The generator validates these tags against actual usage patterns in the code.
+Relationships can be explicitly tagged with `DirectRelationship` or `IndirectRelationship` tags. The generator validates these tags against actual usage patterns in the code.
 
 #### @c4Group name
 
@@ -392,10 +392,10 @@ In this example:
 
 The generator automatically detects and validates two types of relationships:
 
-- **Direct Relations**: When a component directly uses another component (e.g., through constructor injection or class properties)
-- **Indirect Relations**: When a component creates or uses another component indirectly (e.g., creating new instances or using in method calls)
+- **Direct Relationships**: When a component directly uses another component (e.g., through constructor injection or class properties)
+- **Indirect Relationships**: When a component creates or uses another component indirectly (e.g., creating new instances or using in method calls)
 
-Relationships can be explicitly tagged with `DirectRelation` or `IndirectRelation` tags. The generator validates these tags against actual usage patterns in the code.
+Relationships can be explicitly tagged with `DirectRelationship` or `IndirectRelationship` tags. The generator validates these tags against actual usage patterns in the code.
 
 ### Analysis Output
 
@@ -488,7 +488,7 @@ The generator validates relationships in several ways:
 2. **Usage Validation**: For relationships between internal components, the generator checks if the relationship is actually used in the code:
    - Direct usage through constructor injection, properties, or method parameters
    - Indirect usage through method calls or instance creation
-   - The validation adds appropriate tags (`DirectRelation` or `IndirectRelation`)
+   - The validation adds appropriate tags (`DirectRelationship` or `IndirectRelationship`)
 
 3. **Tag Consistency**: The generator validates that:
    - A relationship cannot be both direct and indirect

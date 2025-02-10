@@ -1,8 +1,9 @@
-import { Project, SourceFile, Symbol, CallExpression, SyntaxKind } from 'ts-morph';
+import { Project, SourceFile, Symbol, CallExpression, SyntaxKind, ClassDeclaration, MethodDeclaration, ConstructorDeclaration, JSDoc } from 'ts-morph';
 import { ComponentInfo } from './model/component';
-import { RelationshipInfo } from './model/relationship';
+import { RelationshipInfo, RelationshipMetadata } from './model/relationship';
 import { ContainerConfig } from './model/container';
 import { resolve, dirname } from 'path';
+import { C4RelationshipTags } from './model/constants';
 
 /**
  * Result of relationship validation
@@ -141,7 +142,7 @@ export class RelationshipValidator {
                     metadata: {
                         target: targetComponent.metadata.name,
                         description: 'Undeclared relationship',
-                        tags: []
+                        tags: [C4RelationshipTags.UNDECLARED]
                     },
                     location: {
                         filePath: component.location.filePath,
@@ -174,7 +175,7 @@ export class RelationshipValidator {
         const existingTags = new Set(relation.metadata.tags || []);
 
         // Check if relationship is marked as both direct and indirect
-        if (existingTags.has('DirectRelation') && existingTags.has('IndirectRelation')) {
+        if (existingTags.has(C4RelationshipTags.DIRECT) && existingTags.has(C4RelationshipTags.INDIRECT)) {
             errors.push(`Relationship from "${relation.sourceComponent}" to "${relation.metadata.target}" cannot be both direct and indirect`);
         }
 
@@ -334,22 +335,22 @@ export class RelationshipValidator {
 
         // Validate tags based on usage
         if (isDirectUsage) {
-            if (existingTags.has('IndirectRelation')) {
+            if (existingTags.has(C4RelationshipTags.INDIRECT)) {
                 errors.push(
                     `Relationship from "${relation.sourceComponent}" to "${relation.metadata.target}" is marked as indirect but has direct usage at ${usageLocation?.filePath}:${usageLocation?.line}`
                 );
             }
-            if (!existingTags.has('DirectRelation')) {
-                relation.metadata.tags = [...(relation.metadata.tags || []), 'DirectRelation'];
+            if (!existingTags.has(C4RelationshipTags.DIRECT)) {
+                relation.metadata.tags = [...(relation.metadata.tags || []), C4RelationshipTags.DIRECT];
             }
         } else if (usageLocation) {
-            if (existingTags.has('DirectRelation')) {
+            if (existingTags.has(C4RelationshipTags.DIRECT)) {
                 errors.push(
                     `Relationship from "${relation.sourceComponent}" to "${relation.metadata.target}" is marked as direct but only has indirect usage at ${usageLocation.filePath}:${usageLocation.line}`
                 );
             }
-            if (!existingTags.has('IndirectRelation')) {
-                relation.metadata.tags = [...(relation.metadata.tags || []), 'IndirectRelation'];
+            if (!existingTags.has(C4RelationshipTags.INDIRECT)) {
+                relation.metadata.tags = [...(relation.metadata.tags || []), C4RelationshipTags.INDIRECT];
             }
         }
 

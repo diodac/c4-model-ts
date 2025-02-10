@@ -1,11 +1,10 @@
 import { resolve, dirname } from 'path';
 import { ContainerConfig, Groups, ContainerRelationship } from './model/container';
 import { ComponentFinder } from './component-finder';
-import { RelationshipFinder } from './relationship-finder';
+import { RelationshipFinder, MethodUsage } from './relationship-finder';
 import { RelationshipValidator, RelationshipValidatorConfig } from './relationship-validator';
 import { ComponentInfo } from './model/component';
 import { ValidationResult } from './relationship-validator';
-import { MethodUsage } from './relationship-finder';
 
 export interface AnalysisResult {
     container: {

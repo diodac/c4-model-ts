@@ -1,6 +1,7 @@
 import { ClassDeclaration, Symbol, SyntaxKind, Project, Node, MethodDeclaration, CallExpression } from 'ts-morph';
 import { ComponentInfo } from './model/component';
 import { RelationshipInfo } from './model/relationship';
+import { C4RelationshipTags } from './model/constants';
 
 /**
  * Information about method usage between components
@@ -39,12 +40,11 @@ export class RelationshipFinder {
     }
 
     /**
-     * Find all relationships between components by analyzing method usage patterns.
-     * This includes both direct and indirect method calls between components.
+     * Find all relationships between components, both declared and undeclared
      */
     findAllRelationships(components: ComponentInfo[]): MethodUsage[] {
-        this.componentMethods.clear();
-        this.methodUsages = [];
+        const usages: MethodUsage[] = [];
+        const componentsByName = new Map(components.map(c => [c.metadata.name, c]));
 
         // First collect all methods from components
         this.collectComponentMethods(components);
@@ -64,14 +64,14 @@ export class RelationshipFinder {
         
         return allUsages.filter(usage => {
             // Get all declared relationships from source component
-            const declaredRelationships = usage.calledFrom.component.relationships;
+            const relationships = usage.calledFrom.component.relationships;
             
             // Check if there's a declared relationship matching this usage
-            const isDeclared = declaredRelationships.some(relationship => 
+            const isDeclared = relationships.some(relationship => 
                 relationship.metadata.target === usage.method.component.metadata.name
             );
 
-            // Keep only undeclared relationships
+            // Keep only undeclared relations
             return !isDeclared;
         });
     }

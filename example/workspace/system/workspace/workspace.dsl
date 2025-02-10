@@ -36,7 +36,7 @@ workspace {
                     }
                     MetricsService = component "MetricsService" {
                         technology "TypeScript"
-                        description "Core service for metrics processing and analysis"
+                        description "Processes and analyzes metrics data"
                     }
                 }
 
@@ -49,13 +49,25 @@ workspace {
                         technology "TypeScript"
                         description "Configuration service client"
                     }
-                    FeaturesClient = component "FeaturesClient" {
+                    DataValidator = component "DataValidator" {
                         technology "TypeScript"
-                        description "Client for checking feature flags"
+                        description "Validates metrics data format and content"
+                    }
+                    FeaturesClient = component "FeaturesClient" {
+                        technology "TypeScript, HTTP"
+                        description "Client for checking feature flags from features service"
                     }
                     Logger = component "Logger" {
                         technology "TypeScript"
                         description "Logger component"
+                    }
+                    MetricsProcessor = component "MetricsProcessor" {
+                        technology "TypeScript"
+                        description "Processes and transforms metrics data"
+                    }
+                    MetricsPublisher = component "MetricsPublisher" {
+                        technology "TypeScript, Kafka"
+                        description "Publishes metrics data to Kafka for analytics"
                     }
                     MetricsRepository = component "MetricsRepository" {
                         technology "TypeScript"
@@ -83,14 +95,14 @@ workspace {
                 group "Domain" {
                     FeaturesService = component "FeaturesService" {
                         technology "TypeScript"
-                        description "Core service for feature flag management"
+                        description "Manages feature flags and their states"
                     }
                 }
 
                 group "Infrastructure" {
                     ConfigClient = component "ConfigClient" {
-                        technology "TypeScript"
-                        description "Client for accessing configuration"
+                        technology "TypeScript, HTTP"
+                        description "Client for accessing configuration service"
                     }
                     FeatureRepository = component "FeatureRepository" {
                         technology "TypeScript, MongoDB"
@@ -162,20 +174,32 @@ workspace {
             # Component relationships
             metrics-service.MetricsPublisher -> analytics-service "publishes metrics data to" "kafka"
             metrics-service.MetricsController -> metrics-service.MetricsService "Uses for metrics processing" "TypeScript"
-            metrics-service.MetricsService -> metrics-service.MetricsRepository "Stores metrics data" "Internal" {
-                tags "DirectRelation"
+            metrics-service.MetricsService -> metrics-service.AlertService "Sends alerts on metrics thresholds" "Internal" {
+                tags "DirectRelationship"
             }
-            metrics-service.MetricsService -> config-service.ConfigService "Gets metrics configuration" "HTTP" {
-                tags "DirectRelation"
+            metrics-service.MetricsService -> metrics-service.ConfigService "Gets metrics configuration" "HTTP/REST" {
+                tags "IndirectRelationship"
+            }
+            metrics-service.MetricsService -> metrics-service.MetricsProcessor "Processes metrics data" "Internal" {
+                tags "DirectRelationship"
+            }
+            metrics-service.MetricsService -> metrics-service.MetricsRepository "Stores metrics data" "Internal" {
+                tags "DirectRelationship"
+            }
+            metrics-service.MetricsService -> metrics-service.MetricsPublisher "Publishes metrics data" "Internal" {
+                tags "DirectRelationship"
+            }
+            metrics-service.MetricsService -> metrics-service.Logger "Logs metrics operations" "Internal" {
+                tags "DirectRelationship"
+            }
+            metrics-service.MetricsService -> metrics-service.DataValidator "Validates metrics data" "Internal" {
+                tags "DirectRelationship"
             }
             metrics-service.MetricsService -> features-service.FeaturesService "Checks if metrics collection is enabled" "HTTP" {
                 tags "DirectRelation"
             }
-            metrics-service.MetricsService -> metrics-service.MetricsProcessor "Processes metrics data" "Internal" {
-                tags "DirectRelation"
-            }
-            metrics-service.MetricsService -> metrics-service.DataValidator "Validates metrics data" "Internal" {
-                tags "DirectRelation"
+            metrics-service.FeaturesClient -> features-service.FeaturesService "Checks feature flags" "HTTP/REST" {
+                tags "DirectRelationship"
             }
             metrics-service.FeaturesClient -> features-service.FeaturesService "Checks feature flags" "HTTP" {
                 tags "DirectRelation"
@@ -184,10 +208,16 @@ workspace {
             features-service.FeaturesService -> features-service.FeatureRepository "Stores feature flags" "MongoDB" {
                 tags "DirectRelation"
             }
-            features-service.FeaturesService -> config-service.ConfigService "Stores feature flags configuration" "HTTP" {
-                tags "DirectRelation"
+            features-service.FeaturesService -> features-service.ConfigClient "Gets feature configuration" "HTTP/REST" {
+                tags "DirectRelationship"
             }
             features-service.FeaturesService -> metrics-service "Sends usage metrics" "Kafka"
+            features-service.FeaturesService -> features-service.ConfigClient "Updates feature configuration" "HTTP/REST" {
+                tags "DirectRelationship"
+            }
+            features-service.ConfigClient -> config-service.ConfigService "Gets configuration" "HTTP/REST" {
+                tags "DirectRelationship"
+            }
             features-service.ConfigClient -> config-service.ConfigService "Gets configuration" "HTTP" {
                 tags "DirectRelation"
             }

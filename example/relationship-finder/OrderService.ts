@@ -3,21 +3,17 @@ import { InventoryService } from './InventoryService';
 import { ShippingService } from './ShippingService';
 
 /**
- * Component that manages order processing and orchestrates order flow
+ * Service managing order processing
  * @c4Component
- * - description: Component that manages order processing
+ * - description: Manages order processing and payment
  * - technology: TypeScript
- * - tags: core, order-management
- * - properties:
- *   criticality: high
- *   maintainer: team-core
+ * - tags: core, orders
  * 
- * @c4Relation PaymentService | Processes payments for orders | HTTP/REST
+ * @c4Relationship PaymentService | Processes payments for orders | HTTP/REST
  * - technology: HTTP/REST
- * - tags: DirectRelation
+ * - tags: DirectRelationship
  * - properties:
  *   criticality: high
- *   frequency: high
  */
 export class OrderService {
     constructor(

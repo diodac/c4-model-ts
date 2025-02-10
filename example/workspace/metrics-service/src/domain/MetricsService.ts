@@ -1,74 +1,49 @@
-import { MetricsRepository } from '../infrastructure/MetricsRepository';
-import { ConfigService } from '../infrastructure/ConfigService';
-import { Logger } from '../infrastructure/Logger';
-import { MetricsProcessor } from './MetricsProcessor';
-import { DataValidator } from './DataValidator';
 import { AlertService } from '../infrastructure/AlertService';
-import { FeaturesClient } from '../infrastructure/FeaturesClient';
+import { DataValidator } from '../infrastructure/DataValidator';
+import { MetricsProcessor } from '../infrastructure/MetricsProcessor';
+import { MetricsRepository } from '../infrastructure/MetricsRepository';
+import { MetricsPublisher } from '../infrastructure/MetricsPublisher';
+import { Logger } from '../infrastructure/Logger';
+import { ConfigService } from '../infrastructure/ConfigService';
 
 /**
  * Core service for metrics processing and analysis
  * @c4Component
- * - description: Core service for metrics processing and analysis
+ * - description: Processes and analyzes metrics data
  * - technology: TypeScript
- * - tags: Domain, Core
+ * - tags: Domain
  * @c4Group Domain
  */
 export class MetricsService {
-    private processor: MetricsProcessor;
-    private validator: DataValidator;
-    private alertService: AlertService;
-    private featuresClient: FeaturesClient;
-
     /**
-     * @c4Relationship MetricsRepository | Stores metrics data | Database
+     * @c4Relationship AlertService | Sends alerts on metrics thresholds | Internal
      * - technology: Internal
-     * - tags: DirectRelation
+     * - tags: DirectRelationship
      */
     constructor(
+        private alertService: AlertService,
+        private validator: DataValidator,
+        private processor: MetricsProcessor,
         private repository: MetricsRepository,
-        /**
-         * @c4Relationship Logger | Logs service operations | Logging
-         * - technology: Internal
-         * - tags: IndirectRelation
-         */
+        private publisher: MetricsPublisher,
         private logger: Logger,
-        /**
-         * @c4Relationship config-service.ConfigService | Gets configuration from config service | HTTP
-         * - technology: HTTP
-         * - tags: DirectRelation
-         */
         private configService: ConfigService
-    ) {
-        this.processor = new MetricsProcessor();
-        this.validator = new DataValidator();
-        this.alertService = new AlertService();
-        this.featuresClient = new FeaturesClient();
-    }
+    ) {}
 
     /**
-     * @c4Relationship config-service.ConfigService | Gets metrics configuration | HTTP
-     * - technology: HTTP
-     * - tags: DirectRelation
+     * @c4Relationship ConfigService | Gets metrics configuration | HTTP/REST
+     * - technology: HTTP/REST
+     * - tags: IndirectRelationship
      */
-    async getMetricsConfig(): Promise<any> {
+    async getConfig(): Promise<any> {
         const config = await this.configService.getConfig();
         return config;
     }
 
     /**
-     * @c4Relationship features-service.FeaturesService | Checks if metrics collection is enabled | HTTP
-     * - technology: HTTP
-     * - tags: DirectRelation
-     */
-    private async isMetricsEnabled(type: string): Promise<boolean> {
-        return await this.featuresClient.isFeatureEnabled(`metrics.${type}`);
-    }
-
-    /**
      * @c4Relationship MetricsProcessor | Processes metrics data | Internal
      * - technology: Internal
-     * - tags: DirectRelation
+     * - tags: DirectRelationship
      */
     async processMetrics(data: any): Promise<void> {
         this.logger.log('Processing metrics');
@@ -88,11 +63,47 @@ export class MetricsService {
     }
 
     /**
+     * @c4Relationship MetricsRepository | Stores metrics data | Internal
+     * - technology: Internal
+     * - tags: DirectRelationship
+     */
+    async storeMetrics(data: any): Promise<void> {
+        // Implementation
+    }
+
+    /**
+     * @c4Relationship MetricsPublisher | Publishes metrics data | Internal
+     * - technology: Internal
+     * - tags: DirectRelationship
+     */
+    async publishMetrics(data: any): Promise<void> {
+        // Implementation
+    }
+
+    /**
+     * @c4Relationship Logger | Logs metrics operations | Internal
+     * - technology: Internal
+     * - tags: DirectRelationship
+     */
+    private logOperation(operation: string): void {
+        // Implementation
+    }
+
+    /**
      * @c4Relationship DataValidator | Validates metrics data | Internal
      * - technology: Internal
-     * - tags: DirectRelation
+     * - tags: DirectRelationship
      */
     private validateData(data: any): boolean {
         return this.validator.validate(data);
+    }
+
+    /**
+     * @c4Relationship features-service.FeaturesService | Checks if metrics collection is enabled | HTTP
+     * - technology: HTTP
+     * - tags: DirectRelation
+     */
+    private async isMetricsEnabled(type: string): Promise<boolean> {
+        return await this.featuresClient.isFeatureEnabled(`metrics.${type}`);
     }
 } 

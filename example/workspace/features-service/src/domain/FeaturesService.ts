@@ -2,11 +2,11 @@ import { FeatureRepository } from '../infrastructure/FeatureRepository';
 import { ConfigClient } from '../infrastructure/ConfigClient';
 
 /**
- * Core service for feature flags management
+ * Core service for feature flag management
  * @c4Component
- * - description: Core service for feature flag management
+ * - description: Manages feature flags and their states
  * - technology: TypeScript
- * - tags: Domain, Core
+ * - tags: Domain
  * @c4Group Domain
  */
 export class FeaturesService {
@@ -24,9 +24,9 @@ export class FeaturesService {
     }
 
     /**
-     * @c4Relationship config-service.ConfigService | Stores feature flags configuration | HTTP
-     * - technology: HTTP
-     * - tags: DirectRelation
+     * @c4Relationship ConfigClient | Gets feature configuration | HTTP/REST
+     * - technology: HTTP/REST
+     * - tags: DirectRelationship
      */
     async getFeatureConfig(name: string): Promise<any> {
         return await this.configClient.getConfig(`features.${name}`);
@@ -43,6 +43,15 @@ export class FeaturesService {
      * - technology: Kafka
      */
     async trackFeatureUsage(featureId: string): Promise<void> {
+        // Implementation
+    }
+
+    /**
+     * @c4Relationship ConfigClient | Updates feature configuration | HTTP/REST
+     * - technology: HTTP/REST
+     * - tags: DirectRelationship
+     */
+    async updateFeature(name: string, enabled: boolean): Promise<void> {
         // Implementation
     }
 } 
