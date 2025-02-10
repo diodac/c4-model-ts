@@ -5,6 +5,7 @@ import { readFileSync } from 'fs';
 import { Command } from 'commander';
 import { ContainerConfig, Groups } from '../container/model/container';
 import { ContainerAnalyzer, ContainerAnalyzerConfig } from '../container/container-analyzer';
+import { simplifyUndeclaredRelations } from '../common/relation-simplifier';
 
 const program = new Command();
 
@@ -39,7 +40,8 @@ program
             });
 
             if (options.json) {
-                console.log(JSON.stringify(result, null, 2));
+                const simplifiedResult = simplifyUndeclaredRelations(result);
+                console.log(JSON.stringify(simplifiedResult, null, 2));
                 if (result.invalidRelations && result.invalidRelations.length > 0) {
                     process.exit(1);
                 }

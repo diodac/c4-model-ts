@@ -4,6 +4,7 @@ import { resolve, dirname } from 'path';
 import { readFileSync } from 'fs';
 import { Command } from 'commander';
 import { WorkspaceAnalyzer } from '../workspace/analyzer';
+import { simplifyUndeclaredRelations } from '../common/relation-simplifier';
 
 const program = new Command();
 
@@ -36,7 +37,18 @@ program
         });
 
         if (options.json) {
-            console.log(JSON.stringify(result, null, 2));
+            // Simplify component information in undeclared relations
+            const simplifiedResult = {
+                ...result,
+                systems: result.systems.map(system => ({
+                    ...system,
+                    containers: system.containers.map(container => ({
+                        ...container,
+                        analysis: simplifyUndeclaredRelations(container.analysis)
+                    }))
+                }))
+            };
+            console.log(JSON.stringify(simplifiedResult, null, 2));
             return;
         }
 
