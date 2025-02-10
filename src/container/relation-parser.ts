@@ -1,5 +1,5 @@
 import { ClassDeclaration, MethodDeclaration, ConstructorDeclaration, JSDoc } from 'ts-morph';
-import { RelationInfo, RelationMetadata } from './model/relation';
+import { RelationshipInfo, RelationshipMetadata } from './model/relationship';
 import { TagParser, TagSchema } from './tag-parser';
 
 /**
@@ -34,8 +34,8 @@ export class RelationParser {
     /**
      * Find all relations in a component
      */
-    findRelations(classDecl: ClassDeclaration): RelationInfo[] {
-        const relations: RelationInfo[] = [];
+    findRelations(classDecl: ClassDeclaration): RelationshipInfo[] {
+        const relations: RelationshipInfo[] = [];
 
         // Check class level relations
         this.findRelationsInNode(classDecl, relations);
@@ -56,7 +56,7 @@ export class RelationParser {
 
     private findRelationsInNode(
         node: ClassDeclaration | MethodDeclaration | ConstructorDeclaration, 
-        relations: RelationInfo[],
+        relations: RelationshipInfo[],
         methodName?: string
     ): void {
         const jsDocs = node.getJsDocs();
@@ -74,7 +74,7 @@ export class RelationParser {
                 const parsed = this.tagParser.parse(tag, this.schema);
                 const targetComponent = parsed.args[0];
                 
-                const metadata: RelationMetadata = {
+                const metadata: RelationshipMetadata = {
                     target: targetComponent,
                     description: parsed.args[1],
                     technology: (parsed.params.technology as string) || parsed.args[2],

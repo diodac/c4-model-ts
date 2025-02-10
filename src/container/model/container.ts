@@ -1,4 +1,4 @@
-import { RelationMetadata } from './relation';
+import { RelationshipMetadata } from './relationship';
 
 /**
  * Recursive group structure
@@ -88,7 +88,7 @@ export interface ContainerData {
 /**
  * Container-level relationship configuration
  */
-export interface ContainerRelation extends RelationMetadata {
+export interface ContainerRelation extends RelationshipMetadata {
     /** Target container or system name */
     target: string;
 }

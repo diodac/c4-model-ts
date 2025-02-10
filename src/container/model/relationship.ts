@@ -1,14 +1,14 @@
 /**
- * Metadata about a relation between components
+ * Metadata about a relationship between components
  */
-export interface RelationMetadata {
+export interface RelationshipMetadata {
     /** Target component name */
     target: string;
-    /** Relation description */
+    /** Relationship description */
     description: string;
-    /** Technology used for the relation */
+    /** Technology used for the relationship */
     technology?: string;
-    /** Relation tags */
+    /** Relationship tags */
     tags?: string[];
     /** URL with documentation */
     url?: string;
@@ -17,11 +17,11 @@ export interface RelationMetadata {
 }
 
 /**
- * Information about a relation found in the code
+ * Information about a relationship found in the code
  */
-export interface RelationInfo {
-    /** Relation metadata */
-    metadata: RelationMetadata;
+export interface RelationshipInfo {
+    /** Relationship metadata */
+    metadata: RelationshipMetadata;
     /** Source component name */
     sourceComponent: string;
     /** Location in code */
@@ -30,7 +30,7 @@ export interface RelationInfo {
         filePath: string;
         /** Class name */
         className: string;
-        /** Method name (if relation is on method) */
+        /** Method name (if relationship is on method) */
         methodName?: string;
         /** Line number in file */
         line: number;

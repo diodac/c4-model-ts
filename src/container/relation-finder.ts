@@ -1,6 +1,6 @@
 import { ClassDeclaration, Symbol, SyntaxKind, Project, Node, MethodDeclaration, CallExpression } from 'ts-morph';
 import { ComponentInfo } from './model/component';
-import { RelationInfo } from './model/relation';
+import { RelationshipInfo } from './model/relationship';
 
 /**
  * Information about method usage between components

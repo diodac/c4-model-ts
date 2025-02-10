@@ -16,7 +16,7 @@ program
     .option('-t, --template <path>', 'Custom template file path')
     .option('-o, --output <path>', 'Custom output file path')
     .option('-w, --workspace-dir <path>', 'Custom workspace directory')
-    .option('-u, --include-undeclared', 'Include undeclared relations in DSL output')
+    .option('-u, --include-undeclared', 'Include undeclared relationships in DSL output')
     .action(async (configPath: string, options: any) => {
         try {
             const resolvedPath = resolve(configPath);

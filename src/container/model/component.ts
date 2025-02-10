@@ -1,4 +1,4 @@
-import { RelationInfo } from './relation';
+import { RelationshipInfo } from './relationship';
 
 /**
  * C4 component metadata from @c4Component annotation
@@ -38,5 +38,5 @@ export interface ComponentInfo {
     };
     
     /** Relations defined in this component */
-    relations: RelationInfo[];
+    relations: RelationshipInfo[];
 } 

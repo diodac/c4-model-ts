@@ -1,6 +1,6 @@
 import { Project, SourceFile, Symbol, CallExpression, SyntaxKind } from 'ts-morph';
 import { ComponentInfo } from './model/component';
-import { RelationInfo } from './model/relation';
+import { RelationshipInfo } from './model/relationship';
 import { ContainerConfig } from './model/container';
 import { resolve, dirname } from 'path';
 
@@ -9,7 +9,7 @@ import { resolve, dirname } from 'path';
  */
 export interface ValidationResult {
     /** Relation being validated */
-    relation: RelationInfo;
+    relation: RelationshipInfo;
     /** Whether target component exists */
     targetExists: boolean;
     /** Whether relation is actually used in code */
@@ -136,7 +136,7 @@ export class RelationValidator {
                 if (!usage) continue;
 
                 // Create a synthetic relation for the undeclared usage
-                const relation: RelationInfo = {
+                const relation: RelationshipInfo = {
                     sourceComponent: component.metadata.name,
                     metadata: {
                         target: targetComponent.metadata.name,
@@ -167,7 +167,7 @@ export class RelationValidator {
      * Validate a single relation
      */
     private validateRelation(
-        relation: RelationInfo,
+        relation: RelationshipInfo,
         componentsByName: Map<string, ComponentInfo>
     ): ValidationResult {
         const errors: string[] = [];

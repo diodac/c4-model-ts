@@ -11,10 +11,10 @@ const program = new Command();
 
 program
     .name('c4-container')
-    .description('Analyze C4 container TypeScript codebase for components and relations')
+    .description('Analyze C4 container TypeScript codebase for components and relationships')
     .argument('<config>', 'path to c4container.json file')
-    .option('-u, --undeclared', 'show only undeclared relations')
-    .option('-i, --invalid', 'show only invalid relations')
+    .option('-u, --undeclared', 'show only undeclared relationships')
+    .option('-i, --invalid', 'show only invalid relationships')
     .option('-c, --components', 'show only components')
     .option('-j, --json', 'output raw JSON')
     .action((configPath, options) => {
@@ -73,7 +73,7 @@ program
                         console.log(`Tags: ${component.metadata.tags.join(', ')}`);
                     }
                     if (component.relations.length > 0) {
-                        console.log('Relations:');
+                        console.log('Relationships:');
                         for (const relation of component.relations) {
                             console.log(`  → ${relation.metadata.target}`);
                             console.log(`    Description: ${relation.metadata.description}`);
@@ -89,10 +89,10 @@ program
                 }
             }
 
-            // Show undeclared relations if requested
+            // Show undeclared relationships if requested
             if (result.undeclaredRelations?.length) {
-                console.log('\nWarning: Found undeclared relations in code:');
-                console.log('Consider documenting these relations with @c4Relationship tag if they are significant dependencies.\n');
+                console.log('\nWarning: Found undeclared relationships in code:');
+                console.log('Consider documenting these relationships with @c4Relationship tag if they are significant dependencies.\n');
                 
                 for (const relation of result.undeclaredRelations) {
                     console.log(`${relation.calledFrom.component.metadata.name} → ${relation.method.component.metadata.name}`);
@@ -105,12 +105,12 @@ program
                     console.log('');
                 }
             } else if (options.undeclared) {
-                console.log('\nAll code relations are properly documented.');
+                console.log('\nAll code relationships are properly documented.');
             }
 
-            // Show invalid relations if requested
+            // Show invalid relationships if requested
             if (result.invalidRelations?.length) {
-                console.log('\nError: Found invalid relations:');
+                console.log('\nError: Found invalid relationships:');
                 for (const validationResult of result.invalidRelations) {
                     const relation = validationResult.relation;
 
@@ -123,13 +123,13 @@ program
 
                     // Unused relation is an error
                     if (!validationResult.isUsed) {
-                        console.log(`\nError: Declared but unused relation: ${relation.sourceComponent} → ${relation.metadata.target}`);
+                        console.log(`\nError: Declared but unused relationship: ${relation.sourceComponent} → ${relation.metadata.target}`);
                         console.log(`Description: ${relation.metadata.description}`);
                         if (relation.metadata.technology) {
                             console.log(`Technology: ${relation.metadata.technology}`);
                         }
                         console.log(`Location: ${relation.location.filePath}:${relation.location.line}`);
-                        console.log('This relation is documented but not found in the code. Either implement the relation or remove its documentation.');
+                        console.log('This relationship is documented but not found in the code. Either implement the relationship or remove its documentation.');
                     }
 
                     // Tag validation errors
@@ -141,10 +141,10 @@ program
                     }
                 }
             } else if (options.invalid) {
-                console.log('\nAll declared relations are valid.');
+                console.log('\nAll declared relationships are valid.');
             }
 
-            // Exit with error if invalid relations found
+            // Exit with error if invalid relationships found
             if (result.invalidRelations && result.invalidRelations.length > 0) {
                 process.exit(1);
             }
