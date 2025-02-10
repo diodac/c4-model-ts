@@ -2,10 +2,10 @@ import { resolve, dirname } from 'path';
 import { ContainerConfig, Groups, ContainerRelation } from './model/container';
 import { ComponentFinder } from './component-finder';
 import { RelationshipFinder } from './relationship-finder';
-import { RelationValidator, RelationValidatorConfig } from './relation-validator';
+import { RelationshipValidator, RelationshipValidatorConfig } from './relationship-validator';
 import { ComponentInfo } from './model/component';
+import { ValidationResult } from './relationship-validator';
 import { MethodUsage } from './relationship-finder';
-import { ValidationResult } from './relation-validator';
 
 export interface AnalysisResult {
     container: {
@@ -34,7 +34,7 @@ export interface ContainerAnalyzerConfig {
 export class ContainerAnalyzer {
     private componentFinder: ComponentFinder;
     private relationshipFinder: RelationshipFinder;
-    private relationValidator: RelationValidator;
+    private relationshipValidator: RelationshipValidator;
     private containerConfig: ContainerConfig;
 
     constructor(config: ContainerAnalyzerConfig) {
@@ -43,7 +43,7 @@ export class ContainerAnalyzer {
         // Initialize finders
         this.componentFinder = new ComponentFinder(config.tsConfigPath, config.config);
         this.relationshipFinder = new RelationshipFinder(config.tsConfigPath);
-        this.relationValidator = new RelationValidator({
+        this.relationshipValidator = new RelationshipValidator({
             tsConfigPath: config.tsConfigPath,
             config: config.config,
             rootDir: config.rootDir
@@ -91,8 +91,8 @@ export class ContainerAnalyzer {
 
         // Add invalid relations if requested
         if (options.includeInvalid) {
-            const validationResults = this.relationValidator.validateRelations(components);
-            result.invalidRelations = validationResults.filter(result => 
+            const validationResults = this.relationshipValidator.validateRelationships(components);
+            result.invalidRelations = validationResults.filter((result: ValidationResult) => 
                 !result.targetExists || 
                 !result.isUsed || 
                 (result.errors && result.errors.length > 0)

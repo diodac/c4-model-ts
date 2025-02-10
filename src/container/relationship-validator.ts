@@ -5,16 +5,16 @@ import { ContainerConfig } from './model/container';
 import { resolve, dirname } from 'path';
 
 /**
- * Result of relation validation
+ * Result of relationship validation
  */
 export interface ValidationResult {
-    /** Relation being validated */
+    /** Relationship being validated */
     relation: RelationshipInfo;
     /** Whether target component exists */
     targetExists: boolean;
-    /** Whether relation is actually used in code */
+    /** Whether relationship is actually used in code */
     isUsed: boolean;
-    /** Location where relation is used (if found) */
+    /** Location where relationship is used (if found) */
     usageLocation?: {
         filePath: string;
         line: number;
@@ -24,9 +24,9 @@ export interface ValidationResult {
 }
 
 /**
- * Configuration for relation validator
+ * Configuration for relationship validator
  */
-export interface RelationValidatorConfig {
+export interface RelationshipValidatorConfig {
     /** Path to tsconfig.json file */
     tsConfigPath?: string;
     /** Container configuration */
@@ -36,14 +36,14 @@ export interface RelationValidatorConfig {
 }
 
 /**
- * Validates relations between components
+ * Validates relationships between components
  */
-export class RelationValidator {
+export class RelationshipValidator {
     private project: Project;
     private config: ContainerConfig;
     private configDir: string;
 
-    constructor(config: RelationValidatorConfig) {
+    constructor(config: RelationshipValidatorConfig) {
         this.project = new Project({
             tsConfigFilePath: config.tsConfigPath
         });
@@ -60,23 +60,23 @@ export class RelationValidator {
     }
 
     /**
-     * Validate all relations in components
+     * Validate all relationships in components
      */
-    validateRelations(components: ComponentInfo[]): ValidationResult[] {
+    validateRelationships(components: ComponentInfo[]): ValidationResult[] {
         const results: ValidationResult[] = [];
         const componentsByName = new Map(components.map(c => [c.metadata.name, c]));
 
-        // First validate declared relations
+        // First validate declared relationships
         for (const component of components) {
             for (const relation of component.relations) {
-                const result = this.validateRelation(relation, componentsByName);
+                const result = this.validateRelationship(relation, componentsByName);
                 results.push(result);
             }
         }
 
-        // Then check for undeclared relations
+        // Then check for undeclared relationships
         for (const component of components) {
-            const undeclaredResults = this.findUndeclaredRelations(component, components, componentsByName);
+            const undeclaredResults = this.findUndeclaredRelationships(component, components, componentsByName);
             results.push(...undeclaredResults);
         }
 
@@ -84,9 +84,9 @@ export class RelationValidator {
     }
 
     /**
-     * Find relations that are used in code but not declared in JSDoc
+     * Find relationships that are used in code but not declared in JSDoc
      */
-    private findUndeclaredRelations(
+    private findUndeclaredRelationships(
         component: ComponentInfo,
         allComponents: ComponentInfo[],
         componentsByName: Map<string, ComponentInfo>
@@ -99,7 +99,7 @@ export class RelationValidator {
 
         // Check all components to find undeclared usages
         for (const targetComponent of allComponents) {
-            // Skip if it's the same component or if relation is already declared
+            // Skip if it's the same component or if relationship is already declared
             if (targetComponent.metadata.name === component.metadata.name || 
                 declaredTargets.has(targetComponent.metadata.name)) {
                 continue;
@@ -135,12 +135,12 @@ export class RelationValidator {
                 const usage = constructorUsage || propertyUsage || methodUsage;
                 if (!usage) continue;
 
-                // Create a synthetic relation for the undeclared usage
+                // Create a synthetic relationship for the undeclared usage
                 const relation: RelationshipInfo = {
                     sourceComponent: component.metadata.name,
                     metadata: {
                         target: targetComponent.metadata.name,
-                        description: 'Undeclared relation',
+                        description: 'Undeclared relationship',
                         tags: []
                     },
                     location: {
@@ -155,7 +155,7 @@ export class RelationValidator {
                     targetExists: true,
                     isUsed: true,
                     usageLocation: usage,
-                    errors: [`Undeclared relation from "${component.metadata.name}" to "${targetComponent.metadata.name}" found at ${relation.location.filePath}:${relation.location.line}`]
+                    errors: [`Undeclared relationship from "${component.metadata.name}" to "${targetComponent.metadata.name}" found at ${relation.location.filePath}:${relation.location.line}`]
                 });
             }
         }
@@ -164,18 +164,18 @@ export class RelationValidator {
     }
 
     /**
-     * Validate a single relation
+     * Validate a single relationship
      */
-    private validateRelation(
+    private validateRelationship(
         relation: RelationshipInfo,
         componentsByName: Map<string, ComponentInfo>
     ): ValidationResult {
         const errors: string[] = [];
         const existingTags = new Set(relation.metadata.tags || []);
 
-        // Check if relation is marked as both direct and indirect
+        // Check if relationship is marked as both direct and indirect
         if (existingTags.has('DirectRelation') && existingTags.has('IndirectRelation')) {
-            errors.push(`Relation from "${relation.sourceComponent}" to "${relation.metadata.target}" cannot be both direct and indirect`);
+            errors.push(`Relationship from "${relation.sourceComponent}" to "${relation.metadata.target}" cannot be both direct and indirect`);
         }
 
         const targetComponent = componentsByName.get(relation.metadata.target);
@@ -336,7 +336,7 @@ export class RelationValidator {
         if (isDirectUsage) {
             if (existingTags.has('IndirectRelation')) {
                 errors.push(
-                    `Relation from "${relation.sourceComponent}" to "${relation.metadata.target}" is marked as indirect but has direct usage at ${usageLocation?.filePath}:${usageLocation?.line}`
+                    `Relationship from "${relation.sourceComponent}" to "${relation.metadata.target}" is marked as indirect but has direct usage at ${usageLocation?.filePath}:${usageLocation?.line}`
                 );
             }
             if (!existingTags.has('DirectRelation')) {
@@ -345,7 +345,7 @@ export class RelationValidator {
         } else if (usageLocation) {
             if (existingTags.has('DirectRelation')) {
                 errors.push(
-                    `Relation from "${relation.sourceComponent}" to "${relation.metadata.target}" is marked as direct but only has indirect usage at ${usageLocation.filePath}:${usageLocation.line}`
+                    `Relationship from "${relation.sourceComponent}" to "${relation.metadata.target}" is marked as direct but only has indirect usage at ${usageLocation.filePath}:${usageLocation.line}`
                 );
             }
             if (!existingTags.has('IndirectRelation')) {
