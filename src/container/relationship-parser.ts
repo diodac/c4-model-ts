@@ -5,7 +5,7 @@ import { TagParser, TagSchema } from './tag-parser';
 /**
  * Parser for @c4Relationship tags
  */
-export class RelationParser {
+export class RelationshipParser {
     private tagParser = new TagParser();
 
     /**
@@ -32,31 +32,31 @@ export class RelationParser {
     };
 
     /**
-     * Find all relations in a component
+     * Find all relationships in a component
      */
-    findRelations(classDecl: ClassDeclaration): RelationshipInfo[] {
-        const relations: RelationshipInfo[] = [];
+    findRelationships(classDecl: ClassDeclaration): RelationshipInfo[] {
+        const relationships: RelationshipInfo[] = [];
 
-        // Check class level relations
-        this.findRelationsInNode(classDecl, relations);
+        // Check class level relationships
+        this.findRelationshipsInNode(classDecl, relationships);
 
-        // Check constructor relations
+        // Check constructor relationships
         const constructor = classDecl.getConstructors()[0];
         if (constructor) {
-            this.findRelationsInNode(constructor, relations, 'constructor');
+            this.findRelationshipsInNode(constructor, relationships, 'constructor');
         }
 
-        // Check method level relations
+        // Check method level relationships
         for (const method of classDecl.getMethods()) {
-            this.findRelationsInNode(method, relations, method.getName());
+            this.findRelationshipsInNode(method, relationships, method.getName());
         }
 
-        return relations;
+        return relationships;
     }
 
-    private findRelationsInNode(
+    private findRelationshipsInNode(
         node: ClassDeclaration | MethodDeclaration | ConstructorDeclaration, 
-        relations: RelationshipInfo[],
+        relationships: RelationshipInfo[],
         methodName?: string
     ): void {
         const jsDocs = node.getJsDocs();
@@ -83,7 +83,7 @@ export class RelationParser {
                     properties: parsed.params.properties as Record<string, string>
                 };
 
-                relations.push({
+                relationships.push({
                     metadata,
                     sourceComponent: className,  // Use class name instead of component name
                     location: {

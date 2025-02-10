@@ -1,31 +1,31 @@
 import { Project, SourceFile } from 'ts-morph';
 import { ComponentInfo } from './model/component';
+import { RelationshipParser } from './relationship-parser';
 import { ComponentParser } from './component-parser';
-import { RelationParser } from './relation-parser';
 import { ContainerConfig } from './model/container';
 
 export class ComponentFinder {
     private project: Project;
+    private relationshipParser: RelationshipParser;
     private componentParser: ComponentParser;
-    private relationParser: RelationParser;
 
-    constructor(tsConfigPath?: string, containerConfig?: ContainerConfig) {
+    constructor(tsConfigPath?: string, config?: ContainerConfig) {
         this.project = new Project({
             tsConfigFilePath: tsConfigPath
         });
-        this.componentParser = new ComponentParser(containerConfig);
-        this.relationParser = new RelationParser();
+        this.relationshipParser = new RelationshipParser();
+        this.componentParser = new ComponentParser(config);
     }
 
     /**
-     * Add source files to analyze
+     * Add source files to the project
      */
     addSourceFiles(patterns: string[]): void {
         this.project.addSourceFilesAtPaths(patterns);
     }
 
     /**
-     * Find all components in added source files
+     * Find all components in the project
      */
     findComponents(): ComponentInfo[] {
         const components: ComponentInfo[] = [];
@@ -44,9 +44,9 @@ export class ComponentFinder {
         for (const classDecl of classes) {
             const componentInfo = this.componentParser.parse(classDecl);
             if (componentInfo) {
-                // Find relations in the component
-                const relations = this.relationParser.findRelations(classDecl);
-                componentInfo.relations = relations;
+                // Find relationships in the component
+                const relationships = this.relationshipParser.findRelationships(classDecl);
+                componentInfo.relations = relationships;
                 
                 components.push(componentInfo);
             }
