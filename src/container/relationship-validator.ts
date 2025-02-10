@@ -137,7 +137,7 @@ export class RelationshipValidator {
                 if (!usage) continue;
 
                 // Create a synthetic relationship for the undeclared usage
-                const relation: RelationshipInfo = {
+                const relationship: RelationshipInfo = {
                     sourceComponent: component.metadata.name,
                     metadata: {
                         target: targetComponent.metadata.name,
@@ -152,11 +152,11 @@ export class RelationshipValidator {
                 };
 
                 results.push({
-                    relationship: relation,
+                    relationship,
                     targetExists: true,
                     isUsed: true,
                     usageLocation: usage,
-                    errors: [`Undeclared relationship from "${component.metadata.name}" to "${targetComponent.metadata.name}" found at ${relation.location.filePath}:${relation.location.line}`]
+                    errors: [`Undeclared relationship from "${component.metadata.name}" to "${targetComponent.metadata.name}" found at ${usage.filePath}:${usage.line}`]
                 });
             }
         }
@@ -168,27 +168,27 @@ export class RelationshipValidator {
      * Validate a single relationship
      */
     private validateRelationship(
-        relation: RelationshipInfo,
+        relationship: RelationshipInfo,
         componentsByName: Map<string, ComponentInfo>
     ): ValidationResult {
         const errors: string[] = [];
-        const existingTags = new Set(relation.metadata.tags || []);
+        const existingTags = new Set(relationship.metadata.tags || []);
 
         // Check if relationship is marked as both direct and indirect
         if (existingTags.has(C4RelationshipTags.DIRECT) && existingTags.has(C4RelationshipTags.INDIRECT)) {
-            errors.push(`Relationship from "${relation.sourceComponent}" to "${relation.metadata.target}" cannot be both direct and indirect`);
+            errors.push(`Relationship from "${relationship.sourceComponent}" to "${relationship.metadata.target}" cannot be both direct and indirect`);
         }
 
-        const targetComponent = componentsByName.get(relation.metadata.target);
-        const sourceComponent = componentsByName.get(relation.sourceComponent);
+        const targetComponent = componentsByName.get(relationship.metadata.target);
+        const sourceComponent = componentsByName.get(relationship.sourceComponent);
 
         // Check if target is an external component or defined in relationships
-        const isExternalTarget = this.config?.external?.[relation.metadata.target];
-        const isRelationshipTarget = this.config?.relationships?.some(rel => rel.target === relation.metadata.target);
+        const isExternalTarget = this.config?.external?.[relationship.metadata.target];
+        const isRelationshipTarget = this.config?.relationships?.some(rel => rel.target === relationship.metadata.target);
 
         if (!sourceComponent) {
             return {
-                relationship: relation,
+                relationship,
                 targetExists: !!targetComponent || !!isExternalTarget || !!isRelationshipTarget,
                 isUsed: false,
                 errors
@@ -198,7 +198,7 @@ export class RelationshipValidator {
         // If target is external or defined in relationships, we consider it exists but don't validate usage
         if (isExternalTarget || isRelationshipTarget) {
             return {
-                relationship: relation,
+                relationship,
                 targetExists: true,
                 isUsed: true,
                 errors
@@ -208,7 +208,7 @@ export class RelationshipValidator {
         // If target is internal but not found, it's invalid
         if (!targetComponent) {
             return {
-                relationship: relation,
+                relationship,
                 targetExists: false,
                 isUsed: false,
                 errors
@@ -219,7 +219,7 @@ export class RelationshipValidator {
         const sourceFile = this.project.getSourceFile(sourceComponent.location.filePath);
         if (!sourceFile) {
             return {
-                relationship: relation,
+                relationship,
                 targetExists: true,
                 isUsed: false,
                 errors
@@ -230,7 +230,7 @@ export class RelationshipValidator {
         const targetFile = this.project.getSourceFile(targetComponent.location.filePath);
         if (!targetFile) {
             return {
-                relationship: relation,
+                relationship,
                 targetExists: true,
                 isUsed: false,
                 errors
@@ -240,7 +240,7 @@ export class RelationshipValidator {
         const targetClass = targetFile.getClass(targetComponent.location.className);
         if (!targetClass) {
             return {
-                relationship: relation,
+                relationship,
                 targetExists: true,
                 isUsed: false,
                 errors
@@ -251,7 +251,7 @@ export class RelationshipValidator {
         const targetSymbol = targetClass.getSymbol();
         if (!targetSymbol) {
             return {
-                relationship: relation,
+                relationship,
                 targetExists: true,
                 isUsed: false,
                 errors
@@ -337,25 +337,25 @@ export class RelationshipValidator {
         if (isDirectUsage) {
             if (existingTags.has(C4RelationshipTags.INDIRECT)) {
                 errors.push(
-                    `Relationship from "${relation.sourceComponent}" to "${relation.metadata.target}" is marked as indirect but has direct usage at ${usageLocation?.filePath}:${usageLocation?.line}`
+                    `Relationship from "${relationship.sourceComponent}" to "${relationship.metadata.target}" is marked as indirect but has direct usage at ${usageLocation?.filePath}:${usageLocation?.line}`
                 );
             }
             if (!existingTags.has(C4RelationshipTags.DIRECT)) {
-                relation.metadata.tags = [...(relation.metadata.tags || []), C4RelationshipTags.DIRECT];
+                relationship.metadata.tags = [...(relationship.metadata.tags || []), C4RelationshipTags.DIRECT];
             }
         } else if (usageLocation) {
             if (existingTags.has(C4RelationshipTags.DIRECT)) {
                 errors.push(
-                    `Relationship from "${relation.sourceComponent}" to "${relation.metadata.target}" is marked as direct but only has indirect usage at ${usageLocation.filePath}:${usageLocation.line}`
+                    `Relationship from "${relationship.sourceComponent}" to "${relationship.metadata.target}" is marked as direct but only has indirect usage at ${usageLocation.filePath}:${usageLocation.line}`
                 );
             }
             if (!existingTags.has(C4RelationshipTags.INDIRECT)) {
-                relation.metadata.tags = [...(relation.metadata.tags || []), C4RelationshipTags.INDIRECT];
+                relationship.metadata.tags = [...(relationship.metadata.tags || []), C4RelationshipTags.INDIRECT];
             }
         }
 
         return {
-            relationship: relation,
+            relationship,
             targetExists: true,
             isUsed: !!usageLocation,
             usageLocation,
