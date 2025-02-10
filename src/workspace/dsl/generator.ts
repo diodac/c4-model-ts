@@ -358,32 +358,67 @@ export class DslGenerator {
         const systems: WorkspaceData['systems'] = {};
 
         for (const system of model.systems) {
-            // Transform containers
-            const containers: Container[] = system.containers.map(container => ({
-                name: container.data.name,
-                title: container.data.name,
-                technology: container.data.technology || '',
-                description: container.data.description || '',
-                analysis: container.analysis && {
-                    components: container.analysis.components.map(component => ({
-                        metadata: {
-                            name: component.metadata.name,
-                            description: component.metadata.description || '',
-                            technology: component.metadata.technology,
-                            group: component.metadata.group
-                        }
-                    })),
-                    groups: container.analysis.groups
-                }
-            }));
+            // Transform containers and collect their relationships
+            const containers: Container[] = [];
+            const relationships: Relationship[] = [];
 
-            // Transform relationships
-            const relationships: Relationship[] = system.relations.map(relation => ({
-                source: relation.source,
-                target: relation.target,
-                description: relation.description,
-                technology: relation.technology || ''
-            }));
+            for (const container of system.containers) {
+                // Add container
+                containers.push({
+                    name: container.data.name,
+                    title: container.data.name,
+                    technology: container.data.technology || '',
+                    description: container.data.description || '',
+                    analysis: container.analysis && {
+                        components: container.analysis.components.map(component => ({
+                            metadata: {
+                                name: component.metadata.name,
+                                description: component.metadata.description || '',
+                                technology: component.metadata.technology,
+                                group: component.metadata.group
+                            }
+                        })),
+                        groups: container.analysis.groups
+                    }
+                });
+
+                // Extract relationships from components
+                if (container.analysis?.components) {
+                    for (const component of container.analysis.components) {
+                        if (component.relations) {
+                            relationships.push(...component.relations.map(relation => {
+                                // First check if the entire target is defined in external
+                                const isFullPathExternal = container.data.external && 
+                                    relation.metadata.target in container.data.external;
+                                
+                                if (isFullPathExternal) {
+                                    return {
+                                        source: `${container.data.name}.${component.metadata.name}`,
+                                        target: relation.metadata.target,
+                                        description: relation.metadata.description || '',
+                                        technology: relation.metadata.technology || '',
+                                        tags: relation.metadata.tags
+                                    };
+                                }
+
+                                // If not external as full path, check if needs container prefix
+                                const targetParts = relation.metadata.target.split('.');
+                                const target = targetParts.length === 1 
+                                    ? `${container.data.name}.${relation.metadata.target}`
+                                    : relation.metadata.target;
+
+                                return {
+                                    source: `${container.data.name}.${component.metadata.name}`,
+                                    target,
+                                    description: relation.metadata.description || '',
+                                    technology: relation.metadata.technology || '',
+                                    tags: relation.metadata.tags
+                                };
+                            }));
+                        }
+                    }
+                }
+            }
 
             // Add system to the map using id as key
             systems[system.id] = {
