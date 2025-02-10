@@ -119,7 +119,7 @@ export class RelationValidator {
             const propertyUsage = this.checkProperties(sourceFile, targetSymbol);
             const methodUsage = this.checkMethods(sourceFile, targetSymbol);
 
-            // Skip if the usage is in constructor parameters, as these should be declared with @c4Relation
+            // Skip if the usage is in constructor parameters, as these should be declared with @c4Relationship
             if (constructorUsage) {
                 const constructor = sourceFile.getClass(component.location.className)?.getConstructors()[0];
                 if (constructor) {

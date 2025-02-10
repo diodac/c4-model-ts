@@ -6,7 +6,7 @@ This module automatically generates C4 model documentation from TypeScript code 
 
 - Extracts C4 components and relationships from TypeScript code
 - Uses JSDoc-style annotations with custom C4 tags
-- Implements custom block tags (@c4Component, @c4Relation, and @c4Group)
+- Implements custom block tags (@c4Component, @c4Relationship, and @c4Group)
 - Supports core Structurizr DSL parameters for components and relationships
 - Validates relationships and detects undeclared dependencies
 - Supports direct and indirect relationship detection
@@ -34,7 +34,7 @@ The generator uses JSDoc-style block comments with custom C4 tags. Each tag supp
  */
 export class ExampleService {
     /**
-     * @c4Relation target | description | technology
+     * @c4Relationship target | description | technology
      * - technology: Technology used (overrides the argument if specified)
      * - url: Documentation URL
      * - properties:
@@ -45,7 +45,7 @@ export class ExampleService {
     constructor(private db: DatabaseService) {}
 
     /**
-     * @c4Relation NotificationService | Sends notifications | SMTP
+     * @c4Relationship NotificationService | Sends notifications | SMTP
      * - tags: IndirectRelation
      */
     async notifyUser(userId: string): Promise<void> {
@@ -58,7 +58,7 @@ export class ExampleService {
 
 Each C4 tag supports the following format:
 - `@c4Component [name]` - Defines a component with optional inline name
-- `@c4Relation target | description | technology` - Defines a relationship with target, description, and technology
+- `@c4Relationship target | description | technology` - Defines a relationship with target, description, and technology
 - `@c4Group name` - Assigns component to a group
 
 Properties are defined using a simple structured format:
@@ -73,7 +73,7 @@ The module uses:
 - [ts-morph](https://github.com/dsherret/ts-morph) for TypeScript code analysis and JSDoc parsing
 - Custom block tags that extend the JSDoc standard:
   - `@c4Component` - Marks a class as a C4 component
-  - `@c4Relation` - Defines relationships between components
+  - `@c4Relationship` - Defines relationships between components
   - `@c4Group` - Defines logical grouping of components
 
 ## Installation
@@ -298,7 +298,7 @@ export class PaymentProcessor {
 }
 ```
 
-#### @c4Relation target | description | technology
+#### @c4Relationship target | description | technology
 
 Defines a relationship between components. Typically used on methods to document their dependencies, but can also be used on constructors or at the class level.
 All three arguments are required and should be separated by `|`:
@@ -315,16 +315,16 @@ Example:
 ```typescript
 /**
  * @c4Component OrderService
- * @c4Relation PaymentGateway | Uses for payment processing | HTTPS
+ * @c4Relationship PaymentGateway | Uses for payment processing | HTTPS
  */
 export class OrderService {
     /**
-     * @c4Relation Database | Persists order data | SQL
+     * @c4Relationship Database | Persists order data | SQL
      */
     constructor(private db: Database) {}
 
     /**
-     * @c4Relation NotificationService | Sends order confirmations | Message Queue
+     * @c4Relationship NotificationService | Sends order confirmations | Message Queue
      * - technology: RabbitMQ
      * - tags: IndirectRelation
      */
@@ -333,7 +333,7 @@ export class OrderService {
     }
 
     /**
-     * @c4Relation PaymentProcessor | Processes refunds | REST API
+     * @c4Relationship PaymentProcessor | Processes refunds | REST API
      */
     async processRefund(orderId: string): Promise<void> {
         // Implementation
@@ -478,7 +478,7 @@ This allows for flexible relationship definitions while maintaining validation a
 
 The generator validates relationships in several ways:
 
-1. **Target Existence**: For relationships defined with `@c4Relation`, the target must exist as one of:
+1. **Target Existence**: For relationships defined with `@c4Relationship`, the target must exist as one of:
    - A component defined with `@c4Component`
    - An external component defined in the `external` section
    - A target defined in the `relationships` section
@@ -492,7 +492,7 @@ The generator validates relationships in several ways:
    - A relationship cannot be both direct and indirect
    - Tags match the actual usage pattern in code
 
-4. **Undeclared Relations**: The generator can detect relationships that exist in code but are not documented with `@c4Relation`
+4. **Undeclared Relations**: The generator can detect relationships that exist in code but are not documented with `@c4Relationship`
 
 For container-level relationships defined in `c4container.json`:
 - No code-level validation is performed

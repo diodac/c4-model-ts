@@ -57,7 +57,7 @@ export class RelationFinder {
 
     /**
      * Find only undeclared relations between components.
-     * These are relations that exist in code through method calls but are not documented with @c4Relation tags.
+     * These are relations that exist in code through method calls but are not documented with @c4Relationship tags.
      */
     findUndeclaredRelations(components: ComponentInfo[]): MethodUsage[] {
         const allUsages = this.findAllRelations(components);

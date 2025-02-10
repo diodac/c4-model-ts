@@ -3,16 +3,16 @@ import { RelationInfo, RelationMetadata } from './model/relation';
 import { TagParser, TagSchema } from './tag-parser';
 
 /**
- * Parser for @c4Relation tags
+ * Parser for @c4Relationship tags
  */
 export class RelationParser {
     private tagParser = new TagParser();
 
     /**
-     * Schema for @c4Relation tag
+     * Schema for @c4Relationship tag
      * Format:
      * ```
-     * @c4Relation target | description | technology
+     * @c4Relationship target | description | technology
      * - technology: Technology used (overrides the argument if specified)
      * - url: Documentation URL
      * - properties:
@@ -68,7 +68,7 @@ export class RelationParser {
             : this.getParentClassName(node);
 
         for (const jsDoc of jsDocs) {
-            const relationTags = jsDoc.getTags().filter(tag => tag.getTagName() === 'c4Relation');
+            const relationTags = jsDoc.getTags().filter(tag => tag.getTagName() === 'c4Relationship');
             
             for (const tag of relationTags) {
                 const parsed = this.tagParser.parse(tag, this.schema);

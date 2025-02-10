@@ -92,7 +92,7 @@ program
             // Show undeclared relations if requested
             if (result.undeclaredRelations?.length) {
                 console.log('\nWarning: Found undeclared relations in code:');
-                console.log('Consider documenting these relations with @c4Relation tag if they are significant dependencies.\n');
+                console.log('Consider documenting these relations with @c4Relationship tag if they are significant dependencies.\n');
                 
                 for (const relation of result.undeclaredRelations) {
                     console.log(`${relation.calledFrom.component.metadata.name} → ${relation.method.component.metadata.name}`);

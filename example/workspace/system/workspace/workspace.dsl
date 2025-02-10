@@ -158,42 +158,6 @@ workspace {
             config-service -> analytics-system "Provides configuration data to" "HTTP/REST" {
                 tags "analytics,config"
             }
-
-            # Component relationships
-            metrics-service.MetricsPublisher -> analytics-service "publishes metrics data to" "kafka"
-            metrics-service.MetricsController -> metrics-service.MetricsService "Uses for metrics processing" "TypeScript"
-            metrics-service.MetricsService -> metrics-service.MetricsRepository "Stores metrics data" "Internal" {
-                tags "DirectRelation"
-            }
-            metrics-service.MetricsService -> config-service.ConfigService "Gets metrics configuration" "HTTP" {
-                tags "DirectRelation"
-            }
-            metrics-service.MetricsService -> features-service.FeaturesService "Checks if metrics collection is enabled" "HTTP" {
-                tags "DirectRelation"
-            }
-            metrics-service.MetricsService -> metrics-service.MetricsProcessor "Processes metrics data" "Internal" {
-                tags "DirectRelation"
-            }
-            metrics-service.MetricsService -> metrics-service.DataValidator "Validates metrics data" "Internal" {
-                tags "DirectRelation"
-            }
-            metrics-service.FeaturesClient -> features-service.FeaturesService "Checks feature flags" "HTTP" {
-                tags "DirectRelation"
-            }
-            features-service.FeaturesController -> features-service.FeaturesService "Uses for feature management" "Internal"
-            features-service.FeaturesService -> features-service.FeatureRepository "Stores feature flags" "MongoDB" {
-                tags "DirectRelation"
-            }
-            features-service.FeaturesService -> config-service.ConfigService "Stores feature flags configuration" "HTTP" {
-                tags "DirectRelation"
-            }
-            features-service.FeaturesService -> metrics-service "Sends usage metrics" "Kafka"
-            features-service.ConfigClient -> config-service.ConfigService "Gets configuration" "HTTP" {
-                tags "DirectRelation"
-            }
-            config-service.ConfigController -> config-service.ConfigService "Uses for config management" "Internal"
-            config-service.ConfigService -> config-service.ConfigRepository "Stores configuration" "Internal"
-            config-service.ConfigService -> metrics-service "Sends config access metrics" "Kafka"
         }
     }
 

@@ -39,7 +39,7 @@
 
 ## Documentation
 - Document public APIs with TSDoc comments
-- Use custom TSDoc tags (@c4Component, @c4Relation, @c4Group) for C4 metadata
+- Use custom TSDoc tags (@c4Component, @c4Relationship, @c4Group) for C4 metadata
 - Define custom tags in tsdoc.json
 - Keep documentation format consistent with Structurizr DSL
 - Support multi-line tag content according to Structurizr DSL format

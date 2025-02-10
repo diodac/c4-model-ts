@@ -38,6 +38,10 @@
           },
           "description": "Container properties"
         },
+        "groups": {
+          "$ref": "#/definitions/Groups",
+          "description": "Component groups"
+        },
         "external": {
           "type": "object",
           "additionalProperties": {
@@ -61,6 +65,23 @@
       "additionalProperties": false,
       "description": "Container configuration from c4container.json"
     },
+    "Groups": {
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/Groups"
+          },
+          {
+            "type": "object",
+            "additionalProperties": {
+              "not": {}
+            }
+          }
+        ]
+      },
+      "description": "Recursive group structure"
+    },
     "ExternalElement": {
       "type": "object",
       "properties": {
@@ -82,6 +103,10 @@
             "type": "string"
           },
           "description": "Element tags"
+        },
+        "type": {
+          "type": "string",
+          "description": "Element type (container, system, etc.)"
         }
       },
       "required": [
@@ -100,22 +125,22 @@
         },
         "description": {
           "type": "string",
-          "description": "Relationship description"
+          "description": "Relation description"
         },
         "technology": {
           "type": "string",
-          "description": "Technology used for communication"
+          "description": "Technology used for the relation"
         },
         "tags": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Relationship tags"
+          "description": "Relation tags"
         },
         "url": {
           "type": "string",
-          "description": "Documentation URL"
+          "description": "URL with documentation"
         },
         "properties": {
           "type": "object",
@@ -126,8 +151,8 @@
         }
       },
       "required": [
-        "target",
-        "description"
+        "description",
+        "target"
       ],
       "additionalProperties": false,
       "description": "Container-level relationship configuration"
