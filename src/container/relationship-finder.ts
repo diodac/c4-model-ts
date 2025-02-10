@@ -64,7 +64,7 @@ export class RelationshipFinder {
         
         return allUsages.filter(usage => {
             // Get all declared relationships from source component
-            const declaredRelationships = usage.calledFrom.component.relations;
+            const declaredRelationships = usage.calledFrom.component.relationships;
             
             // Check if there's a declared relationship matching this usage
             const isDeclared = declaredRelationships.some(relationship => 

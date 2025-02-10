@@ -72,16 +72,16 @@ program
                     if (component.metadata.tags?.length) {
                         console.log(`Tags: ${component.metadata.tags.join(', ')}`);
                     }
-                    if (component.relations.length > 0) {
+                    if (component.relationships.length > 0) {
                         console.log('Relationships:');
-                        for (const relation of component.relations) {
-                            console.log(`  → ${relation.metadata.target}`);
-                            console.log(`    Description: ${relation.metadata.description}`);
-                            if (relation.metadata.technology) {
-                                console.log(`    Technology: ${relation.metadata.technology}`);
+                        for (const relationship of component.relationships) {
+                            console.log(`  → ${relationship.metadata.target}`);
+                            console.log(`    Description: ${relationship.metadata.description}`);
+                            if (relationship.metadata.technology) {
+                                console.log(`    Technology: ${relationship.metadata.technology}`);
                             }
-                            if (relation.metadata.tags?.length) {
-                                console.log(`    Tags: ${relation.metadata.tags.join(', ')}`);
+                            if (relationship.metadata.tags?.length) {
+                                console.log(`    Tags: ${relationship.metadata.tags.join(', ')}`);
                             }
                         }
                     }

@@ -143,7 +143,7 @@ export class ComponentParser {
                 className,
                 line: classDecl.getStartLineNumber()
             },
-            relations: []
+            relationships: []
         };
     }
 

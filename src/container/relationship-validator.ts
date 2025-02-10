@@ -68,8 +68,8 @@ export class RelationshipValidator {
 
         // First validate declared relationships
         for (const component of components) {
-            for (const relation of component.relations) {
-                const result = this.validateRelationship(relation, componentsByName);
+            for (const relationship of component.relationships) {
+                const result = this.validateRelationship(relationship, componentsByName);
                 results.push(result);
             }
         }
@@ -92,7 +92,7 @@ export class RelationshipValidator {
         componentsByName: Map<string, ComponentInfo>
     ): ValidationResult[] {
         const results: ValidationResult[] = [];
-        const declaredTargets = new Set(component.relations.map(r => r.metadata.target));
+        const declaredTargets = new Set(component.relationships.map(r => r.metadata.target));
         const sourceFile = this.project.getSourceFile(component.location.filePath);
         
         if (!sourceFile) return results;

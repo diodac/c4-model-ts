@@ -403,8 +403,8 @@ export class DslGenerator {
                 // Extract relationships from components
                 if (c4container.analysis?.components) {
                     for (const component of c4container.analysis.components) {
-                        if (component.relations) {
-                            relationships.push(...component.relations.map(relation => {
+                        if (component.relationships) {
+                            relationships.push(...component.relationships.map(relation => {
                                 // First check if the entire target is defined in external
                                 const isFullPathExternal = c4container.data.external && 
                                     relation.metadata.target in c4container.data.external;

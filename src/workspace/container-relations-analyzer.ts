@@ -45,7 +45,7 @@ export class ContainerRelationsAnalyzer {
             );
 
             for (const component of container.analysis.components) {
-                for (const relation of component.relations) {
+                for (const relation of component.relationships) {
                     // Check if target is another container (either directly or as container.component)
                     const targetParts = relation.metadata.target.split('.');
                     const targetContainerName = targetParts.length > 1 ? targetParts[0] : relation.metadata.target;

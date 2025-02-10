@@ -16,7 +16,7 @@ export interface AnalysisResult {
         properties?: Record<string, string>;
         relationships?: ContainerRelation[];
     };
-    components: Array<ComponentInfo & { relations: Array<{ sourceComponent: string }> }>;
+    components: Array<ComponentInfo & { relationships: Array<{ sourceComponent: string }> }>;
     groups: Groups;
     undeclaredRelations?: MethodUsage[];
     invalidRelations?: ValidationResult[];
@@ -76,8 +76,8 @@ export class ContainerAnalyzer {
             },
             components: components.map(component => ({
                 ...component,
-                relations: component.relations.map(relation => ({
-                    ...relation,
+                relationships: component.relationships.map(relationship => ({
+                    ...relationship,
                     sourceComponent: component.metadata.name
                 }))
             })),

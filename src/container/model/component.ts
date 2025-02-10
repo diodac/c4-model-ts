@@ -37,6 +37,6 @@ export interface ComponentInfo {
         line: number;
     };
     
-    /** Relations defined in this component */
-    relations: RelationshipInfo[];
+    /** Relationships defined in this component */
+    relationships: RelationshipInfo[];
 } 
