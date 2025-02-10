@@ -24,20 +24,20 @@ const TECHNOLOGY_DESCRIPTIONS: Record<string, string> = {
 };
 
 /**
- * Analyzes relations between containers based on their components' relations
+ * Analyzes relationships between containers based on their components' relationships
  */
-export class ContainerRelationsAnalyzer {
+export class ContainerRelationshipsAnalyzer {
     /**
-     * Find relations between containers based on their analysis results
+     * Find relationships between containers based on their analysis results
      */
     analyze(containers: C4Container[]): C4ContainerRelation[] {
-        // Use Map to store unique relations by source-target-technology key
-        const relationsMap = new Map<string, C4ContainerRelation>();
+        // Use Map to store unique relationships by source-target-technology key
+        const relationshipsMap = new Map<string, C4ContainerRelation>();
         const containersByName = new Map(
             containers.map(c => [c.data.name, c])
         );
 
-        // Look for relations in each container's components
+        // Look for relationships in each container's components
         for (const container of containers) {
             // Get list of allowed external containers
             const allowedTargets = new Set(
@@ -45,24 +45,24 @@ export class ContainerRelationsAnalyzer {
             );
 
             for (const component of container.analysis.components) {
-                for (const relation of component.relationships) {
+                for (const relationship of component.relationships) {
                     // Check if target is another container (either directly or as container.component)
-                    const targetParts = relation.metadata.target.split('.');
-                    const targetContainerName = targetParts.length > 1 ? targetParts[0] : relation.metadata.target;
+                    const targetParts = relationship.metadata.target.split('.');
+                    const targetContainerName = targetParts.length > 1 ? targetParts[0] : relationship.metadata.target;
                     const targetContainer = containersByName.get(targetContainerName);
                     
                     if (targetContainer && targetContainer !== container && allowedTargets.has(targetContainerName)) {
-                        // Create unique key for this relation direction and technology
-                        const technology = relation.metadata.technology || 'unknown';
-                        const relationKey = `${container.data.name}->${targetContainer.data.name}:${technology}`;
+                        // Create unique key for this relationship direction and technology
+                        const technology = relationship.metadata.technology || 'unknown';
+                        const relationshipKey = `${container.data.name}->${targetContainer.data.name}:${technology}`;
 
-                        if (!relationsMap.has(relationKey)) {
+                        if (!relationshipsMap.has(relationshipKey)) {
                             // Get technology-specific description or use default
                             const description = technology !== 'unknown'
                                 ? TECHNOLOGY_DESCRIPTIONS[technology.toLowerCase()] || `communicates using ${technology} with`
                                 : 'is connected with';
 
-                            relationsMap.set(relationKey, {
+                            relationshipsMap.set(relationshipKey, {
                                 source: container.data.name,
                                 target: targetContainer.data.name,
                                 description,
@@ -74,6 +74,6 @@ export class ContainerRelationsAnalyzer {
             }
         }
 
-        return Array.from(relationsMap.values());
+        return Array.from(relationshipsMap.values());
     }
 } 

@@ -3,14 +3,14 @@ import { MethodUsage } from '../container/relationship-finder';
 /**
  * Simplifies component information in undeclared relationships by keeping only essential data
  */
-export function simplifyUndeclaredRelationships<T extends { undeclaredRelations?: MethodUsage[] }>(result: T): T {
-    if (!result.undeclaredRelations) {
+export function simplifyUndeclaredRelationships<T extends { undeclaredRelationships?: MethodUsage[] }>(result: T): T {
+    if (!result.undeclaredRelationships) {
         return result;
     }
 
     return {
         ...result,
-        undeclaredRelations: result.undeclaredRelations.map(relationship => ({
+        undeclaredRelationships: result.undeclaredRelationships.map(relationship => ({
             method: {
                 name: relationship.method.name,
                 component: {

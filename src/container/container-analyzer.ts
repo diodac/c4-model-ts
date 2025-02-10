@@ -18,8 +18,8 @@ export interface AnalysisResult {
     };
     components: Array<ComponentInfo & { relationships: Array<{ sourceComponent: string }> }>;
     groups: Groups;
-    undeclaredRelations?: MethodUsage[];
-    invalidRelations?: ValidationResult[];
+    undeclaredRelationships?: MethodUsage[];
+    invalidRelationships?: ValidationResult[];
 }
 
 export interface ContainerAnalyzerConfig {
@@ -86,13 +86,13 @@ export class ContainerAnalyzer {
 
         // Add undeclared relations if requested
         if (options.includeUndeclared) {
-            result.undeclaredRelations = this.relationshipFinder.findUndeclaredRelationships(components);
+            result.undeclaredRelationships = this.relationshipFinder.findUndeclaredRelationships(components);
         }
 
         // Add invalid relations if requested
         if (options.includeInvalid) {
             const validationResults = this.relationshipValidator.validateRelationships(components);
-            result.invalidRelations = validationResults.filter((result: ValidationResult) => 
+            result.invalidRelationships = validationResults.filter((result: ValidationResult) => 
                 !result.targetExists || 
                 !result.isUsed || 
                 (result.errors && result.errors.length > 0)

@@ -9,7 +9,7 @@ import {
     C4System
 } from './model/workspace';
 import { WorkspaceConfigLoader } from './config-loader';
-import { ContainerRelationsAnalyzer } from './container-relations-analyzer';
+import { ContainerRelationshipsAnalyzer } from './container-relationships-analyzer';
 
 export interface WorkspaceAnalyzerConfig {
     /** Path to workspace configuration file */
@@ -23,13 +23,13 @@ export class WorkspaceAnalyzer {
     private configPath: string;
     private workspaceDir: string;
     private configLoader: WorkspaceConfigLoader;
-    private relationsAnalyzer: ContainerRelationsAnalyzer;
+    private relationshipsAnalyzer: ContainerRelationshipsAnalyzer;
 
     constructor(config: WorkspaceAnalyzerConfig, schema: object) {
         this.configPath = config.configPath;
         this.workspaceDir = dirname(config.configPath);
         this.configLoader = new WorkspaceConfigLoader(schema);
-        this.relationsAnalyzer = new ContainerRelationsAnalyzer();
+        this.relationshipsAnalyzer = new ContainerRelationshipsAnalyzer();
     }
 
     /**
@@ -91,7 +91,7 @@ export class WorkspaceAnalyzer {
                 }
 
                 // Find relations between containers in this system
-                const relations = this.relationsAnalyzer.analyze(containers);
+                const relations = this.relationshipsAnalyzer.analyze(containers);
 
                 // Add system to the model
                 systems.push({

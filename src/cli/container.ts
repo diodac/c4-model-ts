@@ -42,7 +42,7 @@ program
             if (options.json) {
                 const simplifiedResult = simplifyUndeclaredRelationships(result);
                 console.log(JSON.stringify(simplifiedResult, null, 2));
-                if (result.invalidRelations && result.invalidRelations.length > 0) {
+                if (result.invalidRelationships && result.invalidRelationships.length > 0) {
                     process.exit(1);
                 }
                 return;
@@ -90,11 +90,11 @@ program
             }
 
             // Show undeclared relationships if requested
-            if (result.undeclaredRelations?.length) {
+            if (result.undeclaredRelationships?.length) {
                 console.log('\nWarning: Found undeclared relationships in code:');
                 console.log('Consider documenting these relationships with @c4Relationship tag if they are significant dependencies.\n');
                 
-                for (const relation of result.undeclaredRelations) {
+                for (const relation of result.undeclaredRelationships) {
                     console.log(`${relation.calledFrom.component.metadata.name} → ${relation.method.component.metadata.name}`);
                     console.log(`Method: ${relation.method.name}`);
                     console.log(`Called from: ${relation.calledFrom.method || '(constructor)'}`);
@@ -109,9 +109,9 @@ program
             }
 
             // Show invalid relationships if requested
-            if (result.invalidRelations?.length) {
+            if (result.invalidRelationships?.length) {
                 console.log('\nError: Found invalid relationships:');
-                for (const validationResult of result.invalidRelations) {
+                for (const validationResult of result.invalidRelationships) {
                     const relation = validationResult.relation;
 
                     // Invalid target is an error
@@ -145,7 +145,7 @@ program
             }
 
             // Exit with error if invalid relationships found
-            if (result.invalidRelations && result.invalidRelations.length > 0) {
+            if (result.invalidRelationships && result.invalidRelationships.length > 0) {
                 process.exit(1);
             }
         } catch (error: unknown) {
