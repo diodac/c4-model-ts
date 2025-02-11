@@ -133,7 +133,8 @@ export class ComponentParser {
             description: parsed.params.description as string || commentText || '',
             technology: parsed.params.technology as string,
             tags: Array.isArray(parsed.params.tags) ? parsed.params.tags : [],
-            group: groupName
+            group: groupName,
+            url: parsed.params.url as string
         };
 
         return {

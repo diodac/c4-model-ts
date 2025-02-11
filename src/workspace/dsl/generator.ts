@@ -4,6 +4,7 @@ import { C4WorkspaceConfig, C4WorkspaceModel, C4Container } from '../model/works
 import { resolve, dirname } from 'path';
 import { readFileSync, writeFileSync } from 'fs';
 import { Groups } from '../../container/model/container';
+import { C4RelationshipTags } from '../../container/model/constants';
 
 /**
  * Component metadata in DSL generation context
@@ -17,6 +18,8 @@ interface ComponentMetadata {
     technology?: string;
     /** Component group */
     group?: string;
+    /** Component URL */
+    url?: string;
 }
 
 /**
@@ -162,12 +165,24 @@ export class DslGenerator {
         // Helper function to render a component
         const renderComponent = (component: any, indent: number): string => {
             const indentation = ' '.repeat(indent);
-            return [
-                `${indentation}${component.metadata.name} = component "${component.metadata.name}" {`,
-                `${indentation}    technology "${component.metadata.technology || 'undefined'}"`,
+            const lines = [
+                `${indentation}${component.metadata.name} = component "${component.metadata.name}" {`
+            ];
+
+            if (component.metadata.technology) {
+                lines.push(`${indentation}    technology "${component.metadata.technology}"`);
+            }
+            
+            if (component.metadata.url) {
+                lines.push(`${indentation}    url "${component.metadata.url}"`);
+            }
+            
+            lines.push(
                 `${indentation}    description "${component.metadata.description}"`,
                 `${indentation}}`
-            ].join('\n');
+            );
+            
+            return lines.join('\n');
         };
 
         // Helper function to render components in a specific group
@@ -263,8 +278,8 @@ export class DslGenerator {
         const relationships = system.relationships || [];
 
         // Split relationships into declared and undeclared
-        const declaredRelations = relationships.filter(rel => !rel.tags?.includes('UndeclaredRelation'));
-        const undeclaredRelations = relationships.filter(rel => rel.tags?.includes('UndeclaredRelation'));
+        const declaredRelations = relationships.filter(rel => !rel.tags?.includes(C4RelationshipTags.UNDECLARED));
+        const undeclaredRelations = relationships.filter(rel => rel.tags?.includes(C4RelationshipTags.UNDECLARED));
 
         // Group declared relationships
         const containerRelations = declaredRelations.filter(rel => !rel.source.includes('.'));
@@ -382,7 +397,8 @@ export class DslGenerator {
                                 name: component.metadata.name,
                                 description: component.metadata.description || '',
                                 technology: component.metadata.technology,
-                                group: component.metadata.group
+                                group: component.metadata.group,
+                                url: component.metadata.url
                             }
                         })),
                         groups: c4container.analysis.groups

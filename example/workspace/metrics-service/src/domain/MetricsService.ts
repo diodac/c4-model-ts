@@ -12,6 +12,7 @@ import { ConfigService } from '../infrastructure/ConfigService';
  * - description: Processes and analyzes metrics data
  * - technology: TypeScript
  * - tags: Domain
+ * - url: https://github.com/example/metrics-service/docs
  * @c4Group Domain
  */
 export class MetricsService {

@@ -18,6 +18,9 @@ export interface ComponentMetadata {
     
     /** Group that the component belongs to (from @c4Group) */
     group?: string;
+
+    /** URL associated with the component */
+    url?: string;
 }
 
 /**

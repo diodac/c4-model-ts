@@ -36,6 +36,7 @@ workspace {
                     }
                     MetricsService = component "MetricsService" {
                         technology "TypeScript"
+                        url "https://github.com/example/metrics-service/docs"
                         description "Processes and analyzes metrics data"
                     }
                 }
