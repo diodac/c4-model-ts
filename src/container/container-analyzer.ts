@@ -146,7 +146,7 @@ export class ContainerAnalyzer {
             result.invalidRelationships = validationResults.filter((result: ValidationResult) => 
                 !result.targetExists || 
                 !result.isUsed || 
-                (result.errors && result.errors.length > 0)
+                (result.errors && result.errors.length > 0 && !result.errors[0].startsWith('Undeclared relationship'))
             );
         }
 

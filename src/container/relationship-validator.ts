@@ -67,18 +67,12 @@ export class RelationshipValidator {
         const results: ValidationResult[] = [];
         const componentsByName = new Map(components.map(c => [c.metadata.name, c]));
 
-        // First validate declared relationships
+        // Only validate declared relationships
         for (const component of components) {
             for (const relationship of component.relationships) {
                 const result = this.validateRelationship(relationship, componentsByName);
                 results.push(result);
             }
-        }
-
-        // Then check for undeclared relationships
-        for (const component of components) {
-            const undeclaredResults = this.findUndeclaredRelationships(component, components, componentsByName);
-            results.push(...undeclaredResults);
         }
 
         return results;
