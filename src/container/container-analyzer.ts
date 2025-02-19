@@ -38,19 +38,17 @@ export class ContainerAnalyzer {
 
     constructor(config: ContainerAnalyzerConfig) {
         this.containerConfig = config.config;
-
-        // Initialize finders
         this.componentFinder = new ComponentFinder(config.tsConfigPath, config.config);
-        this.relationshipFinder = new RelationshipFinder(config.tsConfigPath);
-        this.relationshipValidator = new RelationshipValidator({
-            tsConfigPath: config.tsConfigPath,
-            config: config.config,
-            rootDir: config.rootDir
-        });
+        this.relationshipFinder = new RelationshipFinder(config.tsConfigPath, config.rootDir);
+        this.relationshipValidator = new RelationshipValidator(config);
 
-        // Add source files - resolve paths relative to root directory
-        const sourcePatterns = config.config.source.map(pattern => resolve(config.rootDir, pattern));
-        this.componentFinder.addSourceFiles(sourcePatterns);
+        // Add source files to component finder
+        if (config.config.source) {
+            const sourcePaths = config.config.source.map(pattern => 
+                resolve(config.rootDir, pattern)
+            );
+            this.componentFinder.addSourceFiles(sourcePaths);
+        }
     }
 
     /**

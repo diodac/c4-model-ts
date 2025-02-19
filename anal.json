@@ -1,0 +1,1931 @@
+{
+  "container": {
+    "name": "rhino-configuration-service",
+    "description": "Configuration service",
+    "technology": "expressjs",
+    "relationships": [
+      {
+        "target": "cacheDb",
+        "description": "stores cache in",
+        "technology": "Redis"
+      },
+      {
+        "target": "rhino-audits-service",
+        "description": "pushes audits to",
+        "technology": "HTTP"
+      }
+    ]
+  },
+  "components": [
+    {
+      "metadata": {
+        "name": "ConfigurationRouter",
+        "description": "",
+        "tags": [
+          "Controller"
+        ]
+      },
+      "location": {
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.router.ts",
+        "className": "ConfigurationRouter",
+        "line": 18
+      },
+      "relationships": [
+        {
+          "metadata": {
+            "target": "ConfigurationService",
+            "description": "routes requests to",
+            "technology": "internal",
+            "tags": [
+              "DirectRelationship"
+            ]
+          },
+          "sourceComponent": "ConfigurationRouter",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.router.ts",
+            "className": "ConfigurationRouter",
+            "line": 18
+          }
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "name": "ConfigurationService",
+        "description": "Provides configurations, sync and notify players",
+        "tags": []
+      },
+      "location": {
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+        "className": "ConfigurationService",
+        "line": 80
+      },
+      "relationships": [
+        {
+          "metadata": {
+            "target": "StickyService",
+            "description": "is using",
+            "tags": [
+              "DirectRelationship"
+            ]
+          },
+          "sourceComponent": "ConfigurationService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+            "className": "ConfigurationService",
+            "line": 80
+          }
+        },
+        {
+          "metadata": {
+            "target": "ConfigurationIdentifierProvider",
+            "description": "gets player identifier mappings from",
+            "technology": "internal",
+            "tags": []
+          },
+          "sourceComponent": "ConfigurationService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+            "className": "ConfigurationService",
+            "line": 80
+          }
+        },
+        {
+          "metadata": {
+            "target": "PayloadEvaluator",
+            "description": "prepares payloads using",
+            "tags": [
+              "DirectRelationship"
+            ]
+          },
+          "sourceComponent": "ConfigurationService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+            "className": "ConfigurationService",
+            "line": 80
+          }
+        },
+        {
+          "metadata": {
+            "target": "AuditPlayerIdentifierMappingHelper",
+            "description": "creates audit using",
+            "tags": []
+          },
+          "sourceComponent": "ConfigurationService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+            "className": "ConfigurationService",
+            "line": 80
+          }
+        },
+        {
+          "metadata": {
+            "target": "PlayerIdentifierMappingNotifier",
+            "description": "publishes player identifier mapping changes using",
+            "technology": "internal",
+            "tags": [
+              "DirectRelationship"
+            ]
+          },
+          "sourceComponent": "ConfigurationService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+            "className": "ConfigurationService",
+            "line": 80
+          }
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "name": "ConfigurationIdentifierProvider",
+        "description": "accessing configuration identifiers intended for a given player",
+        "tags": []
+      },
+      "location": {
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts",
+        "className": "ConfigurationIdentifierProvider",
+        "line": 30
+      },
+      "relationships": [
+        {
+          "metadata": {
+            "target": "ConfigurationService",
+            "description": "is using",
+            "technology": "internal",
+            "tags": [
+              "IndirectRelationship"
+            ]
+          },
+          "sourceComponent": "ConfigurationIdentifierProvider",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts",
+            "className": "ConfigurationIdentifierProvider",
+            "line": 30
+          }
+        },
+        {
+          "metadata": {
+            "target": "PlayerIdentifierMappingNotifier",
+            "description": "publishes player identifier mapping changes using",
+            "technology": "internal",
+            "tags": [
+              "DirectRelationship"
+            ]
+          },
+          "sourceComponent": "ConfigurationIdentifierProvider",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts",
+            "className": "ConfigurationIdentifierProvider",
+            "line": 30
+          }
+        },
+        {
+          "metadata": {
+            "target": "AuditPlayerIdentifierMappingHelper",
+            "description": "creates audit using",
+            "tags": []
+          },
+          "sourceComponent": "ConfigurationIdentifierProvider",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts",
+            "className": "ConfigurationIdentifierProvider",
+            "methodName": "getMultiplePlayerIdentifiers",
+            "line": 94
+          }
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "name": "AuditPlayerIdentifierMappingHelper",
+        "description": "",
+        "tags": []
+      },
+      "location": {
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/helpers/auditPlayerIdentifierMappingHelper.ts",
+        "className": "AuditPlayerIdentifierMappingHelper",
+        "line": 8
+      },
+      "relationships": []
+    },
+    {
+      "metadata": {
+        "name": "SynchronizeAndNotifyConsumerService",
+        "description": "",
+        "tags": []
+      },
+      "location": {
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/kafkaConsumer/synchronizeAndNotifyConsumer.service.ts",
+        "className": "SynchronizeAndNotifyConsumerService",
+        "line": 14
+      },
+      "relationships": [
+        {
+          "metadata": {
+            "target": "syncAndNotifyTopic",
+            "description": "consumes messages from",
+            "technology": "Kafka",
+            "tags": []
+          },
+          "sourceComponent": "SynchronizeAndNotifyConsumerService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/kafkaConsumer/synchronizeAndNotifyConsumer.service.ts",
+            "className": "SynchronizeAndNotifyConsumerService",
+            "line": 14
+          }
+        },
+        {
+          "metadata": {
+            "target": "ConfigurationService",
+            "description": "triggers sync and notify in",
+            "technology": "internal",
+            "tags": [
+              "DirectRelationship"
+            ]
+          },
+          "sourceComponent": "SynchronizeAndNotifyConsumerService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/kafkaConsumer/synchronizeAndNotifyConsumer.service.ts",
+            "className": "SynchronizeAndNotifyConsumerService",
+            "methodName": "handleBatch",
+            "line": 128
+          }
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "name": "MeticaService",
+        "description": "First PoC, payload swapping",
+        "tags": [],
+        "group": "PoC",
+        "url": "https://huuugegames.atlassian.net/wiki/spaces/HC/pages/258244628/Metica+POC"
+      },
+      "location": {
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/metica/metica.service.ts",
+        "className": "MeticaService",
+        "line": 48
+      },
+      "relationships": [
+        {
+          "metadata": {
+            "target": "ConfigurationService",
+            "description": "filters notification in",
+            "tags": []
+          },
+          "sourceComponent": "MeticaService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/metica/metica.service.ts",
+            "className": "MeticaService",
+            "line": 48
+          }
+        },
+        {
+          "metadata": {
+            "target": "ConfigurationIdentifierProvider",
+            "description": "modifies output in",
+            "tags": []
+          },
+          "sourceComponent": "MeticaService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/metica/metica.service.ts",
+            "className": "MeticaService",
+            "line": 48
+          }
+        },
+        {
+          "metadata": {
+            "target": "PlayerDataSupplier",
+            "description": "modifies output in",
+            "tags": []
+          },
+          "sourceComponent": "MeticaService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/metica/metica.service.ts",
+            "className": "MeticaService",
+            "line": 48
+          }
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "name": "PayloadEvaluator",
+        "description": "",
+        "tags": []
+      },
+      "location": {
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/payload/payload-evaluator.ts",
+        "className": "PayloadEvaluator",
+        "line": 46
+      },
+      "relationships": []
+    },
+    {
+      "metadata": {
+        "name": "PlayerDataSupplier",
+        "description": "",
+        "tags": []
+      },
+      "location": {
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+        "className": "PlayerDataSupplier",
+        "line": 33
+      },
+      "relationships": []
+    },
+    {
+      "metadata": {
+        "name": "PlayerIdentifierMappingNotifier",
+        "description": "",
+        "tags": [],
+        "url": "https://huuugegames.atlassian.net/wiki/spaces/BOTOOL/pages/692322380/70.+Player+identifier+mappings+Kafka+topic"
+      },
+      "location": {
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/playerIdentifierMapping/playerIdentifierMappingNotifier.ts",
+        "className": "PlayerIdentifierMappingNotifier",
+        "line": 17
+      },
+      "relationships": [
+        {
+          "metadata": {
+            "target": "PlayerIdentifierMappingKafkaClient",
+            "description": "sends messages using",
+            "technology": "internal",
+            "tags": [
+              "DirectRelationship"
+            ]
+          },
+          "sourceComponent": "PlayerIdentifierMappingNotifier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/playerIdentifierMapping/playerIdentifierMappingNotifier.ts",
+            "className": "PlayerIdentifierMappingNotifier",
+            "line": 17
+          }
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "name": "StickyService",
+        "description": "",
+        "tags": []
+      },
+      "location": {
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/stickyConfiguration/sticky.service.ts",
+        "className": "StickyService",
+        "line": 46
+      },
+      "relationships": []
+    },
+    {
+      "metadata": {
+        "name": "PlayerIdentifierMappingKafkaClient",
+        "description": "",
+        "tags": []
+      },
+      "location": {
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/playerIdentifierMapping/kafka/kafka.client.ts",
+        "className": "KafkaClient",
+        "line": 17
+      },
+      "relationships": [
+        {
+          "metadata": {
+            "target": "externalPlayerIdentifierMappingTopic",
+            "description": "produces messages to",
+            "technology": "Kafka",
+            "tags": []
+          },
+          "sourceComponent": "PlayerIdentifierMappingKafkaClient",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/playerIdentifierMapping/kafka/kafka.client.ts",
+            "className": "KafkaClient",
+            "line": 17
+          }
+        }
+      ]
+    }
+  ],
+  "groups": {},
+  "undeclaredRelationships": [
+    {
+      "method": {
+        "name": "getPlayerSegments",
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+            "line": 80
+          }
+        },
+        "method": "getConfigurationIdentifiersWithMetadata",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+        "line": 162
+      },
+      "callChain": [
+        "ConfigurationService.getConfigurationIdentifiersWithMetadata"
+      ],
+      "summary": {
+        "from": "configuration/configuration.service.ts:ConfigurationService",
+        "to": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "getUuidConfigurations",
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+            "line": 80
+          }
+        },
+        "method": "calculateAndCacheDynamicEconomyConfigurationInternal",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+        "line": 631
+      },
+      "callChain": [
+        "ConfigurationService.calculateAndCacheDynamicEconomyConfigurationInternal"
+      ],
+      "summary": {
+        "from": "configuration/configuration.service.ts:ConfigurationService",
+        "to": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "setIdentifierAliasIfApplicable",
+        "component": {
+          "name": "MeticaService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/metica/metica.service.ts",
+            "line": 48
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationIdentifierProvider",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts",
+            "line": 30
+          }
+        },
+        "method": "getMultiplePlayerIdentifiers",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts",
+        "line": 196
+      },
+      "callChain": [
+        "ConfigurationService.getConfigurationIdentifiersMultipleApproach",
+        "ConfigurationIdentifierProvider.getMultiplePlayerIdentifiers"
+      ],
+      "summary": {
+        "from": "configurationProviders/configurationIdentifierProvider.ts:ConfigurationIdentifierProvider",
+        "to": "metica/metica.service.ts:MeticaService",
+        "type": "IndirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "shouldSuppressMetica",
+        "component": {
+          "name": "MeticaService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/metica/metica.service.ts",
+            "line": 48
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationIdentifierProvider",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts",
+            "line": 30
+          }
+        },
+        "method": "getMultiplePlayerIdentifiers",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts",
+        "line": 220
+      },
+      "callChain": [
+        "ConfigurationService.getConfigurationIdentifiersMultipleApproach",
+        "ConfigurationIdentifierProvider.getMultiplePlayerIdentifiers"
+      ],
+      "summary": {
+        "from": "configurationProviders/configurationIdentifierProvider.ts:ConfigurationIdentifierProvider",
+        "to": "metica/metica.service.ts:MeticaService",
+        "type": "IndirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "getMultiplePlayersLastKnownIdentifiers",
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationIdentifierProvider",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts",
+            "line": 30
+          }
+        },
+        "method": "getMultipleCachedPlayerIdentifiers",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts",
+        "line": 49
+      },
+      "callChain": [
+        "ConfigurationService.getCachedPlayerIdentifiersMultipleApproach",
+        "ConfigurationIdentifierProvider.getMultipleCachedPlayerIdentifiers"
+      ],
+      "summary": {
+        "from": "configurationProviders/configurationIdentifierProvider.ts:ConfigurationIdentifierProvider",
+        "to": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "type": "IndirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "getIdentifierConfigurations",
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+            "line": 80
+          }
+        },
+        "method": "getNonDynamicConfigurationData",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+        "line": 770
+      },
+      "callChain": [
+        "ConfigurationService.getNonDynamicConfigurationData"
+      ],
+      "summary": {
+        "from": "configuration/configuration.service.ts:ConfigurationService",
+        "to": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "resolveIdentifierAliases",
+        "component": {
+          "name": "MeticaService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/metica/metica.service.ts",
+            "line": 48
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        },
+        "method": "getIdentifierConfigurations",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+        "line": 180
+      },
+      "callChain": [
+        "ConfigurationService.getNonDynamicConfigurationData",
+        "PlayerDataSupplier.getIdentifierConfigurations"
+      ],
+      "summary": {
+        "from": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "to": "metica/metica.service.ts:MeticaService",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "updateConfigurationsIfApplicable",
+        "component": {
+          "name": "MeticaService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/metica/metica.service.ts",
+            "line": 48
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        },
+        "method": "getIdentifierConfigurations",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+        "line": 188
+      },
+      "callChain": [
+        "ConfigurationService.getNonDynamicConfigurationData",
+        "PlayerDataSupplier.getIdentifierConfigurations"
+      ],
+      "summary": {
+        "from": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "to": "metica/metica.service.ts:MeticaService",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "getIdentifierConfigurations",
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+            "line": 80
+          }
+        },
+        "method": "getNonDynamicConfigurationDataAndSetSticky",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+        "line": 792
+      },
+      "callChain": [
+        "ConfigurationService.getNonDynamicConfigurationDataAndSetSticky"
+      ],
+      "summary": {
+        "from": "configuration/configuration.service.ts:ConfigurationService",
+        "to": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "resolveIdentifierAliases",
+        "component": {
+          "name": "MeticaService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/metica/metica.service.ts",
+            "line": 48
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        },
+        "method": "getIdentifierConfigurations",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+        "line": 180
+      },
+      "callChain": [
+        "ConfigurationService.getNonDynamicConfigurationDataAndSetSticky",
+        "PlayerDataSupplier.getIdentifierConfigurations"
+      ],
+      "summary": {
+        "from": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "to": "metica/metica.service.ts:MeticaService",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "updateConfigurationsIfApplicable",
+        "component": {
+          "name": "MeticaService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/metica/metica.service.ts",
+            "line": 48
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        },
+        "method": "getIdentifierConfigurations",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+        "line": 188
+      },
+      "callChain": [
+        "ConfigurationService.getNonDynamicConfigurationDataAndSetSticky",
+        "PlayerDataSupplier.getIdentifierConfigurations"
+      ],
+      "summary": {
+        "from": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "to": "metica/metica.service.ts:MeticaService",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "getUuidConfigurations",
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+            "line": 80
+          }
+        },
+        "method": "getNonDynamicConfigurationDataByUuid",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+        "line": 809
+      },
+      "callChain": [
+        "ConfigurationService.getNonDynamicConfigurationDataByUuid"
+      ],
+      "summary": {
+        "from": "configuration/configuration.service.ts:ConfigurationService",
+        "to": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "shouldFilterNotifications",
+        "component": {
+          "name": "MeticaService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/metica/metica.service.ts",
+            "line": 48
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+            "line": 80
+          }
+        },
+        "method": "synchronizeAndNotifyPlayers",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+        "line": 1042
+      },
+      "callChain": [
+        "ConfigurationService.synchronizeAndNotifyPlayers"
+      ],
+      "summary": {
+        "from": "configuration/configuration.service.ts:ConfigurationService",
+        "to": "metica/metica.service.ts:MeticaService",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "filterNotifications",
+        "component": {
+          "name": "MeticaService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/metica/metica.service.ts",
+            "line": 48
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+            "line": 80
+          }
+        },
+        "method": "synchronizeAndNotifyPlayers",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+        "line": 1046
+      },
+      "callChain": [
+        "ConfigurationService.synchronizeAndNotifyPlayers"
+      ],
+      "summary": {
+        "from": "configuration/configuration.service.ts:ConfigurationService",
+        "to": "metica/metica.service.ts:MeticaService",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "getConfigurationsIdentifiersMap",
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+            "line": 80
+          }
+        },
+        "method": "calculateAndCacheDynamicEconomyConfiguration",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+        "line": 1281
+      },
+      "callChain": [
+        "ConfigurationService.calculateAndCacheDynamicEconomyConfiguration"
+      ],
+      "summary": {
+        "from": "configuration/configuration.service.ts:ConfigurationService",
+        "to": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "getPlayersSegments",
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+            "line": 80
+          }
+        },
+        "method": "getPlayersSegments",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+        "line": 1366
+      },
+      "callChain": [
+        "ConfigurationService.getPlayersSegments"
+      ],
+      "summary": {
+        "from": "configuration/configuration.service.ts:ConfigurationService",
+        "to": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "getPlayersPlatforms",
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+            "line": 80
+          }
+        },
+        "method": "getPlayersPlatforms",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+        "line": 1371
+      },
+      "callChain": [
+        "ConfigurationService.getPlayersPlatforms"
+      ],
+      "summary": {
+        "from": "configuration/configuration.service.ts:ConfigurationService",
+        "to": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "getPlayersGameVersionData",
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+            "line": 80
+          }
+        },
+        "method": "getPlayersGameVersionData",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+        "line": 1376
+      },
+      "callChain": [
+        "ConfigurationService.getPlayersGameVersionData"
+      ],
+      "summary": {
+        "from": "configuration/configuration.service.ts:ConfigurationService",
+        "to": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "getPlayersDynamicParams",
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+            "line": 80
+          }
+        },
+        "method": "getPlayersDynamicParams",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+        "line": 1380
+      },
+      "callChain": [
+        "ConfigurationService.getPlayersDynamicParams"
+      ],
+      "summary": {
+        "from": "configuration/configuration.service.ts:ConfigurationService",
+        "to": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "getPlayersStickyConfigurationSummary",
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+            "line": 80
+          }
+        },
+        "method": "getPlayersStickyConfigurationSummary",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+        "line": 1389
+      },
+      "callChain": [
+        "ConfigurationService.getPlayersStickyConfigurationSummary"
+      ],
+      "summary": {
+        "from": "configuration/configuration.service.ts:ConfigurationService",
+        "to": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "getStickySummaryForPlayers",
+        "component": {
+          "name": "StickyService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/stickyConfiguration/sticky.service.ts",
+            "line": 46
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        },
+        "method": "getPlayersStickyConfigurationSummary",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+        "line": 270
+      },
+      "callChain": [
+        "ConfigurationService.getPlayersStickyConfigurationSummary",
+        "PlayerDataSupplier.getPlayersStickyConfigurationSummary"
+      ],
+      "summary": {
+        "from": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "to": "stickyConfiguration/sticky.service.ts:StickyService",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "getMultiplePlayersLastKnownIdentifiers",
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+            "line": 80
+          }
+        },
+        "method": "getMultiplePlayersLastKnownIdentifiers",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+        "line": 1424
+      },
+      "callChain": [
+        "ConfigurationService.getMultiplePlayersLastKnownIdentifiers"
+      ],
+      "summary": {
+        "from": "configuration/configuration.service.ts:ConfigurationService",
+        "to": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "getMultipleGameToFeatureVersionMaps",
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+            "line": 80
+          }
+        },
+        "method": "getMultipleGameToFeatureVersionMaps",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+        "line": 1486
+      },
+      "callChain": [
+        "ConfigurationService.getMultipleGameToFeatureVersionMaps"
+      ],
+      "summary": {
+        "from": "configuration/configuration.service.ts:ConfigurationService",
+        "to": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "getMultiplePlayersLastKnownIdentifiers",
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationIdentifierProvider",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts",
+            "line": 30
+          }
+        },
+        "method": "getMultipleCachedPlayerIdentifiers",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts",
+        "line": 49
+      },
+      "callChain": [
+        "ConfigurationIdentifierProvider.getMultipleCachedPlayerIdentifiers"
+      ],
+      "summary": {
+        "from": "configurationProviders/configurationIdentifierProvider.ts:ConfigurationIdentifierProvider",
+        "to": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "type": "IndirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "setIdentifierAliasIfApplicable",
+        "component": {
+          "name": "MeticaService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/metica/metica.service.ts",
+            "line": 48
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationIdentifierProvider",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts",
+            "line": 30
+          }
+        },
+        "method": "getMultiplePlayerIdentifiers",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts",
+        "line": 196
+      },
+      "callChain": [
+        "ConfigurationIdentifierProvider.getMultiplePlayerIdentifiers"
+      ],
+      "summary": {
+        "from": "configurationProviders/configurationIdentifierProvider.ts:ConfigurationIdentifierProvider",
+        "to": "metica/metica.service.ts:MeticaService",
+        "type": "IndirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "shouldSuppressMetica",
+        "component": {
+          "name": "MeticaService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/metica/metica.service.ts",
+            "line": 48
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationIdentifierProvider",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts",
+            "line": 30
+          }
+        },
+        "method": "getMultiplePlayerIdentifiers",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts",
+        "line": 220
+      },
+      "callChain": [
+        "ConfigurationIdentifierProvider.getMultiplePlayerIdentifiers"
+      ],
+      "summary": {
+        "from": "configurationProviders/configurationIdentifierProvider.ts:ConfigurationIdentifierProvider",
+        "to": "metica/metica.service.ts:MeticaService",
+        "type": "IndirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "shouldFilterNotifications",
+        "component": {
+          "name": "MeticaService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/metica/metica.service.ts",
+            "line": 48
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+            "line": 80
+          }
+        },
+        "method": "synchronizeAndNotifyPlayers",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+        "line": 1042
+      },
+      "callChain": [
+        "SynchronizeAndNotifyConsumerService.handleBatch",
+        "ConfigurationService.synchronizeAndNotifyPlayers"
+      ],
+      "summary": {
+        "from": "configuration/configuration.service.ts:ConfigurationService",
+        "to": "metica/metica.service.ts:MeticaService",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "filterNotifications",
+        "component": {
+          "name": "MeticaService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/metica/metica.service.ts",
+            "line": 48
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "ConfigurationService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+            "line": 80
+          }
+        },
+        "method": "synchronizeAndNotifyPlayers",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+        "line": 1046
+      },
+      "callChain": [
+        "SynchronizeAndNotifyConsumerService.handleBatch",
+        "ConfigurationService.synchronizeAndNotifyPlayers"
+      ],
+      "summary": {
+        "from": "configuration/configuration.service.ts:ConfigurationService",
+        "to": "metica/metica.service.ts:MeticaService",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "resolveIdentifierAliases",
+        "component": {
+          "name": "MeticaService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/metica/metica.service.ts",
+            "line": 48
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        },
+        "method": "getIdentifierConfigurations",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+        "line": 180
+      },
+      "callChain": [
+        "PlayerDataSupplier.getIdentifierConfigurations"
+      ],
+      "summary": {
+        "from": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "to": "metica/metica.service.ts:MeticaService",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "updateConfigurationsIfApplicable",
+        "component": {
+          "name": "MeticaService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/metica/metica.service.ts",
+            "line": 48
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        },
+        "method": "getIdentifierConfigurations",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+        "line": 188
+      },
+      "callChain": [
+        "PlayerDataSupplier.getIdentifierConfigurations"
+      ],
+      "summary": {
+        "from": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "to": "metica/metica.service.ts:MeticaService",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "getStickyPayload",
+        "component": {
+          "name": "StickyService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/stickyConfiguration/sticky.service.ts",
+            "line": 46
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        },
+        "method": "getStickyConfiguration",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+        "line": 251
+      },
+      "callChain": [
+        "PlayerDataSupplier.getStickyConfiguration"
+      ],
+      "summary": {
+        "from": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "to": "stickyConfiguration/sticky.service.ts:StickyService",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "getStickyIdentifiers",
+        "component": {
+          "name": "StickyService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/stickyConfiguration/sticky.service.ts",
+            "line": 46
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        },
+        "method": "getStickyConfigurationIdentifiers",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+        "line": 260
+      },
+      "callChain": [
+        "PlayerDataSupplier.getStickyConfigurationIdentifiers"
+      ],
+      "summary": {
+        "from": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "to": "stickyConfiguration/sticky.service.ts:StickyService",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "getStickySummaryForPlayers",
+        "component": {
+          "name": "StickyService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/stickyConfiguration/sticky.service.ts",
+            "line": 46
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        },
+        "method": "getPlayersStickyConfigurationSummary",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+        "line": 270
+      },
+      "callChain": [
+        "PlayerDataSupplier.getPlayersStickyConfigurationSummary"
+      ],
+      "summary": {
+        "from": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "to": "stickyConfiguration/sticky.service.ts:StickyService",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "getStickyConfiguration",
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "StickyService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/stickyConfiguration/sticky.service.ts",
+            "line": 46
+          }
+        },
+        "method": "getStickedAndNotStickedPlayerData",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/stickyConfiguration/sticky.service.ts",
+        "line": 315
+      },
+      "callChain": [
+        "StickyService.getStickedAndNotStickedPlayerData"
+      ],
+      "summary": {
+        "from": "stickyConfiguration/sticky.service.ts:StickyService",
+        "to": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "type": "IndirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "getStickyPayload",
+        "component": {
+          "name": "StickyService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/stickyConfiguration/sticky.service.ts",
+            "line": 46
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        },
+        "method": "getStickyConfiguration",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+        "line": 251
+      },
+      "callChain": [
+        "StickyService.getStickedAndNotStickedPlayerData",
+        "PlayerDataSupplier.getStickyConfiguration"
+      ],
+      "summary": {
+        "from": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "to": "stickyConfiguration/sticky.service.ts:StickyService",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "getStickyConfigurationIdentifiers",
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "StickyService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/stickyConfiguration/sticky.service.ts",
+            "line": 46
+          }
+        },
+        "method": "getStickedAndNotStickedPlayerData",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/stickyConfiguration/sticky.service.ts",
+        "line": 327
+      },
+      "callChain": [
+        "StickyService.getStickedAndNotStickedPlayerData"
+      ],
+      "summary": {
+        "from": "stickyConfiguration/sticky.service.ts:StickyService",
+        "to": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "type": "IndirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "getStickyIdentifiers",
+        "component": {
+          "name": "StickyService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/stickyConfiguration/sticky.service.ts",
+            "line": 46
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "PlayerDataSupplier",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+            "line": 33
+          }
+        },
+        "method": "getStickyConfigurationIdentifiers",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+        "line": 260
+      },
+      "callChain": [
+        "StickyService.getStickedAndNotStickedPlayerData",
+        "PlayerDataSupplier.getStickyConfigurationIdentifiers"
+      ],
+      "summary": {
+        "from": "player/playerDataSupplier.ts:PlayerDataSupplier",
+        "to": "stickyConfiguration/sticky.service.ts:StickyService",
+        "type": "DirectRelationship"
+      }
+    },
+    {
+      "method": {
+        "name": "evaluate",
+        "component": {
+          "name": "PayloadEvaluator",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/payload/payload-evaluator.ts",
+            "line": 46
+          }
+        }
+      },
+      "calledFrom": {
+        "component": {
+          "name": "StickyService",
+          "location": {
+            "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/stickyConfiguration/sticky.service.ts",
+            "line": 46
+          }
+        },
+        "method": "evaluateConfigurationByIdentifier",
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/stickyConfiguration/sticky.service.ts",
+        "line": 622
+      },
+      "callChain": [
+        "StickyService.evaluateConfigurationByIdentifier"
+      ],
+      "summary": {
+        "from": "stickyConfiguration/sticky.service.ts:StickyService",
+        "to": "payload/payload-evaluator.ts:PayloadEvaluator",
+        "type": "DirectRelationship"
+      }
+    }
+  ],
+  "invalidRelationships": [
+    {
+      "relationship": {
+        "metadata": {
+          "target": "ConfigurationIdentifierProvider",
+          "description": "gets player identifier mappings from",
+          "technology": "internal",
+          "tags": []
+        },
+        "sourceComponent": "ConfigurationService",
+        "location": {
+          "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+          "className": "ConfigurationService",
+          "line": 80
+        }
+      },
+      "targetExists": true,
+      "isUsed": false,
+      "errors": []
+    },
+    {
+      "relationship": {
+        "metadata": {
+          "target": "AuditPlayerIdentifierMappingHelper",
+          "description": "creates audit using",
+          "tags": []
+        },
+        "sourceComponent": "ConfigurationService",
+        "location": {
+          "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+          "className": "ConfigurationService",
+          "line": 80
+        }
+      },
+      "targetExists": true,
+      "isUsed": false,
+      "errors": []
+    },
+    {
+      "relationship": {
+        "metadata": {
+          "target": "AuditPlayerIdentifierMappingHelper",
+          "description": "creates audit using",
+          "tags": []
+        },
+        "sourceComponent": "ConfigurationIdentifierProvider",
+        "location": {
+          "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts",
+          "className": "ConfigurationIdentifierProvider",
+          "methodName": "getMultiplePlayerIdentifiers",
+          "line": 94
+        }
+      },
+      "targetExists": true,
+      "isUsed": false,
+      "errors": []
+    },
+    {
+      "relationship": {
+        "metadata": {
+          "target": "ConfigurationService",
+          "description": "filters notification in",
+          "tags": []
+        },
+        "sourceComponent": "MeticaService",
+        "location": {
+          "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/metica/metica.service.ts",
+          "className": "MeticaService",
+          "line": 48
+        }
+      },
+      "targetExists": true,
+      "isUsed": false,
+      "errors": []
+    },
+    {
+      "relationship": {
+        "metadata": {
+          "target": "ConfigurationIdentifierProvider",
+          "description": "modifies output in",
+          "tags": []
+        },
+        "sourceComponent": "MeticaService",
+        "location": {
+          "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/metica/metica.service.ts",
+          "className": "MeticaService",
+          "line": 48
+        }
+      },
+      "targetExists": true,
+      "isUsed": false,
+      "errors": []
+    },
+    {
+      "relationship": {
+        "metadata": {
+          "target": "PlayerDataSupplier",
+          "description": "modifies output in",
+          "tags": []
+        },
+        "sourceComponent": "MeticaService",
+        "location": {
+          "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/metica/metica.service.ts",
+          "className": "MeticaService",
+          "line": 48
+        }
+      },
+      "targetExists": true,
+      "isUsed": false,
+      "errors": []
+    },
+    {
+      "relationship": {
+        "metadata": {
+          "target": "externalPlayerIdentifierMappingTopic",
+          "description": "produces messages to",
+          "technology": "Kafka",
+          "tags": []
+        },
+        "sourceComponent": "KafkaClient",
+        "location": {
+          "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/playerIdentifierMapping/kafka/kafka.client.ts",
+          "className": "KafkaClient",
+          "line": 17
+        }
+      },
+      "targetExists": true,
+      "isUsed": false,
+      "errors": []
+    },
+    {
+      "relationship": {
+        "sourceComponent": "ConfigurationService",
+        "metadata": {
+          "target": "MeticaService",
+          "description": "Undeclared relationship",
+          "tags": [
+            "UndeclaredRelationship"
+          ]
+        },
+        "location": {
+          "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+          "className": "ConfigurationService",
+          "line": 86
+        }
+      },
+      "targetExists": true,
+      "isUsed": true,
+      "usageLocation": {
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts",
+        "line": 86
+      },
+      "errors": [
+        "Undeclared relationship from \"ConfigurationService\" to \"MeticaService\" found at /Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configuration/configuration.service.ts:86"
+      ]
+    },
+    {
+      "relationship": {
+        "sourceComponent": "ConfigurationIdentifierProvider",
+        "metadata": {
+          "target": "PlayerDataSupplier",
+          "description": "Undeclared relationship",
+          "tags": [
+            "UndeclaredRelationship"
+          ]
+        },
+        "location": {
+          "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts",
+          "className": "ConfigurationIdentifierProvider",
+          "line": 108
+        }
+      },
+      "targetExists": true,
+      "isUsed": true,
+      "usageLocation": {
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts",
+        "line": 108,
+        "methodName": "getMultiplePlayerIdentifiers"
+      },
+      "errors": [
+        "Undeclared relationship from \"ConfigurationIdentifierProvider\" to \"PlayerDataSupplier\" found at /Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts:108"
+      ]
+    },
+    {
+      "relationship": {
+        "sourceComponent": "ConfigurationIdentifierProvider",
+        "metadata": {
+          "target": "StickyService",
+          "description": "Undeclared relationship",
+          "tags": [
+            "UndeclaredRelationship"
+          ]
+        },
+        "location": {
+          "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts",
+          "className": "ConfigurationIdentifierProvider",
+          "line": 110
+        }
+      },
+      "targetExists": true,
+      "isUsed": true,
+      "usageLocation": {
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts",
+        "line": 110,
+        "methodName": "getMultiplePlayerIdentifiers"
+      },
+      "errors": [
+        "Undeclared relationship from \"ConfigurationIdentifierProvider\" to \"StickyService\" found at /Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/configurationProviders/configurationIdentifierProvider.ts:110"
+      ]
+    },
+    {
+      "relationship": {
+        "sourceComponent": "PlayerDataSupplier",
+        "metadata": {
+          "target": "MeticaService",
+          "description": "Undeclared relationship",
+          "tags": [
+            "UndeclaredRelationship"
+          ]
+        },
+        "location": {
+          "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+          "className": "PlayerDataSupplier",
+          "line": 42
+        }
+      },
+      "targetExists": true,
+      "isUsed": true,
+      "usageLocation": {
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+        "line": 42
+      },
+      "errors": [
+        "Undeclared relationship from \"PlayerDataSupplier\" to \"MeticaService\" found at /Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts:42"
+      ]
+    },
+    {
+      "relationship": {
+        "sourceComponent": "PlayerDataSupplier",
+        "metadata": {
+          "target": "StickyService",
+          "description": "Undeclared relationship",
+          "tags": [
+            "UndeclaredRelationship"
+          ]
+        },
+        "location": {
+          "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+          "className": "PlayerDataSupplier",
+          "line": 38
+        }
+      },
+      "targetExists": true,
+      "isUsed": true,
+      "usageLocation": {
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts",
+        "line": 38
+      },
+      "errors": [
+        "Undeclared relationship from \"PlayerDataSupplier\" to \"StickyService\" found at /Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/player/playerDataSupplier.ts:38"
+      ]
+    },
+    {
+      "relationship": {
+        "sourceComponent": "StickyService",
+        "metadata": {
+          "target": "PayloadEvaluator",
+          "description": "Undeclared relationship",
+          "tags": [
+            "UndeclaredRelationship"
+          ]
+        },
+        "location": {
+          "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/stickyConfiguration/sticky.service.ts",
+          "className": "StickyService",
+          "line": 53
+        }
+      },
+      "targetExists": true,
+      "isUsed": true,
+      "usageLocation": {
+        "filePath": "/Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/stickyConfiguration/sticky.service.ts",
+        "line": 53
+      },
+      "errors": [
+        "Undeclared relationship from \"StickyService\" to \"PayloadEvaluator\" found at /Users/dpr/Work/expermients/rr-c4-living-doc/servers/rhino-configuration-service/stickyConfiguration/sticky.service.ts:53"
+      ]
+    }
+  ]
+}

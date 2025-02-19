@@ -21,6 +21,15 @@ export interface MethodUsage {
     };
     /** Chain of method calls that led to this usage */
     callChain: string[];
+    /** Summary of the undeclared relationship */
+    summary: {
+        /** Source component in format "path/to/file:ClassName" */
+        from: string;
+        /** Target component in format "path/to/file:ClassName" */
+        to: string;
+        /** Type of relationship (DirectRelationship or IndirectRelationship) */
+        type: string;
+    };
 }
 
 /**
@@ -30,13 +39,24 @@ export class RelationshipFinder {
     private project: Project;
     private componentMethods: Map<string, { component: ComponentInfo; methods: MethodDeclaration[] }>;
     private methodUsages: MethodUsage[];
+    private configDir: string;
 
-    constructor(tsConfigPath?: string) {
+    constructor(tsConfigPath?: string, configDir?: string) {
         this.project = new Project({
             tsConfigFilePath: tsConfigPath
         });
         this.componentMethods = new Map();
         this.methodUsages = [];
+        this.configDir = configDir || process.cwd();
+    }
+
+    /**
+     * Get relative path from config directory
+     */
+    private getRelativePath(absolutePath: string): string {
+        return absolutePath.startsWith(this.configDir) 
+            ? absolutePath.slice(this.configDir.length + 1) 
+            : absolutePath;
     }
 
     /**
@@ -135,6 +155,44 @@ export class RelationshipFinder {
             if (targetInfo.methods.some(m => m === declaration)) {
                 // Found a call to another component's method
                 if (sourceComponent.metadata.name !== targetName) {
+                    // Determine if this is a direct or indirect relationship
+                    let isDirectRelationship = false;
+
+                    // Check if the target component is stored in a property
+                    const sourceClass = this.getComponentClass(sourceComponent);
+                    if (sourceClass) {
+                        const properties = sourceClass.getProperties();
+                        const hasPropertyOfType = properties.some(prop => {
+                            const propType = prop.getType();
+                            const propSymbol = propType.getSymbol();
+                            return propSymbol === containingClass.getSymbol();
+                        });
+
+                        // If we're accessing a property of the target type, it's a direct relationship
+                        if (hasPropertyOfType) {
+                            const body = sourceClass.getMethod(callChain[callChain.length - 1]?.split('.')[1])?.getBody();
+                            if (body) {
+                                const propertyAccesses = body.getDescendantsOfKind(SyntaxKind.PropertyAccessExpression);
+                                isDirectRelationship = propertyAccesses.some(access => {
+                                    let leftmost = access;
+                                    while (leftmost.getKind() === SyntaxKind.PropertyAccessExpression) {
+                                        leftmost = (leftmost as any).getExpression();
+                                    }
+                                    if (leftmost.getKind() === SyntaxKind.ThisKeyword) {
+                                        const propertyName = access.getName();
+                                        const property = sourceClass.getProperty(propertyName);
+                                        if (property) {
+                                            const type = property.getType();
+                                            const symbol = type.getSymbol();
+                                            return symbol === containingClass.getSymbol();
+                                        }
+                                    }
+                                    return false;
+                                });
+                            }
+                        }
+                    }
+
                     this.methodUsages.push({
                         method: {
                             name: declaration.getName(),
@@ -146,7 +204,12 @@ export class RelationshipFinder {
                             filePath: call.getSourceFile().getFilePath(),
                             line: call.getStartLineNumber()
                         },
-                        callChain
+                        callChain,
+                        summary: {
+                            from: `${this.getRelativePath(sourceComponent.location.filePath)}:${sourceComponent.location.className}`,
+                            to: `${this.getRelativePath(targetInfo.component.location.filePath)}:${targetInfo.component.location.className}`,
+                            type: isDirectRelationship ? C4RelationshipTags.DIRECT : C4RelationshipTags.INDIRECT
+                        }
                     });
 
                     // Analyze the called method for indirect usage

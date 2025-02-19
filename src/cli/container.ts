@@ -102,6 +102,7 @@ program
                     if (relation.callChain.length > 1) {
                         console.log(`Call chain: ${relation.callChain.join(' → ')}`);
                     }
+                    console.log(`Summary: ${relation.summary.from} → ${relation.summary.to} (${relation.summary.type})`);
                     console.log('');
                 }
             } else if (options.undeclared) {

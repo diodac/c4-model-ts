@@ -33,7 +33,8 @@ export function simplifyUndeclaredRelationships<T extends { undeclaredRelationsh
                 filePath: relationship.calledFrom.filePath,
                 line: relationship.calledFrom.line
             },
-            callChain: relationship.callChain
+            callChain: relationship.callChain,
+            summary: relationship.summary
         }))
     };
 } 
