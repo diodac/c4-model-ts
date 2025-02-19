@@ -1,0 +1,4 @@
+- wykrywanie circular dependencies między komponentami
+- opisy wielolinijkowe
+- niezadeklarowane relacje w dsl
+- nie widzi tagów na metodach typu `public whatever = () => {}`

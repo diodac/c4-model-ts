@@ -321,6 +321,7 @@ export class DslGenerator {
             parts.push('# Component relationships');
             for (const [containerName, relations] of componentRelationsByContainer) {
                 parts.push(...relations.map(formatRelation));
+                parts.push('');
             }
         }
 
