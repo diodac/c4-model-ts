@@ -7,11 +7,6 @@
         "team": "analytics",
         "criticality": "medium"
     },
-    "groups": {
-        "API": {},
-        "Domain": {},
-        "Infrastructure": {}
-    },
     "source": [
         "src/**/*.ts",
         "!**/*.spec.ts"

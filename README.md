@@ -10,7 +10,7 @@ This module automatically generates C4 model documentation from TypeScript code 
 - Supports core Structurizr DSL parameters for components and relationships
 - Validates relationships and detects undeclared dependencies
 - Supports direct and indirect relationship detection
-- Groups components logically with hierarchical group structures
+- Groups components using path-based notation (e.g., "Core/Auth/Security")
 - Configurable source file patterns with glob support
 - Command-line interface (CLI) with component and relationship validation
 - External component definitions support
@@ -21,34 +21,33 @@ The generator uses JSDoc-style block comments with custom C4 tags. Each tag supp
 
 ```typescript
 /**
- * @c4Component [name]
- * - description: Component description
- * - technology: Technology stack
- * - url: Documentation URL
+ * @c4Component
+ * - description: Authentication service component
+ * - technology: TypeScript
+ * - url: https://docs/auth-service
  * - properties:
  *   criticality: high
- *   maintainer: team-name
- * - tags: tag1, tag2
+ *   maintainer: team-auth
+ * - tags: core, auth
  * 
- * @c4Group GroupName
+ * @c4Group Core System/Authentication/Security Services
  */
-export class ExampleService {
+export class AuthService {
     /**
-     * @c4Relationship target | description | technology
-     * - technology: Technology used (overrides the argument if specified)
-     * - url: Documentation URL
+     * @c4Relationship DatabaseService | Stores user credentials | PostgreSQL
+     * - url: https://docs/db-integration
      * - properties:
-     *   key1: value1
-     *   key2: value2
-     * - tags: DirectRelation, tag2
+     *   criticality: high
+     *   sla: 99.9%
+     * - tags: DirectRelation, persistence
      */
     constructor(private db: DatabaseService) {}
 
     /**
-     * @c4Relationship NotificationService | Sends notifications | SMTP
+     * @c4Relationship EmailService | Sends password reset emails | SMTP
      * - tags: IndirectRelation
      */
-    async notifyUser(userId: string): Promise<void> {
+    async resetPassword(userId: string): Promise<void> {
         // Implementation
     }
 }
@@ -59,13 +58,40 @@ export class ExampleService {
 Each C4 tag supports the following format:
 - `@c4Component [name]` - Defines a component with optional inline name
 - `@c4Relationship target | description | technology` - Defines a relationship with target, description, and technology
-- `@c4Group name` - Assigns component to a group
+- `@c4Group path/to/group` - Assigns component to a group using path notation (e.g., "Core/Auth/Security")
 
 Properties are defined using a simple structured format:
 - Each property starts with `-` followed by a property name and value separated by `:`
 - Nested properties are indented under their parent property
 - Multiple values can be separated by commas
 - Properties are optional and can be omitted if not needed
+
+## Group System
+
+Components can be organized into logical groups using a path-based notation:
+
+```typescript
+/**
+ * @c4Group Core System/Authentication
+ */
+class AuthService { }
+
+/**
+ * @c4Group Core System/Authentication/Session Management
+ */
+class SessionManager { }
+
+/**
+ * @c4Group Technical Infrastructure/Data Storage
+ */
+class DatabaseService { }
+```
+
+Group paths:
+- Use forward slashes (/) to indicate hierarchy
+- Can contain spaces and hyphens
+- Are used to generate nested groups in the C4 diagram
+- Can be organized independently of the physical file structure
 
 ## Technical Details
 
@@ -209,17 +235,7 @@ Create a `c4container.json` file in your project root to define a container:
                 "sla": "99.9%"
             }
         }
-    ],
-    "groups": {
-        "Core": {
-            "CustomerManagement": {},
-            "OrderProcessing": {}
-        },
-        "Infrastructure": {
-            "Database": {},
-            "Messaging": {}
-        }
-    }
+    ]
 }
 ```
 
@@ -348,9 +364,9 @@ In the example above:
 
 Relationships can be explicitly tagged with `DirectRelationship` or `IndirectRelationship` tags. The generator validates these tags against actual usage patterns in the code.
 
-#### @c4Group name
+#### @c4Group path/to/group
 
-Assigns a component to a logical group. The group name must match one of the groups defined in `c4container.json`.
+Assigns a component to a logical group using path notation. The group path must match one of the paths defined in `c4container.json`.
 
 Example:
 ```typescript
@@ -358,7 +374,7 @@ Example:
  * @c4Component
  * - description: Manages customer data
  * - technology: Node.js
- * @c4Group CustomerManagement
+ * @c4Group Core System/Authentication
  */
 export class CustomerService {
     // Implementation
@@ -384,8 +400,8 @@ Groups and their hierarchy are defined in the container configuration:
 ```
 
 In this example:
-- `CustomerManagement` is a subgroup of `Core`
-- Components can be assigned to any group (`Core`, `CustomerManagement`, `Infrastructure`, etc.)
+- `Core System/Authentication` is a group
+- Components can be assigned to any group (`Core System/Authentication`, `Core System/Authentication/Session Management`, etc.)
 - Group hierarchy is used for visualization and organization
 
 ### Relationship Types

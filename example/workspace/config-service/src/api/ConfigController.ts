@@ -1,12 +1,11 @@
 import { ConfigService } from '../domain/ConfigService';
 
 /**
- * REST API for configuration management
+ * Configuration API Controller
+ * 
+ * Handles HTTP requests for configuration operations
  * @c4Component
- * - description: REST API for configuration management
- * - technology: TypeScript
- * - tags: API, Controller
- * @c4Group API
+ * @c4Group Application Layer/API
  */
 export class ConfigController {
     /**

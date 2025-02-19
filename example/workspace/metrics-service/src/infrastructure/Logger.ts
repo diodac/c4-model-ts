@@ -1,8 +1,7 @@
 /**
- * Logger component
+ * Logging service for the application
  * @c4Component
- * - technology: TypeScript
- * @c4Group Infrastructure
+ * @c4Group Technical Infrastructure/Logging
  */
 export class Logger {
     log(message: string): void {

@@ -1,10 +1,7 @@
 /**
- * Repository for storing configuration data
+ * Repository for configuration data
  * @c4Component
- * - description: Stores configuration data
- * - technology: TypeScript, Redis
- * - tags: Infrastructure, Database
- * @c4Group Infrastructure
+ * @c4Group Technical Infrastructure/Data Storage
  */
 export class ConfigRepository {
     // Implementation

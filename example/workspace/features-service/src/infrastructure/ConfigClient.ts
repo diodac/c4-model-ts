@@ -4,7 +4,7 @@
  * - description: Client for accessing configuration service
  * - technology: TypeScript, HTTP
  * - tags: Infrastructure
- * @c4Group Infrastructure
+ * @c4Group Technical Infrastructure/Integration
  * 
  * @c4Relationship config-service.ConfigService | Gets configuration | HTTP/REST
  * - technology: HTTP/REST

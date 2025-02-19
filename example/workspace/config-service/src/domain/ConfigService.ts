@@ -1,11 +1,11 @@
 import { ConfigRepository } from '../infrastructure/ConfigRepository';
 
 /**
- * Core service for configuration management
+ * Core configuration service
+ * 
+ * Handles configuration management and validation
  * @c4Component
- * - technology: TypeScript
- * - tags: Domain, Core
- * @c4Group Domain
+ * @c4Group Core/Domain/Configuration
  */
 export class ConfigService {
     /**

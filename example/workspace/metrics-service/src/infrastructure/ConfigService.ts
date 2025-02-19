@@ -1,8 +1,8 @@
 /**
  * Configuration service client
  * @c4Component
+ * @c4Group Technical Infrastructure/Configuration
  * - technology: TypeScript
- * @c4Group Infrastructure
  */
 export class ConfigService {
     async getConfig(): Promise<any> {

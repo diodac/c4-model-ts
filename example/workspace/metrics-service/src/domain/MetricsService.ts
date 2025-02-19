@@ -7,13 +7,12 @@ import { Logger } from '../infrastructure/Logger';
 import { ConfigService } from '../infrastructure/ConfigService';
 
 /**
- * Core service for metrics processing and analysis
+ * Core metrics service
+ * 
+ * Handles metrics processing and validation
+ * 
  * @c4Component
- * - description: Processes and analyzes metrics data
- * - technology: TypeScript
- * - tags: Domain
- * - url: https://github.com/example/metrics-service/docs
- * @c4Group Domain
+ * @c4Group Core/Domain/Metrics
  */
 export class MetricsService {
     /**

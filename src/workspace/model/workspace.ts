@@ -1,5 +1,5 @@
 import { ContainerData } from '../../container/model/container';
-import { AnalysisResult } from '../../container/container-analyzer';
+import { ComponentInfo } from '../../container/model/component';
 
 /**
  * Configuration for including external sources in workspace
@@ -17,18 +17,6 @@ export interface C4IncludeConfig {
 }
 
 /**
- * Configuration for a system's containers
- */
-export interface C4SystemContainersConfig {
-    /** 
-     * Glob patterns for finding container source files
-     * Can be a single pattern or array of patterns
-     * Patterns starting with ! are exclusions
-     */
-    source: string | string[];
-}
-
-/**
  * Configuration for a software system
  */
 export interface C4SystemConfig {
@@ -39,32 +27,57 @@ export interface C4SystemConfig {
     description?: string;
 
     /** Container configuration */
-    containers: C4SystemContainersConfig;
+    containers: {
+        /** 
+         * Glob patterns for finding container source files
+         * Can be a single pattern or array of patterns
+         * Patterns starting with ! are exclusions
+         */
+        source: string | string[];
+    };
 }
 
 /**
  * Workspace configuration from c4workspace.json
  */
 export interface C4WorkspaceConfig {
-    /** 
-     * Map of systems in the workspace
-     * Key is the system identifier
-     */
-    systems: {
-        [systemId: string]: C4SystemConfig;
-    };
-
-    /** 
-     * Directory for workspace files (templates, output)
-     * Relative to basePath or absolute
-     */
+    /** Workspace name */
+    name: string;
+    
+    /** Workspace description */
+    description?: string;
+    
+    /** Systems in the workspace */
+    systems: Record<string, C4SystemConfig>;
+    
+    /** Container configurations */
+    containers: {
+        /** Path to container configuration file */
+        path: string;
+    }[];
+    
+    /** External systems */
+    external?: Record<string, ExternalSystem>;
+    
+    /** Workspace properties */
+    properties?: Record<string, string>;
+    
+    /** Workspace tags */
+    tags?: string[];
+    
+    /** Workspace directory (relative to config file) */
     workspaceDir?: string;
-
-    /**
-     * Base path for resolving relative paths
-     * If not provided, defaults to the directory containing c4workspace.json
-     */
+    
+    /** Base path for resolving relative paths */
     basePath?: string;
+}
+
+/**
+ * Container analysis results
+ */
+export interface AnalysisResult {
+    /** Components found in container */
+    components: ComponentInfo[];
 }
 
 /**
@@ -116,7 +129,7 @@ export interface C4System {
 }
 
 /**
- * Represents the entire workspace model
+ * Workspace model after analysis
  */
 export interface C4WorkspaceModel {
     /** Systems in the workspace */
@@ -173,4 +186,18 @@ export class C4WorkspaceValidationError extends Error {
         super(message);
         this.name = 'C4WorkspaceValidationError';
     }
+}
+
+/**
+ * External system configuration
+ */
+export interface ExternalSystem {
+    /** System name */
+    name: string;
+    
+    /** System description */
+    description: string;
+    
+    /** System containers */
+    containers?: Record<string, ContainerData>;
 } 

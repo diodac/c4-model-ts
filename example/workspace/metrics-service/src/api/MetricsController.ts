@@ -5,7 +5,7 @@ import { MetricsService } from '../domain/MetricsService';
  * @c4Component
  * - technology: TypeScript
  * - tags: API, Controller
- * @c4Group API
+ * @c4Group Application Layer/API
  */
 export class MetricsController {
     /**

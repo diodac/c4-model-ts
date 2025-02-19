@@ -1,8 +1,8 @@
 /**
  * Processes metrics data
  * @c4Component
+ * @c4Group Core/Domain/Processing
  * - technology: TypeScript
- * @c4Group Domain
  */
 export class MetricsProcessor {
     async process(data: any): Promise<void> {

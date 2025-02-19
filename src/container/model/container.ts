@@ -1,11 +1,9 @@
 import { RelationshipMetadata } from './relationship';
 
 /**
- * Recursive group structure
+ * Group paths collection
  */
-export interface Groups {
-    [key: string]: Groups | Record<string, never>;
-}
+export type Groups = Set<string>;
 
 /**
  * External element configuration
@@ -48,9 +46,6 @@ export interface ContainerConfig {
     
     /** Container properties */
     properties?: Record<string, string>;
-
-    /** Component groups */
-    groups?: Groups;
     
     /** External components */
     external?: Record<string, ExternalElement>;

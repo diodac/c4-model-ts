@@ -7,7 +7,7 @@ import { ConfigClient } from '../infrastructure/ConfigClient';
  * - description: Manages feature flags and their states
  * - technology: TypeScript
  * - tags: Domain
- * @c4Group Domain
+ * @c4Group Core/Domain/Features
  */
 export class FeaturesService {
     private configClient: ConfigClient;

@@ -6,7 +6,7 @@ import { FeaturesService } from '../domain/FeaturesService';
  * - description: REST API for managing feature flags
  * - technology: TypeScript
  * - tags: API, Controller
- * @c4Group API
+ * @c4Group Application Layer/API
  */
 export class FeaturesController {
     /**

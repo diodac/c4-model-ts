@@ -1,8 +1,7 @@
 /**
  * Repository for metrics data
  * @c4Component
- * - technology: TypeScript
- * @c4Group Infrastructure
+ * @c4Group Technical Infrastructure/Data Storage
  */
 export class MetricsRepository {
     async save(data: any): Promise<void> {

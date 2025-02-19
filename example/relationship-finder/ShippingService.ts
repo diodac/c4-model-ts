@@ -4,8 +4,9 @@ import { NotificationService } from './NotificationService';
  * Service managing shipping and delivery operations
  * @c4Component
  * - description: Manages order shipping and delivery scheduling
- * - technology: TypeScript, Logistics API
+ * - technology: TypeScript
  * - tags: core, shipping
+ * @c4Group Business Features/Shipping
  * 
  * @c4Relationship NotificationService | Sends delivery notifications | Message Queue
  * - technology: Message Queue

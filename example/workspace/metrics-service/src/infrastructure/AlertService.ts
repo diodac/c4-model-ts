@@ -1,8 +1,7 @@
 /**
- * Service for sending alerts
+ * Handles system alerts and notifications
  * @c4Component
- * - technology: TypeScript
- * @c4Group Infrastructure
+ * @c4Group Technical Infrastructure/Alerting
  */
 export class AlertService {
     async notify(message: string): Promise<void> {

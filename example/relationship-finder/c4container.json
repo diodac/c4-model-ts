@@ -6,6 +6,5 @@
     "source": [
         "*.ts",
         "!node_modules/**"
-    ],
-    "groups": {}
+    ]
 } 

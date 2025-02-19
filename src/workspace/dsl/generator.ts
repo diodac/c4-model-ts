@@ -48,8 +48,8 @@ interface Container {
     analysis?: {
         /** Components in this container */
         components: Component[];
-        /** Component groups */
-        groups?: Groups;
+        /** Groups in this container */
+        groups?: Set<string>;
     };
 }
 
@@ -155,6 +155,32 @@ export class DslGenerator {
     }
 
     /**
+     * Build group hierarchy from path-based groups
+     */
+    private buildGroupHierarchy(components: Component[]): Map<string, Set<Component>> {
+        const groupMap = new Map<string, Set<Component>>();
+
+        for (const component of components) {
+            if (component.metadata.group) {
+                // Split the path into parts
+                const parts = component.metadata.group.split('/');
+                
+                // Add component to each level of the hierarchy
+                let currentPath = '';
+                for (const part of parts) {
+                    currentPath = currentPath ? `${currentPath}/${part}` : part;
+                    if (!groupMap.has(currentPath)) {
+                        groupMap.set(currentPath, new Set());
+                    }
+                    groupMap.get(currentPath)!.add(component);
+                }
+            }
+        }
+
+        return groupMap;
+    }
+
+    /**
      * Liquid filter for generating container DSL code
      * 
      * @param system - Workspace data containing containers
@@ -191,51 +217,6 @@ export class DslGenerator {
             return lines.join('\n');
         };
 
-        // Helper function to render components in a specific group
-        const renderComponentsInGroup = (group: string, components: any[], indent: number): string[] => {
-            const lines: string[] = [];
-            for (const component of components) {
-                if (component.metadata.group === group) {
-                    lines.push(renderComponent(component, indent));
-                }
-            }
-            return lines;
-        };
-
-        // Helper function to recursively render grouped components
-        const renderGroupedComponents = (groups: Record<string, any>, components: any[], indent: number): string[] => {
-            const lines: string[] = [];
-            for (const [group, subgroups] of Object.entries(groups)) {
-                // Get components in this group
-                const groupComponents = renderComponentsInGroup(group, components, indent + 4);
-                
-                // Get subgroup lines
-                const subgroupLines = Object.keys(subgroups).length > 0 
-                    ? renderGroupedComponents(subgroups, components, indent + 4)
-                    : [];
-
-                // Only render group if it has components or non-empty subgroups
-                if (groupComponents.length > 0 || subgroupLines.length > 0) {
-                    if (lines.length > 0) lines.push('');
-                    lines.push(`${' '.repeat(indent)}group "${group}" {`);
-                    
-                    // Add components
-                    if (groupComponents.length > 0) {
-                        lines.push(...groupComponents);
-                    }
-
-                    // Add subgroups
-                    if (subgroupLines.length > 0) {
-                        if (groupComponents.length > 0) lines.push('');
-                        lines.push(...subgroupLines);
-                    }
-
-                    lines.push(`${' '.repeat(indent)}}`);
-                }
-            }
-            return lines;
-        };
-
         // Generate DSL for each container
         for (const container of containers) {
             const dslContainer: Container = {
@@ -253,17 +234,48 @@ export class DslGenerator {
             ];
 
             if (dslContainer.analysis?.components) {
+                const components = dslContainer.analysis.components;
+                
                 // First render ungrouped components
-                const ungroupedComponents = dslContainer.analysis.components.filter(c => !c.metadata.group);
+                const ungroupedComponents = components.filter(c => !c.metadata.group);
                 if (ungroupedComponents.length > 0) {
                     lines.push('');
                     lines.push(...ungroupedComponents.map(component => renderComponent(component, 4)));
                 }
 
-                // Then render grouped components
-                if (dslContainer.analysis.groups && Object.keys(dslContainer.analysis.groups).length > 0) {
+                // Build group hierarchy from path-based groups
+                const groupHierarchy = this.buildGroupHierarchy(components);
+
+                // Sort groups by path to ensure proper nesting order
+                const sortedGroups = Array.from(groupHierarchy.keys()).sort();
+
+                // Track rendered groups to avoid duplicates
+                const renderedGroups = new Set<string>();
+
+                // Render grouped components
+                if (sortedGroups.length > 0) {
                     if (ungroupedComponents.length > 0) lines.push('');
-                    lines.push(...renderGroupedComponents(dslContainer.analysis.groups, dslContainer.analysis.components, 4));
+
+                    for (const groupPath of sortedGroups) {
+                        // Only render top-level groups (those without a parent that hasn't been rendered)
+                        const parentPath = groupPath.split('/').slice(0, -1).join('/');
+                        if (!parentPath || renderedGroups.has(parentPath)) {
+                            const groupName = groupPath.split('/').pop()!;
+                            const indent = (groupPath.split('/').length - 1) * 4 + 4;
+                            
+                            // Get components that belong directly to this group (not to subgroups)
+                            const directComponents = Array.from(groupHierarchy.get(groupPath)!)
+                                .filter(comp => comp.metadata.group === groupPath);
+
+                            if (directComponents.length > 0) {
+                                lines.push(`${' '.repeat(indent - 4)}group "${groupName}" {`);
+                                lines.push(...directComponents.map(component => renderComponent(component, indent)));
+                                lines.push(`${' '.repeat(indent - 4)}}`);
+                            }
+
+                            renderedGroups.add(groupPath);
+                        }
+                    }
                 }
             }
 
@@ -398,7 +410,7 @@ export class DslGenerator {
                     title: c4container.data.name,
                     technology: c4container.data.technology || '',
                     description: c4container.data.description || '',
-                    analysis: c4container.analysis && {
+                    analysis: {
                         components: c4container.analysis.components.map(component => ({
                             metadata: {
                                 name: component.metadata.name,
@@ -408,8 +420,7 @@ export class DslGenerator {
                                 url: component.metadata.url,
                                 tags: component.metadata.tags
                             }
-                        })),
-                        groups: c4container.analysis.groups
+                        }))
                     }
                 });
 

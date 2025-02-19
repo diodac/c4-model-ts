@@ -8,6 +8,7 @@ import { ShippingService } from './ShippingService';
  * - description: Manages order processing and payment
  * - technology: TypeScript
  * - tags: core, orders
+ * @c4Group Business Features/Order Processing
  * 
  * @c4Relationship PaymentService | Processes payments for orders | HTTP/REST
  * - technology: HTTP/REST

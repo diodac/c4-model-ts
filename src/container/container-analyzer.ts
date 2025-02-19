@@ -80,7 +80,10 @@ export class ContainerAnalyzer {
                     sourceComponent: component.metadata.name
                 }))
             })),
-            groups: this.containerConfig.groups || {}
+            groups: new Set(components
+                .filter(c => c.metadata.group)
+                .map(c => c.metadata.group!)
+            )
         };
 
         // Add undeclared relations if requested

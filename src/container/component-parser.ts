@@ -1,15 +1,15 @@
 import { ClassDeclaration, JSDoc } from 'ts-morph';
 import { ComponentInfo, ComponentMetadata } from './model/component';
 import { TagParser, TagSchema } from './tag-parser';
-import { ContainerConfig, Groups } from './model/container';
+import { ContainerConfig } from './model/container';
 
 /**
- * Error thrown when a group is not declared in container configuration
+ * Error thrown when group path is invalid
  */
-export class UndeclaredGroupError extends Error {
-    constructor(groupName: string) {
-        super(`Group "${groupName}" is not declared in container configuration`);
-        this.name = 'UndeclaredGroupError';
+export class InvalidGroupPathError extends Error {
+    constructor(path: string) {
+        super(`Invalid group path "${path}". Group path segments should only contain alphanumeric characters, spaces, and hyphens. Segments should be separated by forward slashes.`);
+        this.name = 'InvalidGroupPathError';
     }
 }
 
@@ -52,6 +52,7 @@ export class ComponentParser {
 
     /**
      * Schema for @c4Group tag
+     * Format: @c4Group path/to/group
      */
     private readonly groupSchema: TagSchema = {
         args: ['string'],
@@ -59,36 +60,21 @@ export class ComponentParser {
     };
 
     /**
-     * Validate if a group exists in the container configuration
+     * Validate group path format
+     * Allowed characters in segment: alphanumeric, spaces, hyphens
+     * Segments are separated by forward slashes
      */
-    private validateGroup(groupName: string): void {
-        if (!this.containerConfig?.groups) {
-            throw new UndeclaredGroupError(groupName);
+    private validateGroupPath(path: string): void {
+        // Split path into segments
+        const segments = path.split('/');
+        
+        // Each segment should contain only allowed characters
+        const validSegmentRegex = /^[a-zA-Z0-9\s-]+$/;
+        const invalidSegments = segments.filter(segment => !validSegmentRegex.test(segment));
+        
+        if (invalidSegments.length > 0) {
+            throw new InvalidGroupPathError(path);
         }
-
-        const isGroupDeclared = this.isGroupInHierarchy(groupName, this.containerConfig.groups);
-        if (!isGroupDeclared) {
-            throw new UndeclaredGroupError(groupName);
-        }
-    }
-
-    /**
-     * Recursively check if a group exists in the group hierarchy
-     */
-    private isGroupInHierarchy(groupName: string, groups: Groups): boolean {
-        // Check if group exists at current level
-        if (groupName in groups) {
-            return true;
-        }
-
-        // Recursively check subgroups
-        for (const subgroups of Object.values(groups)) {
-            if (this.isGroupInHierarchy(groupName, subgroups)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -117,13 +103,12 @@ export class ComponentParser {
         const className = classDecl.getName() || '';
         const componentName = parsed.args[0] || className;
         
-        // Parse group tag and remove quotes from group name
-        let groupName: string | undefined;
+        // Parse and validate group path
+        let groupPath: string | undefined;
         if (groupTag) {
-            groupName = this.tagParser.parse(groupTag, this.groupSchema).args[0];
-            // Validate group if container config is provided
-            if (groupName && this.containerConfig) {
-                this.validateGroup(groupName);
+            groupPath = this.tagParser.parse(groupTag, this.groupSchema).args[0];
+            if (groupPath) {
+                this.validateGroupPath(groupPath);
             }
         }
         
@@ -133,7 +118,7 @@ export class ComponentParser {
             description: parsed.params.description as string || commentText || '',
             technology: parsed.params.technology as string,
             tags: Array.isArray(parsed.params.tags) ? parsed.params.tags : [],
-            group: groupName,
+            group: groupPath,
             url: parsed.params.url as string
         };
 

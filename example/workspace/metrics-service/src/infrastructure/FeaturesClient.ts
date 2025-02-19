@@ -4,7 +4,7 @@
  * - description: Client for checking feature flags from features service
  * - technology: TypeScript, HTTP
  * - tags: Infrastructure
- * @c4Group Infrastructure
+ * @c4Group Technical Infrastructure/Integration
  * 
  * @c4Relationship features-service.FeaturesService | Checks feature flags | HTTP/REST
  * - technology: HTTP/REST

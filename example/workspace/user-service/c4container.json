@@ -1,0 +1,14 @@
+{
+    "name": "user-service",
+    "description": "User management and authentication service",
+    "technology": "TypeScript, Node.js",
+    "source": [
+        "src/**/*.ts",
+        "!src/**/*.test.ts"
+    ],
+    "tags": ["core", "user-management"],
+    "properties": {
+        "criticality": "high",
+        "team": "core"
+    }
+} 

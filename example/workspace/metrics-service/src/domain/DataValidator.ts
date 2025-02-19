@@ -1,8 +1,7 @@
 /**
  * Validates metrics data
  * @c4Component
- * - technology: TypeScript
- * @c4Group Domain
+ * @c4Group Core/Domain/Validation
  */
 export class DataValidator {
     validate(data: any): boolean {
