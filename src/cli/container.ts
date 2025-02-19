@@ -134,8 +134,13 @@ program
             if (result.invalidRelationships?.length) {
                 console.log('\nError: Found invalid relationships:');
                 console.log(''); // Add empty line for better readability
+                
+                // Track which unused relationships we've already reported
+                const reportedUnused = new Set<string>();
+                
                 for (const validationResult of result.invalidRelationships) {
                     const relationship = validationResult.relationship;
+                    const relationshipKey = `${relationship.sourceComponent}|${relationship.metadata.target}`;
 
                     // Invalid target is an error
                     if (!validationResult.targetExists) {
@@ -147,8 +152,9 @@ program
                         console.log(''); // Add empty line between errors
                     }
 
-                    // Unused relation is an error
-                    if (!validationResult.isUsed) {
+                    // Unused relation is an error - only report once per relationship
+                    if (!validationResult.isUsed && !reportedUnused.has(relationshipKey)) {
+                        reportedUnused.add(relationshipKey);
                         console.log(`  Error: Declared but unused relationship`);
                         console.log(`   From: ${relationship.sourceComponent}`);
                         console.log(`     To: ${relationship.metadata.target}`);
@@ -162,10 +168,11 @@ program
                         console.log('Details: This relationship is documented but not found in the code.');
                         console.log('         Either implement the relationship or remove its documentation.');
                         console.log(''); // Add empty line between errors
+                        continue; // Skip tag validation for unused relationships
                     }
 
-                    // Tag validation errors
-                    if (validationResult.errors?.length) {
+                    // Tag validation errors - only for used relationships
+                    if (validationResult.isUsed && validationResult.errors?.length) {
                         for (const error of validationResult.errors) {
                             console.log(`  Error: Tag validation error`);
                             console.log(`   From: ${relationship.sourceComponent}`);

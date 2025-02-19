@@ -139,55 +139,6 @@ export class ContainerAnalyzer {
     }
 
     /**
-     * Validate relationship declaration against actual usage
-     */
-    private validateRelationship(
-        declared: { sourceComponent: string; metadata: RelationshipMetadata },
-        usage: MethodUsage
-    ): ValidationResult {
-        const errors: string[] = [];
-        const declaredTags = new Set(declared.metadata.tags || []);
-
-        // Check if relationship is marked as both direct and indirect
-        if (declaredTags.has(C4RelationshipTags.DIRECT) && declaredTags.has(C4RelationshipTags.INDIRECT)) {
-            errors.push(
-                `Relationship from "${declared.sourceComponent}" to "${declared.metadata.target}" cannot be both direct and indirect`
-            );
-        }
-
-        // Add appropriate tag based on actual usage
-        const isDirect = usage.summary.type === C4RelationshipTags.DIRECT;
-        const tags = [...(declared.metadata.tags || [])];
-        if (isDirect && !declaredTags.has(C4RelationshipTags.DIRECT)) {
-            tags.push(C4RelationshipTags.DIRECT);
-        } else if (!isDirect && !declaredTags.has(C4RelationshipTags.INDIRECT)) {
-            tags.push(C4RelationshipTags.INDIRECT);
-        }
-
-        return {
-            relationship: {
-                sourceComponent: declared.sourceComponent,
-                metadata: {
-                    ...declared.metadata,
-                    tags
-                },
-                location: {
-                    filePath: usage.calledFrom.filePath,
-                    line: usage.calledFrom.line,
-                    className: usage.calledFrom.component.metadata.name
-                }
-            },
-            targetExists: true, // We know target exists because we found its usage
-            isUsed: true,      // We know it's used because we found its usage
-            usageLocation: {
-                filePath: usage.calledFrom.filePath,
-                line: usage.calledFrom.line
-            },
-            errors: errors.length > 0 ? errors : undefined
-        };
-    }
-
-    /**
      * Analyze the container and return results
      */
     analyze(options: {
@@ -230,12 +181,59 @@ export class ContainerAnalyzer {
             const key = `${usage.calledFrom.component.metadata.name}|${usage.method.component.metadata.name}`;
             
             if (declaredRelations.has(key)) {
-                // Relationship is declared - validate it
+                // Relationship is declared and used - validate tags
                 const declared = declaredRelations.get(key)![0]; // Take first declaration for now
-                const result = this.validateRelationship(declared, usage);
-                if (result.errors?.length) {
-                    validationResults.push(result);
+                const declaredTags = new Set(declared.metadata.tags || []);
+
+                // Check if relationship is marked as both direct and indirect
+                const errors: string[] = [];
+                const targetComponent = componentsByName.get(declared.metadata.target);
+                
+                // Only validate tags if target component exists
+                if (targetComponent && declaredTags.has(C4RelationshipTags.DIRECT) && declaredTags.has(C4RelationshipTags.INDIRECT)) {
+                    errors.push(
+                        `Relationship from "${declared.sourceComponent}" to "${declared.metadata.target}" cannot be both direct and indirect`
+                    );
                 }
+
+                // Add appropriate tag based on actual usage - only if target exists
+                const isDirect = usage.summary.type === C4RelationshipTags.DIRECT;
+                const tags = [...(declared.metadata.tags || [])];
+                if (targetComponent) {
+                    if (isDirect && !declaredTags.has(C4RelationshipTags.DIRECT)) {
+                        tags.push(C4RelationshipTags.DIRECT);
+                    } else if (!isDirect && !declaredTags.has(C4RelationshipTags.INDIRECT)) {
+                        tags.push(C4RelationshipTags.INDIRECT);
+                    }
+                }
+
+                // Only add validation result if there are tag-related errors
+                if (errors.length > 0) {
+                    validationResults.push({
+                        relationship: {
+                            sourceComponent: declared.sourceComponent,
+                            metadata: {
+                                ...declared.metadata,
+                                tags
+                            },
+                            location: {
+                                filePath: usage.calledFrom.filePath,
+                                line: usage.calledFrom.line,
+                                className: usage.calledFrom.component.metadata.name
+                            }
+                        },
+                        targetExists: true,
+                        isUsed: true,
+                        usageLocation: {
+                            filePath: usage.calledFrom.filePath,
+                            line: usage.calledFrom.line
+                        },
+                        errors
+                    });
+                }
+                
+                // Mark this relationship as processed
+                declaredRelations.delete(key);
             } else {
                 // Undeclared relationship
                 undeclaredRelationships.push(usage);
@@ -246,7 +244,7 @@ export class ContainerAnalyzer {
             }
         }
 
-        // Check for declared but unused relationships
+        // Any remaining declared relations are unused
         for (const [key, declarations] of declaredRelations) {
             const [source, target] = key.split('|');
             const targetComponent = componentsByName.get(target);
@@ -257,25 +255,20 @@ export class ContainerAnalyzer {
                 continue;
             }
 
-            // If relationship is declared but not found in actual usage
-            if (!allRelationships.some(usage => 
-                usage.calledFrom.component.metadata.name === source && 
-                usage.method.component.metadata.name === target
-            )) {
-                for (const declared of declarations) {
-                    validationResults.push({
-                        relationship: {
-                            sourceComponent: declared.sourceComponent,
-                            metadata: declared.metadata,
-                            location: componentsByName.get(source)!.location
-                        },
-                        targetExists: !!targetComponent,
-                        isUsed: false,
-                        errors: targetComponent 
-                            ? ['This relationship is documented but not found in the code.']
-                            : ['The target component does not exist in the codebase.']
-                    });
-                }
+            for (const declared of declarations) {
+                // For unused relationships, we only report that they are unused
+                validationResults.push({
+                    relationship: {
+                        sourceComponent: declared.sourceComponent,
+                        metadata: declared.metadata,
+                        location: componentsByName.get(source)!.location
+                    },
+                    targetExists: !!targetComponent,
+                    isUsed: false,
+                    errors: targetComponent 
+                        ? ['This relationship is documented but not found in the code.']
+                        : ['The target component does not exist in the codebase.']
+                });
             }
         }
 
