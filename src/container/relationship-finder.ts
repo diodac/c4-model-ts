@@ -1,4 +1,4 @@
-import { ClassDeclaration, Symbol, SyntaxKind, Project, Node, MethodDeclaration, CallExpression } from 'ts-morph';
+import { ClassDeclaration, Symbol, SyntaxKind, Project, Node, MethodDeclaration, CallExpression, ArrowFunction, FunctionExpression } from 'ts-morph';
 import { ComponentInfo } from './model/component';
 import { RelationshipInfo } from './model/relationship';
 import { C4RelationshipTags } from './model/constants';
@@ -37,7 +37,10 @@ export interface MethodUsage {
  */
 export class RelationshipFinder {
     private project: Project;
-    private componentMethods: Map<string, { component: ComponentInfo; methods: MethodDeclaration[] }>;
+    private componentMethods: Map<string, { 
+        component: ComponentInfo; 
+        methods: Array<MethodDeclaration | ArrowFunction | FunctionExpression>;
+    }>;
     private methodUsages: MethodUsage[];
     private configDir: string;
 
@@ -101,8 +104,27 @@ export class RelationshipFinder {
             const componentClass = this.getComponentClass(component);
             if (!componentClass) continue;
 
+            // Get regular methods
             const methods = componentClass.getMethods();
-            this.componentMethods.set(component.metadata.name, { component, methods });
+
+            // Get properties that are functions
+            const propertyMethods = componentClass.getProperties()
+                .filter(prop => {
+                    const type = prop.getType();
+                    return type.getCallSignatures().length > 0;
+                })
+                .map(prop => {
+                    const arrowFunc = prop.getFirstChildByKind(SyntaxKind.ArrowFunction);
+                    const funcExpr = prop.getFirstChildByKind(SyntaxKind.FunctionExpression);
+                    return arrowFunc || funcExpr;
+                })
+                .filter((node): node is ArrowFunction | FunctionExpression => node !== undefined);
+
+            // Combine both types of methods
+            this.componentMethods.set(component.metadata.name, { 
+                component, 
+                methods: [...methods, ...propertyMethods] 
+            });
         }
     }
 
@@ -115,14 +137,20 @@ export class RelationshipFinder {
     }
 
     private analyzeMethodCalls(
-        method: MethodDeclaration, 
+        method: MethodDeclaration | ArrowFunction | FunctionExpression, 
         sourceComponent: ComponentInfo,
         callChain: string[]
     ): void {
-        const body = method.getBody();
+        const body = method instanceof MethodDeclaration 
+            ? method.getBody()
+            : method.getBody();
         if (!body) return;
 
-        const currentChain = [...callChain, `${sourceComponent.metadata.name}.${method.getName()}`];
+        const methodName = method instanceof MethodDeclaration 
+            ? method.getName()
+            : method.getParentIfKind(SyntaxKind.PropertyDeclaration)?.getName() || 'anonymous';
+
+        const currentChain = [...callChain, `${sourceComponent.metadata.name}.${methodName}`];
         
         // Find all method calls in the method body
         const calls = body.getDescendantsOfKind(SyntaxKind.CallExpression);
