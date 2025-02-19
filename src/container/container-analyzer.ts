@@ -6,17 +6,27 @@ import { ComponentInfo } from './model/component';
 import { C4RelationshipTags } from './model/constants';
 
 /**
+ * Metadata for a relationship between components
+ */
+export interface RelationshipMetadata {
+    /** Target component name */
+    target: string;
+    /** Description of the relationship */
+    description: string;
+    /** Technology used in the relationship */
+    technology?: string;
+    /** Tags describing the relationship type and properties */
+    tags?: string[];
+}
+
+/**
  * Result of relationship validation
  */
 export interface ValidationResult {
     /** Relationship being validated */
     relationship: {
         sourceComponent: string;
-        metadata: {
-            target: string;
-            description: string;
-            tags?: string[];
-        };
+        metadata: RelationshipMetadata;
         location: {
             filePath: string;
             line: number;
@@ -132,7 +142,7 @@ export class ContainerAnalyzer {
      * Validate relationship declaration against actual usage
      */
     private validateRelationship(
-        declared: { sourceComponent: string; metadata: { target: string; description: string; tags?: string[] } },
+        declared: { sourceComponent: string; metadata: RelationshipMetadata },
         usage: MethodUsage
     ): ValidationResult {
         const errors: string[] = [];
@@ -145,22 +155,22 @@ export class ContainerAnalyzer {
             );
         }
 
-        // Check if the declared type matches actual usage
+        // Add appropriate tag based on actual usage
         const isDirect = usage.summary.type === C4RelationshipTags.DIRECT;
+        const tags = [...(declared.metadata.tags || [])];
         if (isDirect && !declaredTags.has(C4RelationshipTags.DIRECT)) {
-            errors.push(
-                `Relationship from "${declared.sourceComponent}" to "${declared.metadata.target}" has direct usage at ${usage.calledFrom.filePath}:${usage.calledFrom.line} but is not marked as @c4DirectRelationship`
-            );
+            tags.push(C4RelationshipTags.DIRECT);
         } else if (!isDirect && !declaredTags.has(C4RelationshipTags.INDIRECT)) {
-            errors.push(
-                `Relationship from "${declared.sourceComponent}" to "${declared.metadata.target}" has indirect usage at ${usage.calledFrom.filePath}:${usage.calledFrom.line} but is not marked as @c4IndirectRelationship`
-            );
+            tags.push(C4RelationshipTags.INDIRECT);
         }
 
         return {
             relationship: {
                 sourceComponent: declared.sourceComponent,
-                metadata: declared.metadata,
+                metadata: {
+                    ...declared.metadata,
+                    tags
+                },
                 location: {
                     filePath: usage.calledFrom.filePath,
                     line: usage.calledFrom.line,
@@ -194,7 +204,7 @@ export class ContainerAnalyzer {
         const componentsByName = new Map(components.map(c => [c.metadata.name, c]));
         const declaredRelations = new Map<string, Array<{ 
             sourceComponent: string; 
-            metadata: { target: string; description: string; tags?: string[] } 
+            metadata: RelationshipMetadata;
         }>>();
         
         // Collect all declared relationships
