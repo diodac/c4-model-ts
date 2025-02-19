@@ -19,6 +19,12 @@ export interface AnalysisResult {
     groups: Groups;
     undeclaredRelationships?: MethodUsage[];
     invalidRelationships?: ValidationResult[];
+    uniqueUndeclaredRelationships?: Array<{
+        from: string;
+        to: string;
+        type: string;
+        occurrences: number;
+    }>;
 }
 
 export interface ContainerAnalyzerConfig {
@@ -49,6 +55,49 @@ export class ContainerAnalyzer {
             );
             this.componentFinder.addSourceFiles(sourcePaths);
         }
+    }
+
+    /**
+     * Create a summary of unique undeclared relationships
+     */
+    private createUniqueRelationshipsSummary(relationships: MethodUsage[]): Array<{
+        from: string;
+        to: string;
+        type: string;
+        occurrences: number;
+    }> {
+        // Create a map to count occurrences of unique relationships
+        const relationshipMap = new Map<string, {
+            from: string;
+            to: string;
+            type: string;
+            occurrences: number;
+        }>();
+
+        // Count occurrences of each unique relationship
+        for (const rel of relationships) {
+            const key = `${rel.summary.from}|${rel.summary.to}|${rel.summary.type}`;
+            const existing = relationshipMap.get(key);
+            if (existing) {
+                existing.occurrences++;
+            } else {
+                relationshipMap.set(key, {
+                    from: rel.summary.from,
+                    to: rel.summary.to,
+                    type: rel.summary.type,
+                    occurrences: 1
+                });
+            }
+        }
+
+        // Convert map to array and sort by from, to, type
+        return Array.from(relationshipMap.values()).sort((a, b) => {
+            const fromCompare = a.from.localeCompare(b.from);
+            if (fromCompare !== 0) return fromCompare;
+            const toCompare = a.to.localeCompare(b.to);
+            if (toCompare !== 0) return toCompare;
+            return a.type.localeCompare(b.type);
+        });
     }
 
     /**
@@ -86,7 +135,9 @@ export class ContainerAnalyzer {
 
         // Add undeclared relations if requested
         if (options.includeUndeclared) {
-            result.undeclaredRelationships = this.relationshipFinder.findUndeclaredRelationships(components);
+            const undeclaredRelationships = this.relationshipFinder.findUndeclaredRelationships(components);
+            result.undeclaredRelationships = undeclaredRelationships;
+            result.uniqueUndeclaredRelationships = this.createUniqueRelationshipsSummary(undeclaredRelationships);
         }
 
         // Add invalid relations if requested
