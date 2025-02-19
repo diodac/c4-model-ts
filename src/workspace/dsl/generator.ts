@@ -20,6 +20,8 @@ interface ComponentMetadata {
     group?: string;
     /** Component URL */
     url?: string;
+    /** Component tags */
+    tags?: string[];
 }
 
 /**
@@ -175,6 +177,10 @@ export class DslGenerator {
             
             if (component.metadata.url) {
                 lines.push(`${indentation}    url "${component.metadata.url}"`);
+            }
+
+            if (component.metadata.tags && component.metadata.tags.length > 0) {
+                lines.push(`${indentation}    tags ${component.metadata.tags.map((tag: string) => `"${tag}"`).join(' ')}`);
             }
             
             lines.push(
@@ -399,7 +405,8 @@ export class DslGenerator {
                                 description: component.metadata.description || '',
                                 technology: component.metadata.technology,
                                 group: component.metadata.group,
-                                url: component.metadata.url
+                                url: component.metadata.url,
+                                tags: component.metadata.tags
                             }
                         })),
                         groups: c4container.analysis.groups

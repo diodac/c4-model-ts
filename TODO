@@ -2,3 +2,4 @@
 - opisy wielolinijkowe
 - niezadeklarowane relacje w dsl
 - nie widzi tagów na metodach typu `public whatever = () => {}`
+- grupy do zmiany "grupa1/grupa2" zamiast hierarchi w c4container.json
