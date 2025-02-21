@@ -334,4 +334,19 @@ All three arguments are required and should be separated by `|`:
 Additional properties (all optional):
 - `url` - Link to relationship documentation
 - `properties` - Custom key-value pairs
-- `
+- `tags` - List of tags for filtering and styling
+
+Example:
+```typescript
+/**
+ * @c4Relationship DatabaseService | Stores payment data | PostgreSQL
+ * - url: https://docs/payment-db-integration
+ * - properties:
+ *   criticality: high
+ *   sla: 99.9%
+ * - tags: DirectRelation, persistence
+ */
+async processPayment(paymentData: PaymentData): Promise<void> {
+    // Implementation
+}
+```
