@@ -3,7 +3,6 @@ import { WorkspaceAnalyzer } from '../analyzer';
 import { C4WorkspaceConfig, C4WorkspaceModel, C4Container } from '../model/workspace';
 import { resolve, dirname } from 'path';
 import { readFileSync, writeFileSync } from 'fs';
-import { Groups } from '../../container/model/container';
 import { C4RelationshipTags } from '../../container/model/constants';
 
 /**
@@ -469,6 +468,19 @@ export class DslGenerator {
                                 };
                             }));
                         }
+                    }
+                }
+
+                // Add undeclared relationships if enabled
+                if (this.includeUndeclared && c4container.analysis?.uniqueUndeclaredRelationships) {
+                    for (const undeclared of c4container.analysis.uniqueUndeclaredRelationships) {
+                        relationships.push({
+                            source: `${c4container.data.name}.${undeclared.from.split(':')[1]}`,
+                            target: `${c4container.data.name}.${undeclared.to.split(':')[1]}`,
+                            description: 'is using (undeclared)',
+                            technology: '',
+                            tags: ['Undeclared Relation']
+                        });
                     }
                 }
             }

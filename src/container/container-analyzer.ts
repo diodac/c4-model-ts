@@ -158,6 +158,9 @@ export class ContainerAnalyzer {
             metadata: RelationshipMetadata;
         }>>();
         
+        // Create a set to track all relationships (declared and undeclared)
+        const allRelationshipKeys = new Set<string>();
+        
         // Collect all declared relationships
         for (const component of components) {
             for (const rel of component.relationships) {
@@ -168,6 +171,8 @@ export class ContainerAnalyzer {
                     metadata: rel.metadata
                 });
                 declaredRelations.set(key, existing);
+                // Add to all relationships set
+                allRelationshipKeys.add(key);
             }
         }
 
@@ -234,13 +239,15 @@ export class ContainerAnalyzer {
                 
                 // Mark this relationship as processed
                 declaredRelations.delete(key);
-            } else {
-                // Undeclared relationship
+            } else if (!allRelationshipKeys.has(key)) {
+                // Only add as undeclared if there's no relationship at all between these components
                 undeclaredRelationships.push(usage);
                 uniqueUndeclaredMap.set(
                     `${usage.summary.from}|${usage.summary.to}|${usage.summary.type}`,
                     usage
                 );
+                // Add to all relationships set to prevent duplicates
+                allRelationshipKeys.add(key);
             }
         }
 

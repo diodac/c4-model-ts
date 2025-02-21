@@ -5,24 +5,72 @@
     "C4WorkspaceConfig": {
       "type": "object",
       "properties": {
+        "name": {
+          "type": "string",
+          "description": "Workspace name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Workspace description"
+        },
         "systems": {
           "type": "object",
           "additionalProperties": {
             "$ref": "#/definitions/C4SystemConfig"
           },
-          "description": "Map of systems in the workspace Key is the system identifier"
+          "description": "Systems in the workspace"
+        },
+        "containers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Path to container configuration file"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          },
+          "description": "Container configurations"
+        },
+        "external": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/ExternalSystem"
+          },
+          "description": "External systems"
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Workspace properties"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Workspace tags"
         },
         "workspaceDir": {
           "type": "string",
-          "description": "Directory for workspace files (templates, output) Relative to basePath or absolute"
+          "description": "Workspace directory (relative to config file)"
         },
         "basePath": {
           "type": "string",
-          "description": "Base path for resolving relative paths If not provided, defaults to the directory containing c4workspace.json"
+          "description": "Base path for resolving relative paths"
         }
       },
       "required": [
-        "systems"
+        "name",
+        "systems",
+        "containers"
       ],
       "additionalProperties": false,
       "description": "Workspace configuration from c4workspace.json"
@@ -39,7 +87,27 @@
           "description": "System description"
         },
         "containers": {
-          "$ref": "#/definitions/C4SystemContainersConfig",
+          "type": "object",
+          "properties": {
+            "source": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ],
+              "description": "Glob patterns for finding container source files Can be a single pattern or array of patterns Patterns starting with ! are exclusions"
+            }
+          },
+          "required": [
+            "source"
+          ],
+          "additionalProperties": false,
           "description": "Container configuration"
         }
       },
@@ -49,29 +117,155 @@
       "additionalProperties": false,
       "description": "Configuration for a software system"
     },
-    "C4SystemContainersConfig": {
+    "ExternalSystem": {
       "type": "object",
       "properties": {
-        "source": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          ],
-          "description": "Glob patterns for finding container source files Can be a single pattern or array of patterns Patterns starting with ! are exclusions"
+        "name": {
+          "type": "string",
+          "description": "System name"
+        },
+        "description": {
+          "type": "string",
+          "description": "System description"
+        },
+        "containers": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/ContainerData"
+          },
+          "description": "System containers"
         }
       },
       "required": [
-        "source"
+        "name",
+        "description"
       ],
       "additionalProperties": false,
-      "description": "Configuration for a system's containers"
+      "description": "External system configuration"
+    },
+    "ContainerData": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Container name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Container description"
+        },
+        "technology": {
+          "type": "string",
+          "description": "Container technology stack"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Container tags"
+        },
+        "sourcePath": {
+          "type": "string",
+          "description": "Source file path"
+        },
+        "external": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/ExternalElement"
+          },
+          "description": "External dependencies"
+        },
+        "relationships": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ContainerRelationship"
+          },
+          "description": "Container-level relationships"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "sourcePath"
+      ],
+      "additionalProperties": false,
+      "description": "Container data collected from source files"
+    },
+    "ExternalElement": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Element name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Element description"
+        },
+        "technology": {
+          "type": "string",
+          "description": "Technology stack"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Element tags"
+        },
+        "type": {
+          "type": "string",
+          "description": "Element type (container, system, etc.)"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "additionalProperties": false,
+      "description": "External element configuration"
+    },
+    "ContainerRelationship": {
+      "type": "object",
+      "properties": {
+        "target": {
+          "type": "string",
+          "description": "Target container or system name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Relationship description"
+        },
+        "technology": {
+          "type": "string",
+          "description": "Technology used for the relationship"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Relationship tags"
+        },
+        "url": {
+          "type": "string",
+          "description": "URL with documentation"
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Custom properties"
+        }
+      },
+      "required": [
+        "description",
+        "target"
+      ],
+      "additionalProperties": false,
+      "description": "Container-level relationship configuration"
     }
   }
 }

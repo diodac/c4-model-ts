@@ -38,10 +38,6 @@
           },
           "description": "Container properties"
         },
-        "groups": {
-          "$ref": "#/definitions/Groups",
-          "description": "Component groups"
-        },
         "external": {
           "type": "object",
           "additionalProperties": {
@@ -63,23 +59,6 @@
       ],
       "additionalProperties": false,
       "description": "Container configuration from c4container.json"
-    },
-    "Groups": {
-      "type": "object",
-      "additionalProperties": {
-        "anyOf": [
-          {
-            "$ref": "#/definitions/Groups"
-          },
-          {
-            "type": "object",
-            "additionalProperties": {
-              "not": {}
-            }
-          }
-        ]
-      },
-      "description": "Recursive group structure"
     },
     "ExternalElement": {
       "type": "object",

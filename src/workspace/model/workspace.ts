@@ -78,6 +78,13 @@ export interface C4WorkspaceConfig {
 export interface AnalysisResult {
     /** Components found in container */
     components: ComponentInfo[];
+    /** Undeclared relationships found in code analysis */
+    uniqueUndeclaredRelationships?: Array<{
+        from: string;
+        to: string;
+        type: string;
+        occurrences: number;
+    }>;
 }
 
 /**
