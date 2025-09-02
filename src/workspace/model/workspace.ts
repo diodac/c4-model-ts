@@ -50,12 +50,6 @@ export interface C4WorkspaceConfig {
     /** Systems in the workspace */
     systems: Record<string, C4SystemConfig>;
     
-    /** Container configurations */
-    containers: {
-        /** Path to container configuration file */
-        path: string;
-    }[];
-    
     /** External systems */
     external?: Record<string, ExternalSystem>;
     

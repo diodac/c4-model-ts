@@ -20,23 +20,6 @@
           },
           "description": "Systems in the workspace"
         },
-        "containers": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "path": {
-                "type": "string",
-                "description": "Path to container configuration file"
-              }
-            },
-            "required": [
-              "path"
-            ],
-            "additionalProperties": false
-          },
-          "description": "Container configurations"
-        },
         "external": {
           "type": "object",
           "additionalProperties": {
@@ -69,8 +52,7 @@
       },
       "required": [
         "name",
-        "systems",
-        "containers"
+        "systems"
       ],
       "additionalProperties": false,
       "description": "Workspace configuration from c4workspace.json"

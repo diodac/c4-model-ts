@@ -50,6 +50,16 @@ program
         } catch (error: unknown) {
             if (error instanceof Error) {
                 console.error('Error:', error.message);
+                // Add detailed error information for WorkspaceConfigError
+                if ('errors' in error && Array.isArray((error as any).errors)) {
+                    console.error('\nValidation errors:');
+                    (error as any).errors.forEach((err: string, index: number) => {
+                        console.error(`  ${index + 1}. ${err}`);
+                    });
+                }
+                if ('configPath' in error) {
+                    console.error(`\nConfig file: ${(error as any).configPath}`);
+                }
             } else {
                 console.error('Unknown error occurred');
             }
